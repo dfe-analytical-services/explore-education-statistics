@@ -1,9 +1,9 @@
 #nullable enable
-using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -19,13 +19,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cac
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Profiling.Internal;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
-public partial class ReleaseService(
+public class ReleaseService(
     ContentDbContext context,
     IUserService userService,
     IReleaseVersionService releaseVersionService,
@@ -73,35 +73,17 @@ public partial class ReleaseService(
             .OnSuccess(async publicationAndPublishingOrganisations =>
             {
                 var (publication, publishingOrganisations) = publicationAndPublishingOrganisations;
-                var release = new Release
-                {
-                    PublicationId = request.PublicationId,
-                    Year = request.Year,
-                    TimePeriodCoverage = request.TimePeriodCoverage,
-                    Slug = request.Slug,
-                    Label = FormatReleaseLabel(request.Label),
-                };
 
-                var newReleaseVersion = new ReleaseVersion
-                {
-                    Id = guidGenerator.NewGuid(),
-                    Release = release,
-                    Type = request.Type!.Value,
-                    ApprovalStatus = ReleaseApprovalStatus.Draft,
-                    PublicationId = release.PublicationId,
-                    PublishingOrganisations = [.. publishingOrganisations],
-                    CreatedById = userService.GetUserId(),
-                };
+                var newReleaseVersion = ReleaseCreationUtils.BuildReleaseVersion(
+                    context: context,
+                    guidGenerator: guidGenerator,
+                    userService: userService,
+                    publication: publication,
+                    releaseCreateRequest: request,
+                    publishingOrganisations: publishingOrganisations
+                );
 
                 await InitialiseContentSections(newReleaseVersion, request.TemplateReleaseId);
-
-                context.ReleaseVersions.Add(newReleaseVersion);
-
-                publication.ReleaseSeries.Insert(
-                    0,
-                    new ReleaseSeriesItem { Id = Guid.NewGuid(), ReleaseId = release.Id }
-                );
-                context.Publications.Update(publication);
 
                 await context.SaveChangesAsync();
                 return await releaseVersionService.GetRelease(newReleaseVersion.Id);
@@ -185,14 +167,8 @@ public partial class ReleaseService(
             );
         }
 
-        releaseVersion.HeadlinesSection = CreateContentSection(ContentSectionType.Headlines);
-        releaseVersion.KeyStatisticsSecondarySection = CreateContentSection(ContentSectionType.KeyStatisticsSecondary);
-        releaseVersion.RelatedDashboardsSection = CreateContentSection(ContentSectionType.RelatedDashboards);
-        releaseVersion.SummarySection = CreateContentSection(ContentSectionType.ReleaseSummary);
-        releaseVersion.WarningSection = CreateContentSection(ContentSectionType.Warning);
+        ContentSectionUtils.InitialiseBaseContentSections(releaseVersion);
     }
-
-    private static ContentSection CreateContentSection(ContentSectionType type) => new() { Type = type };
 
     private async Task<List<ContentSection>> CreateGenericContentFromTemplate(
         Guid templateReleaseVersionId,
@@ -296,13 +272,6 @@ public partial class ReleaseService(
         return Unit.Instance;
     }
 
-    private static string? FormatReleaseLabel(string? releaseLabel)
-    {
-        var trimmedNewLabel = string.IsNullOrWhiteSpace(releaseLabel) ? null : releaseLabel.Trim();
-
-        return trimmedNewLabel.HasValue() ? MatchWhitespaceRegex().Replace(trimmedNewLabel, " ") : null;
-    }
-
     private async Task<ReleaseVersion?> GetLatestPublishedReleaseVersion(
         Guid publicationId,
         string releaseSlug,
@@ -371,7 +340,4 @@ public partial class ReleaseService(
             Title = release.Title,
         };
     }
-
-    [GeneratedRegex(@"\s+", RegexOptions.Compiled, matchTimeoutMilliseconds: 200)]
-    private static partial Regex MatchWhitespaceRegex();
 }

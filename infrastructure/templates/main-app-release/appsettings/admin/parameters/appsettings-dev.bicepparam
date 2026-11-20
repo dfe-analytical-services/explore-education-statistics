@@ -15,6 +15,6 @@ param tableBuilderMaxTableCellsAllowed = 25000
 param preReleaseMinutesBeforeStart = 1440
 param enableThemeDeletion = true
 param enableEinPublishedPageDeletion = true
-param enableReleaseRollover = true
+param enableReleaseRollover = false
 
 param publicApiUrl = 'pp-api.education.gov.uk/statistics-dev'

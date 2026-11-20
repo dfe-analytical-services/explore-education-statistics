@@ -15,6 +15,21 @@ export interface CreateReleaseRequest {
   publishingOrganisations: string[];
 }
 
+export type RolloverMode = 'WithData' | 'StructureOnly';
+
+export interface CreateReleaseRolloverRequest {
+  publicationId: string;
+  rolloverSourceReleaseId: string;
+  mode: RolloverMode;
+  year: number;
+  timePeriodCoverage: {
+    value: string;
+  };
+  type: ReleaseType;
+  label?: string;
+  publishingOrganisations: string[];
+}
+
 export interface UpdateReleaseRequest {
   label?: string;
 }
@@ -36,6 +51,12 @@ const releaseService = {
 
   createRelease(createRequest: CreateReleaseRequest): Promise<ReleaseVersion> {
     return client.post(`/releases`, createRequest);
+  },
+
+  createReleaseRollover(
+    createRequest: CreateReleaseRolloverRequest,
+  ): Promise<ReleaseVersion> {
+    return client.post(`/releases/rollover`, createRequest);
   },
 
   updateRelease(

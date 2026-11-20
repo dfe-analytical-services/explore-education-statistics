@@ -5,7 +5,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clie
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 using Microsoft.Extensions.Configuration;
@@ -67,6 +69,8 @@ public static class HostBuilderExtension
                     // Services
                     .AddTransient<IReleaseDocumentCreator, ReleaseDocumentCreator>()
                     .AddTransient<IReleaseDocumentRemover, ReleaseDocumentRemover>()
+                    .AddTransient<IDataSetDocumentCreator, DataSetDocumentCreator>()
+                    .AddTransient<IDataSetDocumentRemover, DataSetDocumentRemover>()
                     .AddTransient<IFullReleaseDocumentResetter, FullReleaseDocumentResetter>()
                     .AddDocumentCheckers()
                     // Functions

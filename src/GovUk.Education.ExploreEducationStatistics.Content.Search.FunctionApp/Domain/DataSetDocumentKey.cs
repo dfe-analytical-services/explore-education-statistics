@@ -1,7 +1,8 @@
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 
 /// <summary>
-/// Identifies a data set document. There is one per data file in the latest published version of each release.
+/// Identifies a data set document.
+/// There is one data set document per data file in the latest published version of each release.
 /// </summary>
 public record DataSetDocumentKey
 {
@@ -13,5 +14,12 @@ public record DataSetDocumentKey
     /// The name of the blob holding the data set document. The publication and release prefixes allow all the
     /// documents of a publication or release to be listed or removed by prefix.
     /// </summary>
-    public string BlobName => $"{PublicationId}/{ReleaseId}/{FileId}.json";
+    public string BlobName => $"{BlobNamePrefix(PublicationId, ReleaseId)}{FileId}.json";
+
+    /// <summary>
+    /// The prefix shared by the names of the blobs holding the data set documents of a publication, or of one of its
+    /// releases if a release id is specified.
+    /// </summary>
+    public static string BlobNamePrefix(Guid publicationId, Guid? releaseId = null) =>
+        releaseId is null ? $"{publicationId}/" : $"{publicationId}/{releaseId}/";
 }

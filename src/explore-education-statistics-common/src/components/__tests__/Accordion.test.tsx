@@ -5,6 +5,73 @@ import Accordion from '../Accordion';
 import AccordionSection from '../AccordionSection';
 
 describe('Accordion', () => {
+  test('controlled expansion follows props and reports individual and bulk changes', async () => {
+    const onChange = jest.fn();
+    const onToggleAll = jest.fn();
+    const renderAccordion = (openSectionIds: string[]) => (
+      <Accordion
+        id="controlled"
+        openAll
+        openSectionIds={openSectionIds}
+        onOpenSectionIdsChange={onChange}
+        onToggleAll={onToggleAll}
+      >
+        <AccordionSection id="first" heading="First" open>
+          First content
+        </AccordionSection>
+        <AccordionSection id="second" heading="Second">
+          Second content
+        </AccordionSection>
+      </Accordion>
+    );
+    const { user, rerender } = render(renderAccordion([]));
+
+    const first = screen.getByRole('button', { name: /First,/ });
+    expect(first).toHaveAttribute('aria-expanded', 'false');
+    await user.click(first);
+    expect(onChange).toHaveBeenLastCalledWith(['first']);
+    expect(first).toHaveAttribute('aria-expanded', 'false');
+
+    rerender(renderAccordion(['first']));
+    expect(first).toHaveAttribute('aria-expanded', 'true');
+    await user.click(screen.getByRole('button', { name: 'Show all sections' }));
+    expect(onChange).toHaveBeenLastCalledWith(['first', 'second']);
+    expect(onToggleAll).toHaveBeenLastCalledWith(true);
+
+    rerender(renderAccordion(['first', 'second']));
+    await user.click(screen.getByRole('button', { name: 'Hide all sections' }));
+    expect(onChange).toHaveBeenLastCalledWith([]);
+    expect(onToggleAll).toHaveBeenLastCalledWith(false);
+    rerender(renderAccordion([]));
+    expect(first).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('hash navigation reports expansion using the latest controlled state', async () => {
+    const onChange = jest.fn();
+    const renderAccordion = (ids: string[]) => (
+      <Accordion
+        id="controlled"
+        openSectionIds={ids}
+        onOpenSectionIdsChange={onChange}
+      >
+        <AccordionSection id="first" heading="First">
+          First content
+        </AccordionSection>
+        <AccordionSection id="second" heading="Second">
+          Second content
+        </AccordionSection>
+      </Accordion>
+    );
+    const { rerender } = render(renderAccordion([]));
+    rerender(renderAccordion(['second']));
+    window.location.hash = '#first-content';
+
+    await waitFor(() =>
+      expect(onChange).toHaveBeenCalledWith(['first', 'second']),
+    );
+    window.location.hash = '';
+  });
+
   test('renders with section content corresponding to heading button', () => {
     render(
       <Accordion id="test-sections">

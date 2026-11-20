@@ -2,9 +2,13 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.ContentApi;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit.Abstractions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Clients.ContentApi;
@@ -13,13 +17,14 @@ public class ContentApiClientTests(ITestOutputHelper output)
 {
     private IContentApiClient GetSut(
         HttpMessageHandler? httpMessageHandler = null,
-        Action<HttpClient>? modifyHttpClient = null
+        Action<HttpClient>? modifyHttpClient = null,
+        ILogger<ContentApiClient>? logger = null
     )
     {
         var httpClient = httpMessageHandler is null ? new HttpClient() : new HttpClient(httpMessageHandler);
         httpClient.Timeout = TimeSpan.FromSeconds(10);
         modifyHttpClient?.Invoke(httpClient);
-        return new ContentApiClient(httpClient);
+        return new ContentApiClient(httpClient, logger ?? new NullLogger<ContentApiClient>());
     }
 
     protected void Print(string s) => output.WriteLine(s);
@@ -171,14 +176,14 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 """
                 [
                   {
-                    "publicationId": "11111111-1111-1111-1111-111111111111",
-                    "releaseId": "22222222-2222-2222-2222-222222222222",
-                    "fileId": "33333333-3333-3333-3333-333333333333"
+                    "publicationId": "e20a2dd9-98d3-47bc-af5e-4818f3e0e692",
+                    "releaseId": "0ad33459-9eab-447d-a43e-23ffb680e9e5",
+                    "fileId": "be210a75-81fc-4be5-bfd7-dfeb73ef7297"
                   },
                   {
-                    "publicationId": "44444444-4444-4444-4444-444444444444",
-                    "releaseId": "55555555-5555-5555-5555-555555555555",
-                    "fileId": "66666666-6666-6666-6666-666666666666"
+                    "publicationId": "ab545ac3-bccd-4318-a5bf-0b91df9ffba0",
+                    "releaseId": "3fba773a-2947-46e0-a508-ad82150e4628",
+                    "fileId": "879f551e-3fa3-4d0c-a14c-b11c04300254"
                   }
                 ]
                 """,
@@ -192,15 +197,15 @@ public class ContentApiClientTests(ITestOutputHelper output)
                 [
                     new DataSetDocumentKey
                     {
-                        PublicationId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
-                        ReleaseId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
-                        FileId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+                        PublicationId = Guid.Parse("e20a2dd9-98d3-47bc-af5e-4818f3e0e692"),
+                        ReleaseId = Guid.Parse("0ad33459-9eab-447d-a43e-23ffb680e9e5"),
+                        FileId = Guid.Parse("be210a75-81fc-4be5-bfd7-dfeb73ef7297"),
                     },
                     new DataSetDocumentKey
                     {
-                        PublicationId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
-                        ReleaseId = Guid.Parse("55555555-5555-5555-5555-555555555555"),
-                        FileId = Guid.Parse("66666666-6666-6666-6666-666666666666"),
+                        PublicationId = Guid.Parse("ab545ac3-bccd-4318-a5bf-0b91df9ffba0"),
+                        ReleaseId = Guid.Parse("3fba773a-2947-46e0-a508-ad82150e4628"),
+                        FileId = Guid.Parse("879f551e-3fa3-4d0c-a14c-b11c04300254"),
                     },
                 ],
                 result
@@ -225,6 +230,230 @@ public class ContentApiClientTests(ITestOutputHelper output)
             await Assert.ThrowsAsync<UnableToGetDataSetDocumentKeysException>(() =>
                 sut.GetDataSetDocumentKeys(CancellationToken.None)
             );
+        }
+    }
+
+    public class DataSetDocumentsTests(ITestOutputHelper output) : ContentApiClientTests(output)
+    {
+        private const string DataSetDocumentsJson = """
+            [
+              {
+                "fileId": "3d6cf2b9-6b0a-4b0e-9d6f-0f5b7c1f6a01",
+                "dataSetFileId": "5f1f4d0e-2c57-4a4e-8a52-7f0d5b9f3c02",
+                "subjectId": "9a7b2c1d-4e3f-4a5b-8c6d-1e2f3a4b5c03",
+                "filename": "data-file.csv",
+                "fileExtension": "csv",
+                "fileSize": "10 Kb",
+                "title": "Data Set Title",
+                "content": "This is a data set summary.",
+                "themeId": "498e449b-d093-43dc-959c-bc3a2c23fdfb",
+                "themeTitle": "Theme Title",
+                "publicationId": "8db69a42-ef47-441b-bed5-5e91d012194f",
+                "publicationTitle": "Publication Title",
+                "publicationSlug": "publication-slug",
+                "releaseId": "08228000-71de-4a1a-9adf-35f3d2bd061a",
+                "releaseVersionId": "a20f1068-4298-495d-8d80-c662ca72731d",
+                "releaseTitle": "Academic year 2024/25",
+                "releaseSlug": "2024-25",
+                "releaseType": "OfficialStatistics",
+                "latestData": true,
+                "isSuperseded": false,
+                "published": "2025-02-21T09:30:00+00:00",
+                "lastUpdated": "2025-03-14T10:15:00+00:00",
+                "api": { "id": "0d1e2f3a-4b5c-4d6e-8f70-8192a3b4c504", "version": "1.2" },
+                "numDataFileRows": 1234,
+                "geographicLevels": [
+                  { "code": "LA", "label": "Local authority", "csvOnly": false },
+                  { "code": "NAT", "label": "National", "csvOnly": true }
+                ],
+                "timePeriodRange": { "from": "2020/21", "to": "2024/25" },
+                "filters": ["Filter 1", "Filter 2"],
+                "indicators": ["Indicator 1", "Indicator 2"],
+                "publishingOrganisations": [
+                  { "id": "7cbcfe03-9f7e-478a-8512-a1a5e0ca793b", "title": "Department for Education" },
+                  { "id": "7c3252c6-6e94-4a34-8762-ff52aae5c0c0", "title": "Ofsted" }
+                ]
+              }
+            ]
+            """;
+
+        private static readonly DataSetDocument ExpectedDataSetDocument = new DataSetDocumentBuilder()
+            .WithApi(new DataSetDocumentApi { Id = new Guid("0d1e2f3a-4b5c-4d6e-8f70-8192a3b4c504"), Version = "1.2" })
+            .Build();
+
+        private IContentApiClient GetSut(
+            HttpStatusCode statusCode,
+            string json,
+            Action<HttpRequestMessage>? onRequest = null,
+            ILogger<ContentApiClient>? logger = null
+        ) =>
+            GetSut(
+                httpMessageHandler: new StubHttpMessageHandler(
+                    (request, _) =>
+                    {
+                        onRequest?.Invoke(request);
+                        return Task.FromResult(
+                            new HttpResponseMessage(statusCode)
+                            {
+                                Content = new StringContent(json, Encoding.UTF8, "application/json"),
+                            }
+                        );
+                    }
+                ),
+                modifyHttpClient: httpClient => httpClient.BaseAddress = new Uri("http://localhost:5010"),
+                logger: logger
+            );
+
+        public class GetReleaseDataSetDocumentsTests(ITestOutputHelper output) : DataSetDocumentsTests(output)
+        {
+            [Fact]
+            public async Task ValidJsonResponse_ReturnsDataSetDocuments()
+            {
+                string? requestedPath = null;
+                var sut = GetSut(
+                    HttpStatusCode.OK,
+                    DataSetDocumentsJson,
+                    onRequest: request => requestedPath = request.RequestUri?.AbsolutePath
+                );
+
+                var result = await sut.GetReleaseDataSetDocuments("publication-slug", "2024-25");
+
+                Assert.Equal("/api/publications/publication-slug/releases/2024-25/data-sets/searchable", requestedPath);
+                Assert.Equal([ExpectedDataSetDocument], result);
+            }
+
+            [Fact]
+            public async Task DataSetWithoutApi_ReturnsDataSetDocumentWithoutApi()
+            {
+                var json = JsonNode.Parse(DataSetDocumentsJson)!;
+                // Remove the api property rather than setting it to null with `json[0]!["api"] = null`
+                // Responding with "api": null wouldn't reflect the real response,
+                // as the Content API omits null properties, and would hide a failure to deserialise a missing property.
+                json[0]!.AsObject().Remove("api");
+
+                var sut = GetSut(HttpStatusCode.OK, json.ToJsonString());
+
+                var result = await sut.GetReleaseDataSetDocuments("publication-slug", "2024-25");
+
+                Assert.Equal([new DataSetDocumentBuilder().Build()], result);
+            }
+
+            [Fact]
+            public async Task EmptyResponse_ReturnsNoDataSetDocuments()
+            {
+                var sut = GetSut(HttpStatusCode.OK, "[]");
+
+                var result = await sut.GetReleaseDataSetDocuments("publication-slug", "2024-25");
+
+                Assert.Empty(result);
+            }
+
+            [Fact]
+            public async Task NotFoundResponse_ThrowsExceptionAndLogsWarning()
+            {
+                var loggerMockBuilder = new LoggerMockBuilder<ContentApiClient>();
+                var sut = GetSut(HttpStatusCode.NotFound, "", logger: loggerMockBuilder.Build());
+
+                await Assert.ThrowsAsync<UnableToGetReleaseDataSetDocumentsException>(() =>
+                    sut.GetReleaseDataSetDocuments("publication-slug", "2024-25")
+                );
+
+                loggerMockBuilder.Assert.LoggedWarningContains(
+                    """Release "2024-25" of publication "publication-slug" was not found by the Content API"""
+                );
+            }
+
+            [Fact]
+            public async Task UnsuccessfulResponse_ThrowsException()
+            {
+                var sut = GetSut(HttpStatusCode.InternalServerError, "");
+
+                await Assert.ThrowsAsync<UnableToGetReleaseDataSetDocumentsException>(() =>
+                    sut.GetReleaseDataSetDocuments("publication-slug", "2024-25")
+                );
+            }
+
+            [Fact]
+            public async Task ResponseMissingField_ThrowsException()
+            {
+                var json = JsonNode.Parse(DataSetDocumentsJson)!;
+                json[0]!.AsObject().Remove("fileId");
+                var sut = GetSut(HttpStatusCode.OK, json.ToJsonString());
+
+                await Assert.ThrowsAsync<UnableToGetReleaseDataSetDocumentsException>(() =>
+                    sut.GetReleaseDataSetDocuments("publication-slug", "2024-25")
+                );
+            }
+        }
+
+        public class GetPublicationDataSetDocumentsTests(ITestOutputHelper output) : DataSetDocumentsTests(output)
+        {
+            [Fact]
+            public async Task ValidJsonResponse_ReturnsDataSetDocuments()
+            {
+                string? requestedPath = null;
+                var sut = GetSut(
+                    HttpStatusCode.OK,
+                    DataSetDocumentsJson,
+                    onRequest: request => requestedPath = request.RequestUri?.AbsolutePath
+                );
+
+                var result = await sut.GetPublicationDataSetDocuments("publication-slug");
+
+                Assert.Equal("/api/publications/publication-slug/data-sets/searchable", requestedPath);
+                Assert.Equal([ExpectedDataSetDocument], result);
+            }
+
+            [Fact]
+            public async Task DataSetWithoutApi_ReturnsDataSetDocumentWithoutApi()
+            {
+                var json = JsonNode.Parse(DataSetDocumentsJson)!;
+                // Remove the api property rather than setting it to null with `json[0]!["api"] = null`
+                // Responding with "api": null wouldn't reflect the real response,
+                // as the Content API omits null properties, and would hide a failure to deserialise a missing property.
+                json[0]!.AsObject().Remove("api");
+
+                var sut = GetSut(HttpStatusCode.OK, json.ToJsonString());
+
+                var result = await sut.GetPublicationDataSetDocuments("publication-slug");
+
+                Assert.Equal([new DataSetDocumentBuilder().Build()], result);
+            }
+
+            [Fact]
+            public async Task EmptyResponse_ReturnsNoDataSetDocuments()
+            {
+                var sut = GetSut(HttpStatusCode.OK, "[]");
+
+                var result = await sut.GetPublicationDataSetDocuments("publication-slug");
+
+                Assert.Empty(result);
+            }
+
+            [Fact]
+            public async Task NotFoundResponse_ThrowsExceptionAndLogsWarning()
+            {
+                var loggerMockBuilder = new LoggerMockBuilder<ContentApiClient>();
+                var sut = GetSut(HttpStatusCode.NotFound, "", logger: loggerMockBuilder.Build());
+
+                await Assert.ThrowsAsync<UnableToGetPublicationDataSetDocumentsException>(() =>
+                    sut.GetPublicationDataSetDocuments("publication-slug")
+                );
+
+                loggerMockBuilder.Assert.LoggedWarningContains(
+                    """Publication "publication-slug" was not found by the Content API"""
+                );
+            }
+
+            [Fact]
+            public async Task UnsuccessfulResponse_ThrowsException()
+            {
+                var sut = GetSut(HttpStatusCode.InternalServerError, "");
+
+                await Assert.ThrowsAsync<UnableToGetPublicationDataSetDocumentsException>(() =>
+                    sut.GetPublicationDataSetDocuments("publication-slug")
+                );
+            }
         }
     }
 
