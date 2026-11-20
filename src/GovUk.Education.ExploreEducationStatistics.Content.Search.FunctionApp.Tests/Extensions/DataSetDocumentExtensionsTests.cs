@@ -78,4 +78,21 @@ public class DataSetDocumentExtensionsTests
             Assert.Null(jsonObject["api"]);
         }
     }
+
+    public class BuildMetadataTests
+    {
+        [Fact]
+        public void MetadataHasFileIdMatchingTheJson()
+        {
+            var dataSetDocument = new DataSetDocumentBuilder().Build();
+
+            var metadata = dataSetDocument.BuildMetadata();
+
+            var jsonFileId = JsonNode.Parse(dataSetDocument.ToJson())!["fileId"]!.GetValue<string>();
+            Assert.Equal(
+                new Dictionary<string, string> { { DataSetDocumentAzureBlobMetadataKeys.FileId, jsonFileId } },
+                metadata
+            );
+        }
+    }
 }

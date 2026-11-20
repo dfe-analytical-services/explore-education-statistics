@@ -100,7 +100,7 @@ internal class DataSetDocumentCreator(
                 azureBlobStorageClient.UploadBlob(
                     containerName: appOptions.Value.DataSetDocumentsContainerName,
                     blobName: dataSetDocument.GetKey().BlobName,
-                    blob: new Blob(dataSetDocument.ToJson()),
+                    blob: new Blob(dataSetDocument.ToJson(), dataSetDocument.BuildMetadata()),
                     contentType: MediaTypeNames.Application.Json,
                     cancellationToken: cancellationToken
                 )
