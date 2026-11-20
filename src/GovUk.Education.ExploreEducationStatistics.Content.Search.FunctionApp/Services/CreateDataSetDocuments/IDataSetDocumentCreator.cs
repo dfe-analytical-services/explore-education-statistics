@@ -3,19 +3,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 public interface IDataSetDocumentCreator
 {
     /// <summary>
-    /// Create or update the data set documents of a release, and remove any that it should no longer have.
+    /// Create or update the data set documents of a release.
     /// </summary>
-    Task<RefreshDataSetDocumentsResponse> RefreshReleaseDataSetDocuments(
-        RefreshReleaseDataSetDocumentsRequest request,
+    Task<CreateDataSetDocumentsResponse> CreateReleaseDataSetDocuments(
+        CreateReleaseDataSetDocumentsRequest request,
         CancellationToken cancellationToken = default
     );
 
     /// <summary>
-    /// Create or update the data set documents of every release of a publication, and remove any that it should no
-    /// longer have.
+    /// Create or update the data set documents of every release of a publication.
     /// </summary>
-    Task<RefreshDataSetDocumentsResponse> RefreshPublicationDataSetDocuments(
-        RefreshPublicationDataSetDocumentsRequest request,
+    Task<CreateDataSetDocumentsResponse> CreatePublicationDataSetDocuments(
+        CreatePublicationDataSetDocumentsRequest request,
         CancellationToken cancellationToken = default
     );
 }
