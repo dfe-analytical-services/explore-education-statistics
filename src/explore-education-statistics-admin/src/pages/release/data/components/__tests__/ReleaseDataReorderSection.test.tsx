@@ -108,7 +108,7 @@ describe('ReleaseDataReorderSection', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
-  test('managing indicators shows a read-only view, and back returns to the data sets', async () => {
+  test('managing indicators shows a read-only view, and back returns to the data files', async () => {
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     adminTableBuilderService.getPairedIndicators.mockResolvedValue({
@@ -150,7 +150,7 @@ describe('ReleaseDataReorderSection', () => {
     ).not.toBeInTheDocument();
 
     await user.click(
-      screen.getByRole('button', { name: 'Back to data files' }),
+      screen.getAllByRole('button', { name: 'Back to data files' })[0],
     );
 
     expect(
@@ -206,7 +206,7 @@ describe('ReleaseDataReorderSection', () => {
     );
 
     await user.click(
-      await screen.findByRole('button', { name: 'Back to data files' }),
+      (await screen.findAllByRole('button', { name: 'Back to data files' }))[0],
     );
 
     expect(
