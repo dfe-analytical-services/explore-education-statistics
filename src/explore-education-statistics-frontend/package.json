@@ -76,8 +76,7 @@
     "stylelint": "^17.14.1",
     "stylelint-webpack-plugin": "^5.1.0",
     "typescript": "^6.0.3",
-    "urlpattern-polyfill": "^10.1.0",
-    "webpack-dev-server": "^4.15.1"
+    "urlpattern-polyfill": "^10.1.0"
   },
   "scripts": {
     "start": "cross-env NODE_ENV=production NEXT_CONFIG_MODE=server node server.js",
