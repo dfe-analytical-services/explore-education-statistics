@@ -10,8 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
@@ -23,6 +21,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -162,7 +161,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -175,7 +173,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -291,7 +293,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -313,7 +314,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = indicators.Select(i => i.Id),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -405,7 +410,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -417,7 +421,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = indicators[1..2].Concat(indicators[4..6]).Select(i => i.Id),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -487,7 +495,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -499,7 +506,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = ListOf(Guid.NewGuid(), Guid.NewGuid()),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -577,7 +588,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -589,7 +599,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = indicators.Select(i => i.Id),
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -653,14 +667,17 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync("csv_header".ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
             var query = new FullTableQuery { SubjectId = releaseSubject.SubjectId };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -769,7 +786,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync(csv.ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -781,7 +797,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -948,7 +968,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync(csv.ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -960,7 +979,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1073,7 +1096,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync(csv.ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -1085,7 +1107,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = [.. ListOf(indicators[1].Id, indicators[3].Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1186,7 +1212,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync(csv.ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -1199,7 +1224,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = [.. ListOf(Guid.NewGuid(), Guid.NewGuid())],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1300,7 +1329,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync(csv.ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -1312,7 +1340,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1449,7 +1481,6 @@ public class SubjectCsvMetaServiceTests
                 .ReturnsAsync(csv.ToStream());
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -1461,7 +1492,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1542,7 +1577,7 @@ public class SubjectCsvMetaServiceTests
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
         {
-            var service = BuildService(statisticsDbContext: statisticsDbContext, contentDbContext: contentDbContext);
+            var service = BuildService(contentDbContext: contentDbContext);
 
             var query = new FullTableQuery
             {
@@ -1552,7 +1587,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             var viewModel = result.AssertRight();
 
@@ -1657,7 +1696,6 @@ public class SubjectCsvMetaServiceTests
                 .ThrowsAsync(new FileNotFoundException("File not found"));
 
             var service = BuildService(
-                statisticsDbContext: statisticsDbContext,
                 contentDbContext: contentDbContext,
                 releaseFileBlobService: releaseFileBlobService.Object
             );
@@ -1670,7 +1708,11 @@ public class SubjectCsvMetaServiceTests
                 Indicators = [.. indicators.Select(i => i.Id)],
             };
 
-            var result = await service.GetSubjectCsvMeta(releaseSubject, query);
+            var result = await service.GetSubjectCsvMeta(
+                releaseSubject,
+                BuildStatisticsDbDataSetFactory(statisticsDbContext).Create(releaseSubject.SubjectId),
+                query
+            );
 
             VerifyAllMocks(releaseFileBlobService);
 
@@ -1724,23 +1766,14 @@ public class SubjectCsvMetaServiceTests
     }
 
     private static SubjectCsvMetaService BuildService(
-        StatisticsDbContext statisticsDbContext,
         ContentDbContext contentDbContext,
         IReleaseFileBlobService? releaseFileBlobService = null
     )
     {
         return new SubjectCsvMetaService(
             logger: Mock.Of<ILogger<SubjectCsvMetaService>>(),
-            statisticsDbContext: statisticsDbContext,
             contentDbContext: contentDbContext,
             userService: AlwaysTrueUserService().Object,
-            filterItemRepository: new FilterItemRepository(
-                statisticsDbContext,
-                Mock.Of<IAllObservationsMatchedFilterItemsStrategy>(),
-                Mock.Of<ISparseObservationsMatchedFilterItemsStrategy>(),
-                Mock.Of<IDenseObservationsMatchedFilterItemsStrategy>(),
-                Mock.Of<ILogger<FilterItemRepository>>()
-            ),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
     }

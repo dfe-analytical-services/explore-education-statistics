@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
@@ -36,6 +37,7 @@ public class DataSetMappingServiceTests
             Id = originalDataFileId,
             SubjectId = originalSubjectId,
             Type = FileType.Data,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -44,6 +46,7 @@ public class DataSetMappingServiceTests
             SubjectId = replacementSubjectId,
             Type = FileType.Data,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -279,6 +282,7 @@ public class DataSetMappingServiceTests
             Id = originalDataFileId,
             SubjectId = originalSubjectId,
             Type = FileType.Data,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -287,6 +291,7 @@ public class DataSetMappingServiceTests
             SubjectId = replacementSubjectId,
             Type = FileType.Data,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -749,6 +754,7 @@ public class DataSetMappingServiceTests
             Id = Guid.NewGuid(),
             Replacing = null, // a DataSetMapping is only created if a replacement is ongoing
             Type = FileType.Data,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -784,6 +790,7 @@ public class DataSetMappingServiceTests
             Id = Guid.NewGuid(),
             Type = FileType.Data,
             SubjectId = originalSubject.Id,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var replacementFile = new File
@@ -792,6 +799,7 @@ public class DataSetMappingServiceTests
             Type = FileType.Data,
             SubjectId = replacementSubject.Id,
             Replacing = originalFile,
+            DataStorageVersion = DataStorageVersion.StatsDB,
         };
 
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -842,12 +850,18 @@ public class DataSetMappingServiceTests
         string? statisticsDbContextId = null
     )
     {
-        var dbContextSupplier = new InMemoryDbContextSupplier(
-            contentDbContextId ?? Guid.NewGuid().ToString(),
-            statisticsDbContextId ?? Guid.NewGuid().ToString()
-        );
+        contentDbContextId ??= Guid.NewGuid().ToString();
+        statisticsDbContextId ??= Guid.NewGuid().ToString();
 
-        return new DataSetMappingService(dbContextSupplier);
+        var dbContextSupplier = new InMemoryDbContextSupplier(contentDbContextId, statisticsDbContextId);
+
+        return new DataSetMappingService(
+            dbContextSupplier,
+            BuildStorageDataSetResolver(
+                InMemoryContentDbContext(contentDbContextId),
+                InMemoryStatisticsDbContext(statisticsDbContextId)
+            )
+        );
     }
 
     private static FilterMapping CreateFilterMapping(
