@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -282,7 +283,15 @@ public class DataImportServiceTests
             ],
         };
 
-        await service.WriteDataSetFileMeta(import);
+        await service.WriteDataSetFileMeta(
+            import,
+            BuildStatisticsDbDataSetFactory(InMemoryStatisticsDbContext(statisticsDbContextId)).Create(subject.Id),
+            BuildStatisticsDbDataSetWriterFactory(
+                    InMemoryStatisticsDbContext(statisticsDbContextId),
+                    Mock.Of<IDatabaseHelper>(Strict)
+                )
+                .Create(subject.Id)
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -423,7 +432,15 @@ public class DataImportServiceTests
             GeographicLevels = [GeographicLevel.Country],
         };
 
-        await service.WriteDataSetFileMeta(import);
+        await service.WriteDataSetFileMeta(
+            import,
+            BuildStatisticsDbDataSetFactory(InMemoryStatisticsDbContext(statisticsDbContextId)).Create(subject.Id),
+            BuildStatisticsDbDataSetWriterFactory(
+                    InMemoryStatisticsDbContext(statisticsDbContextId),
+                    Mock.Of<IDatabaseHelper>(Strict)
+                )
+                .Create(subject.Id)
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -573,7 +590,13 @@ public class DataImportServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var results = await DataImportService.GenerateFilterHierarchies(statisticsDbContext, filters);
+            var dataSetWriter = BuildStatisticsDbDataSetWriterFactory(
+                    statisticsDbContext,
+                    Mock.Of<IDatabaseHelper>(Strict)
+                )
+                .Create(subject.Id);
+
+            var results = await DataImportService.GenerateFilterHierarchies(dataSetWriter, filters);
 
             var hierarchy = Assert.Single(results);
             Assert.Equal([filters[0].Id, filters[1].Id, filters[2].Id], hierarchy.FilterIds);
@@ -691,7 +714,13 @@ public class DataImportServiceTests
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
         {
-            var results = await DataImportService.GenerateFilterHierarchies(statisticsDbContext, filters);
+            var dataSetWriter = BuildStatisticsDbDataSetWriterFactory(
+                    statisticsDbContext,
+                    Mock.Of<IDatabaseHelper>(Strict)
+                )
+                .Create(subject.Id);
+
+            var results = await DataImportService.GenerateFilterHierarchies(dataSetWriter, filters);
 
             Assert.Equal(2, results.Count);
 
@@ -727,14 +756,8 @@ public class DataImportServiceTests
         contentDbContextId ??= Guid.NewGuid().ToString();
         statisticsDbContextId ??= Guid.NewGuid().ToString();
 
-        var dbContextSupplier = new InMemoryDbContextSupplier(contentDbContextId, statisticsDbContextId);
-
         return new DataImportService(
-            dbContextSupplier,
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(contentDbContextId),
-                InMemoryStatisticsDbContext(statisticsDbContextId)
-            ),
+            new InMemoryDbContextSupplier(contentDbContextId, statisticsDbContextId),
             Mock.Of<ILogger<DataImportService>>(Strict)
         );
     }

@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -14,11 +13,8 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
-public class DataImportService(
-    IDbContextSupplier dbContextSupplier,
-    IStorageDataSetResolver storageDataSetResolver,
-    ILogger<DataImportService> logger
-) : IDataImportService
+public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<DataImportService> logger)
+    : IDataImportService
 {
     public async Task FailImport(Guid id, List<DataImportError> errors)
     {
@@ -133,23 +129,19 @@ public class DataImportService(
         await context.SaveChangesAsync();
     }
 
-    public async Task WriteDataSetFileMeta(DataImport import)
+    public async Task WriteDataSetFileMeta(
+        DataImport import,
+        IStorageDataSet dataSet,
+        IStorageDataSetWriter dataSetWriter
+    )
     {
         var subjectId = import.SubjectId;
 
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
         var file = contentDbContext.Files.Single(f => f.Type == FileType.Data && f.SubjectId == subjectId);
-        var dataSet = storageDataSetResolver.Resolve(file);
 
-        await using var statisticsDbContext = dbContextSupplier.CreateDbContext<StatisticsDbContext>();
-
-        var importedGeographicLevels = await statisticsDbContext
-            .Observation.AsNoTracking()
-            .Where(o => o.SubjectId == subjectId)
-            .Select(o => o.Location.GeographicLevel)
-            .Distinct()
-            .ToListAsync();
+        var importedGeographicLevels = await dataSetWriter.ListGeographicLevels();
 
         var timePeriods = (await dataSet.ListTimePeriods())
             .Select(tp => new TimePeriodRangeBoundMeta
@@ -203,13 +195,13 @@ public class DataImportService(
             .ToList();
         contentDbContext.DataSetFileVersionGeographicLevels.AddRange(dataSetFileVersionGeographicLevels);
 
-        file.FilterHierarchies = await GenerateFilterHierarchies(statisticsDbContext, filters);
+        file.FilterHierarchies = await GenerateFilterHierarchies(dataSetWriter, filters);
 
         await contentDbContext.SaveChangesAsync();
     }
 
     public static async Task<List<DataSetFileFilterHierarchy>> GenerateFilterHierarchies(
-        StatisticsDbContext statisticsDbContext,
+        IStorageDataSetWriter dataSetWriter,
         List<Filter> filters
     )
     {
@@ -222,7 +214,7 @@ public class DataImportService(
 
         foreach (var rootFilter in rootFilters)
         {
-            var hierarchy = await GenerateFilterHierarchy(statisticsDbContext, rootFilter, filters);
+            var hierarchy = await GenerateFilterHierarchy(dataSetWriter, rootFilter, filters);
             hierarchies.Add(hierarchy);
         }
 
@@ -230,7 +222,7 @@ public class DataImportService(
     }
 
     private static async Task<DataSetFileFilterHierarchy> GenerateFilterHierarchy(
-        StatisticsDbContext statisticsDbContext,
+        IStorageDataSetWriter dataSetWriter,
         Filter rootFilter,
         List<Filter> filters
     )
@@ -252,33 +244,12 @@ public class DataImportService(
         // Loop over each parent/child or tier, starting with the root filter, until no child is found
         while (true)
         {
-            var currentParentFilterId = parentFilter.Id; // avoid closure madness
-            var currentChildFilterId = childFilter.Id;
+            filterIds.Add(childFilter.Id);
 
-            filterIds.Add(currentChildFilterId);
-
-            var filterItemRelationships = await statisticsDbContext
-                .FilterItem.AsNoTracking()
-                .Where(fi => fi.FilterGroup.FilterId == currentParentFilterId)
-                .SelectMany(parentFilterItem =>
-                    statisticsDbContext
-                        .ObservationFilterItem.AsNoTracking()
-                        .Where(childOfi =>
-                            childOfi.FilterId == currentChildFilterId
-                            && statisticsDbContext.ObservationFilterItem.Any(parentOfi =>
-                                childOfi.ObservationId == parentOfi.ObservationId
-                                && parentOfi.FilterItemId == parentFilterItem.Id
-                            )
-                        )
-                        .Select(childOfi => new
-                        {
-                            ParentFilterItemId = parentFilterItem.Id,
-                            ChildFilterItemId = childOfi.FilterItem.Id,
-                        })
-                        .ToList()
-                )
-                .Distinct()
-                .ToListAsync();
+            var filterItemRelationships = await dataSetWriter.ListFilterItemRelationships(
+                parentFilterId: parentFilter.Id,
+                childFilterId: childFilter.Id
+            );
 
             var tier = new Dictionary<Guid, List<Guid>>();
             foreach (var parentFilterItemId in parentFilterItemIds)
