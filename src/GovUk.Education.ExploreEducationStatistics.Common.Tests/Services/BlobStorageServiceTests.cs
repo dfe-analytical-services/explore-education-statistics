@@ -723,6 +723,26 @@ public class BlobStorageServiceTests
         Assert.False(result);
     }
 
+    [Theory]
+    // Connects with the app's managed identity, as there's no key.
+    [InlineData("AccountName=testaccount;")]
+    [InlineData(
+        "DefaultEndpointsProtocol=https;AccountName=testaccount;AccountKey=dGVzdGtleQ==;EndpointSuffix=core.windows.net"
+    )]
+    [InlineData("UseDevelopmentStorage=true")]
+    public void Constructor_AcceptsKeylessAndKeyedConnectionStrings(string connectionString)
+    {
+        var exception = Record.Exception(() =>
+            new PrivateBlobStorageService(
+                connectionString,
+                Mock.Of<ILogger<IBlobStorageService>>(),
+                Mock.Of<IBlobSasService>(Strict)
+            )
+        );
+
+        Assert.Null(exception);
+    }
+
     private static TestBlobStorageService SetupTestBlobStorageService(
         BlobServiceClient? blobServiceClient = null,
         IBlobSasService? blobSasService = null,

@@ -48,10 +48,9 @@ public class BlobSasService(
                     cancellationToken: cancellationToken
                 );
 
-                var uri = await CreateSasUrl(
+                var uri = await CreateBlobReadSasUri(
                     blobServiceClient: blobServiceClient,
-                    client: blobClient,
-                    containerName: containerName,
+                    blobClient: blobClient,
                     expiryDuration: expiryDuration,
                     cancellationToken: cancellationToken
                 );
@@ -86,20 +85,19 @@ public class BlobSasService(
             );
     }
 
-    private async Task<Uri> CreateSasUrl(
+    public async Task<Uri> CreateBlobReadSasUri(
         BlobServiceClient blobServiceClient,
-        BlobClient client,
-        string containerName,
+        BlobClient blobClient,
         TimeSpan expiryDuration,
-        CancellationToken cancellationToken
+        CancellationToken cancellationToken = default
     )
     {
         // Create a read-only SAS token for just this blob that's valid for a very short time. It's scoped to the blob,
         // not the container, so that the token can't be used to read any other blob in the container.
         var sasBuilder = new BlobSasBuilder
         {
-            BlobContainerName = containerName,
-            BlobName = client.Name,
+            BlobContainerName = blobClient.BlobContainerName,
+            BlobName = blobClient.Name,
             Resource = "b",
             ExpiresOn = dateTimeProvider.UtcNow.Add(expiryDuration),
         };
@@ -107,9 +105,9 @@ public class BlobSasService(
         sasBuilder.SetPermissions(BlobSasPermissions.Read);
 
         // A client authorised with the account key signs the SAS with that key.
-        if (client.CanGenerateSasUri)
+        if (blobClient.CanGenerateSasUri)
         {
-            return client.GenerateSasUri(sasBuilder);
+            return blobClient.GenerateSasUri(sasBuilder);
         }
 
         // A client authorised with a managed identity has no account key, so signs the SAS with a user delegation key
@@ -120,7 +118,7 @@ public class BlobSasService(
             cancellationToken: cancellationToken
         );
 
-        var uriBuilder = new BlobUriBuilder(client.Uri)
+        var uriBuilder = new BlobUriBuilder(blobClient.Uri)
         {
             Sas = sasBuilder.ToSasQueryParameters(userDelegationKey, blobServiceClient.AccountName),
         };
