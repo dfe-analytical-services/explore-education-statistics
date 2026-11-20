@@ -1,5 +1,6 @@
 #nullable enable
 using System.Runtime.CompilerServices;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -209,9 +210,12 @@ public class StatisticsDbDataSet(
         // These rely on the database's cascading deletes to remove each observation's ObservationFilterItems, each
         // filter's FilterGroups and FilterItems, and each indicator group's Indicators.
         // Observations go first as their ObservationFilterItems restrict the deletion of FilterItems and Filters.
-        await context.Observation.Where(o => o.SubjectId == SubjectId).ExecuteDeleteAsync(cancellationToken);
-        await context.Filter.Where(f => f.SubjectId == SubjectId).ExecuteDeleteAsync(cancellationToken);
-        await context.IndicatorGroup.Where(ig => ig.SubjectId == SubjectId).ExecuteDeleteAsync(cancellationToken);
+        await context.RequireTransaction(async () =>
+        {
+            await context.Observation.Where(o => o.SubjectId == SubjectId).ExecuteDeleteAsync(cancellationToken);
+            await context.Filter.Where(f => f.SubjectId == SubjectId).ExecuteDeleteAsync(cancellationToken);
+            await context.IndicatorGroup.Where(ig => ig.SubjectId == SubjectId).ExecuteDeleteAsync(cancellationToken);
+        });
     }
 
     /// <summary>
