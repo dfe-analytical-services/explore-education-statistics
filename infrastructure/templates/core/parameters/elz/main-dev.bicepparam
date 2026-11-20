@@ -12,5 +12,5 @@ param publicStorageAccountSku = 'Standard_ZRS'
 // Copy file share backups into the geo-redundant Recovery Services Vault.
 param vaultedFileShareBackups = true
 
-// The release pipeline grants the Publisher's user-assigned identity its roles instead.
-param deployPublisherRoleAssignments = false
+// The release pipeline grants Admin's and the Publisher's user-assigned identities their roles instead.
+param deploySystemAssignedIdentityRoleAssignments = false

@@ -3,6 +3,7 @@ import { ResourceNames } from '../common/resource-names.bicep'
 import { publicDataDbConnectionString } from '../common/functions.bicep'
 import { AppServicePlanSku } from '../common/components/app-service-plan/types.bicep'
 import { SignalRSku } from '../common/components/signalr/types.bicep'
+import { builtInRoleDefinitionIds } from '../common/builtInRoles.bicep'
 
 @description('Names of resources in this deploy.')
 param resourceNames ResourceNames
@@ -38,6 +39,9 @@ param autoscaleAppServices bool
 
 @description('Whether to spread the App Service plan\'s instances across availability zones.')
 param zoneRedundant bool
+
+@description('Whether the App Service and its deploy slot use their user-assigned managed identity rather than system-assigned ones.')
+param useUserAssignedIdentity bool = false
 
 @description('Whether or not to deploy Azure Metric alerts.')
 param deployAlerts bool
@@ -96,6 +100,11 @@ module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
 module appServiceModule '../common/components/app-service/app-service.bicep' = {
   name: 'adminAppServiceModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.admin.identity : ''
+    // TODO EES-7502 - stop keeping the system-assigned identities, and remove PsqlUseSystemAssignedIdentity below, once
+    // Admin logs in to PostgreSQL with its user-assigned identity. This needs a PostgreSQL role named after
+    // resourceNames.admin.identity, and the connection string's User Id changing to match.
+    keepSystemAssignedIdentity: true
     appServiceName: resourceNames.admin.appService
     kind: operatingSystem == 'Linux' ? 'app,linux' : 'app'
     operatingSystem: operatingSystem
@@ -141,12 +150,36 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     } : null
     // Application-specific appsettings are controlled in the application release pipeline
     // rather than in the infrastructure rollout so that we can support slot swapping.
-    applicationAppSettings: {}
+    // Log in to PostgreSQL with the system-assigned identity, whose PostgreSQL role is named after the App Service.
+    applicationAppSettings: useUserAssignedIdentity
+      ? {
+          PsqlUseSystemAssignedIdentity: 'true'
+        }
+      : {}
     existingProdAppSettings: existingProdAppSettings
     existingStagingSlotAppSettings: existingStagingSlotAppSettings
     tagValues: tagValues
   }
 }
+
+// When Admin uses its user-assigned identity, grant it here the role that the core pipeline grants its system-assigned
+// identity. The core pipeline can then deploy before Admin's identity exists.
+// TODO EES-7502 - make this grant unconditional once every environment has moved to the ELZ.
+resource adminIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.admin.identity
+}
+
+// Allow Admin to send events to the Event Grid topics.
+module eventGridTopicRoleAssignmentModule '../common/components/event-grid/eventGridTopicRoleAssignment.bicep' = [
+  for (topicName, index) in map(items(resourceNames.eventGrid.topics), item => item.value): if (useUserAssignedIdentity) {
+    name: 'adminTopicRoleAssignmentModuleDeploy-${index}'
+    params: {
+      principalId: adminIdentity!.properties.principalId
+      roleDefinitionId: builtInRoleDefinitionIds.EventGridDataSender
+      topicName: topicName
+    }
+  }
+]
 
 module adminSignalRService '../common/components/signalr/signalr.bicep' = {
   name: 'adminSignalRServiceDeploy'
