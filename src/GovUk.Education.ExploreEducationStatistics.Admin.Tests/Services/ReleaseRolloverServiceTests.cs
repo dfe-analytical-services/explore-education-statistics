@@ -872,6 +872,23 @@ public abstract class ReleaseRolloverServiceTests
                 .WithLatestDraftVersion(templateDataBlockVersion)
                 .Generate();
 
+            // A standard (non-Generic) section - in StructureOnly mode, unlike WithData, nothing has been saved
+            // yet when this section's own HtmlBlock is copied, so destinationSection.Id is still Guid.Empty at
+            // that point. This proves the new block's ContentSectionId still resolves correctly regardless,
+            // via EF's relationship fixup when it's added to destinationSection.Content.
+            HtmlBlock headlinesHtmlBlock = _dataFixture
+                .DefaultHtmlBlock()
+                .WithBody("Last year's headline")
+                .WithOrder(1)
+                .Generate();
+            headlinesHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            ContentSection headlinesSection = _dataFixture
+                .DefaultContentSection(ContentSectionType.Headlines)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithContentBlocks([headlinesHtmlBlock])
+                .Generate();
+
             HtmlBlock genericHtmlBlock = _dataFixture.DefaultHtmlBlock().WithBody("Some text").WithOrder(1).Generate();
             genericHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
 
@@ -898,7 +915,7 @@ public abstract class ReleaseRolloverServiceTests
                 context.Releases.Add(sourceRelease);
                 context.ReleaseVersions.Add(sourceReleaseVersion);
                 context.DataBlocks.Add(templateDataBlock);
-                context.ContentSections.Add(genericSection);
+                context.ContentSections.AddRange(headlinesSection, genericSection);
                 await context.SaveChangesAsync();
             }
 
@@ -936,6 +953,21 @@ public abstract class ReleaseRolloverServiceTests
                         dataBlockVersion.ReleaseVersionId == newReleaseVersionId
                     )
                 );
+
+                var newHeadlinesSection = await context
+                    .ContentSections.Include(section => section.Content)
+                    .SingleAsync(section =>
+                        section.ReleaseVersionId == newReleaseVersionId && section.Type == ContentSectionType.Headlines
+                    );
+
+                var newHeadlinesHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(newHeadlinesSection.Content));
+                Assert.Equal(string.Empty, newHeadlinesHtmlBlock.Body);
+                Assert.Equal(headlinesHtmlBlock.Order, newHeadlinesHtmlBlock.Order);
+
+                // Proves the ContentSectionId FK resolved correctly via EF's relationship fixup, even though
+                // destinationSection.Id was still Guid.Empty (nothing saved yet) at the point this was assigned.
+                Assert.Equal(newHeadlinesSection.Id, newHeadlinesHtmlBlock.ContentSectionId);
+                Assert.NotEqual(Guid.Empty, newHeadlinesHtmlBlock.ContentSectionId);
 
                 var newGenericSection = await context
                     .ContentSections.Include(section => section.Content)

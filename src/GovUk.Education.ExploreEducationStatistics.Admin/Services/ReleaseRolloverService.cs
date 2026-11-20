@@ -71,7 +71,10 @@ public class ReleaseRolloverService(
                         rolloverSourceReleaseId: sourceReleaseVersion.ReleaseId
                     );
 
-                    ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
+                    var (templateSections, destinationSectionsByTemplateSectionId) = await InitialiseContentSections(
+                        templateReleaseVersionId: sourceReleaseVersion.Id,
+                        newReleaseVersion: newReleaseVersion
+                    );
 
                     switch (request.Mode)
                     {
@@ -80,8 +83,9 @@ public class ReleaseRolloverService(
                                 templateReleaseVersionId: sourceReleaseVersion.Id,
                                 newReleaseVersionId: newReleaseVersion.Id
                             );
-                            await CopyContent(
-                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                            CopyContent(
+                                templateSections: templateSections,
+                                destinationSectionsByTemplateSectionId: destinationSectionsByTemplateSectionId,
                                 newReleaseVersion: newReleaseVersion,
                                 dataBlockVersionMap: dataBlockVersionsByTemplateId
                             );
@@ -89,8 +93,9 @@ public class ReleaseRolloverService(
                             // using dataBlockVersionsByTemplateId.
                             break;
                         case RolloverMode.StructureOnly:
-                            await CopyContent(
-                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                            CopyContent(
+                                templateSections: templateSections,
+                                destinationSectionsByTemplateSectionId: destinationSectionsByTemplateSectionId,
                                 newReleaseVersion: newReleaseVersion,
                                 dataBlockVersionMap: null
                             );
@@ -174,94 +179,138 @@ public class ReleaseRolloverService(
         return newDataBlockVersionsByTemplateId;
     }
 
-    private async Task CopyContent(
-        Guid templateReleaseVersionId,
-        ReleaseVersion newReleaseVersion,
-        Dictionary<Guid, DataBlockVersion>? dataBlockVersionMap
-    )
+    // Creates every ContentSection the new release needs - the 5 standard ones (always) plus one new row per
+    // Generic section in the template (if any) - all in one place, before any content gets copied in.
+    private async Task<(
+        List<ContentSection> TemplateSections,
+        Dictionary<Guid, ContentSection> DestinationSectionsByTemplateSectionId
+    )> InitialiseContentSections(Guid templateReleaseVersionId, ReleaseVersion newReleaseVersion)
     {
+        ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
+
         var templateSections = await context
             .ContentSections.Where(section => section.ReleaseVersionId == templateReleaseVersionId)
             .Include(section => section.Content)
             .ToListAsync();
 
+        var destinationSectionsByTemplateSectionId = new Dictionary<Guid, ContentSection>();
+
         foreach (var templateSection in templateSections)
         {
-            ContentSection destinationSection;
-
-            if (templateSection.Type == ContentSectionType.Generic)
+            destinationSectionsByTemplateSectionId[templateSection.Id] = templateSection.Type switch
             {
-                destinationSection = new ContentSection
-                {
-                    Id = guidGenerator.NewGuid(),
-                    ReleaseVersionId = newReleaseVersion.Id,
-                    Type = ContentSectionType.Generic,
-                    Heading = templateSection.Heading,
-                    Order = templateSection.Order,
-                };
+                ContentSectionType.Generic => CreateGenericDestinationSection(templateSection, newReleaseVersion),
+                ContentSectionType.Headlines
+                or ContentSectionType.KeyStatisticsSecondary
+                or ContentSectionType.RelatedDashboards
+                or ContentSectionType.ReleaseSummary
+                or ContentSectionType.Warning =>
+                // The 5 standard sections already exist, created empty by InitialiseBaseContentSections -
+                // copy content into them rather than creating new rows.
+                newReleaseVersion.Content.Single(section => section.Type == templateSection.Type),
+                _ => throw new ArgumentException(
+                    $"Unhandled {nameof(ContentSectionType)} value {templateSection.Type} when copying content for rollover."
+                ),
+            };
+        }
 
-                newReleaseVersion.Content.Add(destinationSection);
-                context.ContentSections.Add(destinationSection);
-            }
-            else
-            {
-                // The 5 standard sections already exist, created empty by InitialiseBaseContentSections - copy
-                // content into them rather than creating new rows.
-                destinationSection = newReleaseVersion.Content.Single(section => section.Type == templateSection.Type);
-            }
+        return (templateSections, destinationSectionsByTemplateSectionId);
+    }
+
+    // Purely copies blocks into already-resolved sections - every section it needs already exists by the time
+    // this runs, created by InitialiseContentSections.
+    private void CopyContent(
+        List<ContentSection> templateSections,
+        Dictionary<Guid, ContentSection> destinationSectionsByTemplateSectionId,
+        ReleaseVersion newReleaseVersion,
+        Dictionary<Guid, DataBlockVersion>? dataBlockVersionMap
+    )
+    {
+        foreach (var templateSection in templateSections)
+        {
+            var destinationSection = destinationSectionsByTemplateSectionId[templateSection.Id];
 
             foreach (var templateBlock in templateSection.Content)
             {
-                if (templateBlock is HtmlBlock templateHtmlBlock)
+                switch (templateBlock)
                 {
-                    var newHtmlBlock = new HtmlBlock
+                    case HtmlBlock templateHtmlBlock:
                     {
-                        Id = guidGenerator.NewGuid(),
-                        ReleaseVersionId = newReleaseVersion.Id,
-                        ContentSectionId = destinationSection.Id,
-                        Order = templateHtmlBlock.Order,
-                        Body = "",
-                    };
+                        var newHtmlBlock = new HtmlBlock
+                        {
+                            Id = guidGenerator.NewGuid(),
+                            ReleaseVersionId = newReleaseVersion.Id,
+                            Order = templateHtmlBlock.Order,
+                            Body = "",
+                        };
 
-                    destinationSection.Content.Add(newHtmlBlock);
-                    context.ContentBlocks.Add(newHtmlBlock);
-
-                    continue;
-                }
-
-                if (templateBlock is DataBlockVersionLink templateLink)
-                {
-                    if (dataBlockVersionMap is null)
-                    {
-                        // StructureOnly - no data blocks were copied, so there's nothing to link to.
-                        continue;
+                        // ContentSectionId isn't set explicitly - EF's relationship fixup sets it from
+                        // destinationSection's own Id (whatever that ends up being) once it's added below.
+                        destinationSection.Content.Add(newHtmlBlock);
+                        context.ContentBlocks.Add(newHtmlBlock);
+                        break;
                     }
 
-                    var newDataBlockVersion = dataBlockVersionMap[templateLink.DataBlockVersionId];
-
-                    var newDataBlockVersionLink = new DataBlockVersionLink
+                    case DataBlockVersionLink templateLink:
                     {
-                        // Shares its Id with the DataBlockVersion it points at. This isn't an EF-enforced shared
-                        // key - it's a convention: FeaturedTable/KeyStatisticDataBlock only store a
-                        // DataBlockVersionId, and use it to find the ContentBlock that displays that version by
-                        // looking up a DataBlockVersionLink with that same value as its own Id. A fresh, unrelated
-                        // Id here would break that lookup.
-                        Id = newDataBlockVersion.Id,
-                        DataBlockVersionId = newDataBlockVersion.Id,
-                        ReleaseVersionId = newReleaseVersion.Id,
-                        ContentSectionId = destinationSection.Id,
-                        Order = templateLink.Order,
-                        Created = DateTime.UtcNow,
-                    };
+                        if (dataBlockVersionMap is null)
+                        {
+                            // StructureOnly - no data blocks were copied, so there's nothing to link to.
+                            break;
+                        }
 
-                    destinationSection.Content.Add(newDataBlockVersionLink);
-                    context.ContentBlocks.Add(newDataBlockVersionLink);
+                        var newDataBlockVersion = dataBlockVersionMap[templateLink.DataBlockVersionId];
 
-                    continue;
+                        var newDataBlockVersionLink = new DataBlockVersionLink
+                        {
+                            // Shares its Id with the DataBlockVersion it points at. This isn't an EF-enforced
+                            // shared key - it's a convention: FeaturedTable/KeyStatisticDataBlock only store a
+                            // DataBlockVersionId, and use it to find the ContentBlock that displays that version
+                            // by looking up a DataBlockVersionLink with that same value as its own Id. A fresh,
+                            // unrelated Id here would break that lookup.
+                            Id = newDataBlockVersion.Id,
+                            DataBlockVersionId = newDataBlockVersion.Id,
+                            ReleaseVersionId = newReleaseVersion.Id,
+                            Order = templateLink.Order,
+                            Created = DateTime.UtcNow,
+                        };
+
+                        // ContentSectionId isn't set explicitly - see the HtmlBlock case above.
+                        destinationSection.Content.Add(newDataBlockVersionLink);
+                        context.ContentBlocks.Add(newDataBlockVersionLink);
+                        break;
+                    }
+
+                    case EmbedBlockLink:
+                        // Dropped: never carried over.
+                        break;
+
+                    default:
+                        throw new ArgumentException(
+                            $"Unhandled ContentBlock type {templateBlock.GetType()} when copying content for rollover."
+                        );
                 }
-
-                // Dropped: EmbedBlockLink (never carried over).
             }
         }
+    }
+
+    private ContentSection CreateGenericDestinationSection(
+        ContentSection templateSection,
+        ReleaseVersion newReleaseVersion
+    )
+    {
+        var destinationSection = new ContentSection
+        {
+            Id = guidGenerator.NewGuid(),
+            ReleaseVersionId = newReleaseVersion.Id,
+            Type = ContentSectionType.Generic,
+            Heading = templateSection.Heading,
+            Order = templateSection.Order,
+        };
+
+        newReleaseVersion.Content.Add(destinationSection);
+        context.ContentSections.Add(destinationSection);
+
+        return destinationSection;
     }
 }
