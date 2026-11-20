@@ -147,6 +147,64 @@ public class ReleaseRolloverService(
         return latestPublishedReleaseVersion;
     }
 
+    // Creates every ContentSection the new release needs - the 5 standard ones (always) plus one new row per
+    // Generic section in the template (if any) - all in one place, before any content gets copied in.
+    private async Task<(
+        List<ContentSection> TemplateSections,
+        Dictionary<Guid, ContentSection> DestinationSectionsByTemplateSectionId
+    )> InitialiseContentSections(Guid templateReleaseVersionId, ReleaseVersion newReleaseVersion)
+    {
+        ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
+
+        var templateSections = await context
+            .ContentSections.Where(section => section.ReleaseVersionId == templateReleaseVersionId)
+            .Include(section => section.Content)
+            .ToListAsync();
+
+        var destinationSectionsByTemplateSectionId = new Dictionary<Guid, ContentSection>();
+
+        foreach (var templateSection in templateSections)
+        {
+            destinationSectionsByTemplateSectionId[templateSection.Id] = templateSection.Type switch
+            {
+                ContentSectionType.Generic => CreateGenericDestinationSection(templateSection, newReleaseVersion),
+                ContentSectionType.Headlines
+                or ContentSectionType.KeyStatisticsSecondary
+                or ContentSectionType.RelatedDashboards
+                or ContentSectionType.ReleaseSummary
+                or ContentSectionType.Warning =>
+                // The 5 standard sections already exist, created empty by InitialiseBaseContentSections -
+                // copy content into them rather than creating new rows.
+                newReleaseVersion.Content.Single(section => section.Type == templateSection.Type),
+                _ => throw new ArgumentException(
+                    $"Unhandled {nameof(ContentSectionType)} value {templateSection.Type} when copying content for rollover."
+                ),
+            };
+        }
+
+        return (templateSections, destinationSectionsByTemplateSectionId);
+    }
+
+    private ContentSection CreateGenericDestinationSection(
+        ContentSection templateSection,
+        ReleaseVersion newReleaseVersion
+    )
+    {
+        var destinationSection = new ContentSection
+        {
+            Id = guidGenerator.NewGuid(),
+            ReleaseVersionId = newReleaseVersion.Id,
+            Type = ContentSectionType.Generic,
+            Heading = templateSection.Heading,
+            Order = templateSection.Order,
+        };
+
+        newReleaseVersion.Content.Add(destinationSection);
+        context.ContentSections.Add(destinationSection);
+
+        return destinationSection;
+    }
+
     private async Task<Dictionary<Guid, DataBlockVersion>> CopyDataBlocks(
         Guid templateReleaseVersionId,
         Guid newReleaseVersionId
@@ -186,107 +244,6 @@ public class ReleaseRolloverService(
         await context.SaveChangesAsync();
 
         return newDataBlockVersionsByTemplateId;
-    }
-
-    private async Task CopyFeaturedTables(
-        Guid templateReleaseVersionId,
-        Guid newReleaseVersionId,
-        Dictionary<Guid, DataBlockVersion> dataBlockVersionMap
-    )
-    {
-        var templateFeaturedTables = await context
-            .FeaturedTables.Where(featuredTable => featuredTable.ReleaseVersionId == templateReleaseVersionId)
-            .ToListAsync();
-
-        var newFeaturedTables = templateFeaturedTables.Select(templateFeaturedTable =>
-        {
-            var newDataBlockVersion = dataBlockVersionMap[templateFeaturedTable.DataBlockVersionId];
-
-            return new FeaturedTable
-            {
-                Id = guidGenerator.NewGuid(),
-                ReleaseVersionId = newReleaseVersionId,
-                DataBlockVersionId = newDataBlockVersion.Id,
-                DataBlockId = newDataBlockVersion.DataBlockId,
-                Name = templateFeaturedTable.Name,
-                Description = templateFeaturedTable.Description,
-                Order = templateFeaturedTable.Order,
-                Created = DateTime.UtcNow,
-                CreatedById = userService.GetUserId(),
-            };
-        });
-
-        context.FeaturedTables.AddRange(newFeaturedTables);
-    }
-
-    private async Task CopyKeyStatisticDataBlocks(
-        Guid templateReleaseVersionId,
-        Guid newReleaseVersionId,
-        Dictionary<Guid, DataBlockVersion> dataBlockVersionMap
-    )
-    {
-        var templateKeyStatisticDataBlocks = await context
-            .KeyStatisticsDataBlock.Where(keyStatistic => keyStatistic.ReleaseVersionId == templateReleaseVersionId)
-            .ToListAsync();
-
-        var newKeyStatisticDataBlocks = templateKeyStatisticDataBlocks.Select(templateKeyStatisticDataBlock =>
-        {
-            var newDataBlockVersion = dataBlockVersionMap[templateKeyStatisticDataBlock.DataBlockVersionId];
-
-            return new KeyStatisticDataBlock
-            {
-                Id = guidGenerator.NewGuid(),
-                ReleaseVersionId = newReleaseVersionId,
-                DataBlockVersionId = newDataBlockVersion.Id,
-                DataBlockId = newDataBlockVersion.DataBlockId,
-                Trend = templateKeyStatisticDataBlock.Trend,
-                GuidanceTitle = templateKeyStatisticDataBlock.GuidanceTitle,
-                GuidanceText = templateKeyStatisticDataBlock.GuidanceText,
-                Order = templateKeyStatisticDataBlock.Order,
-                Created = DateTime.UtcNow,
-                CreatedById = userService.GetUserId(),
-            };
-        });
-
-        context.KeyStatisticsDataBlock.AddRange(newKeyStatisticDataBlocks);
-    }
-
-    // Creates every ContentSection the new release needs - the 5 standard ones (always) plus one new row per
-    // Generic section in the template (if any) - all in one place, before any content gets copied in.
-    private async Task<(
-        List<ContentSection> TemplateSections,
-        Dictionary<Guid, ContentSection> DestinationSectionsByTemplateSectionId
-    )> InitialiseContentSections(Guid templateReleaseVersionId, ReleaseVersion newReleaseVersion)
-    {
-        ContentSectionUtils.InitialiseBaseContentSections(newReleaseVersion);
-
-        var templateSections = await context
-            .ContentSections.Where(section => section.ReleaseVersionId == templateReleaseVersionId)
-            .Include(section => section.Content)
-            .ToListAsync();
-
-        var destinationSectionsByTemplateSectionId = new Dictionary<Guid, ContentSection>();
-
-        foreach (var templateSection in templateSections)
-        {
-            destinationSectionsByTemplateSectionId[templateSection.Id] = templateSection.Type switch
-            {
-                ContentSectionType.Generic => CreateGenericDestinationSection(templateSection, newReleaseVersion),
-                ContentSectionType.Headlines
-                or ContentSectionType.KeyStatisticsSecondary
-                or ContentSectionType.RelatedDashboards
-                or ContentSectionType.ReleaseSummary
-                or ContentSectionType.Warning =>
-                // The 5 standard sections already exist, created empty by InitialiseBaseContentSections -
-                // copy content into them rather than creating new rows.
-                newReleaseVersion.Content.Single(section => section.Type == templateSection.Type),
-                _ => throw new ArgumentException(
-                    $"Unhandled {nameof(ContentSectionType)} value {templateSection.Type} when copying content for rollover."
-                ),
-            };
-        }
-
-        return (templateSections, destinationSectionsByTemplateSectionId);
     }
 
     // Purely copies blocks into already-resolved sections - every section it needs already exists by the time
@@ -366,23 +323,73 @@ public class ReleaseRolloverService(
         }
     }
 
-    private ContentSection CreateGenericDestinationSection(
-        ContentSection templateSection,
-        ReleaseVersion newReleaseVersion
+    // Only ever called from WithData - a FeaturedTable without a copied DataBlockVersion to repoint at would be
+    // meaningless, and StructureOnly never produces a dataBlockVersionMap.
+    private async Task CopyFeaturedTables(
+        Guid templateReleaseVersionId,
+        Guid newReleaseVersionId,
+        Dictionary<Guid, DataBlockVersion> dataBlockVersionMap
     )
     {
-        var destinationSection = new ContentSection
+        var templateFeaturedTables = await context
+            .FeaturedTables.Where(featuredTable => featuredTable.ReleaseVersionId == templateReleaseVersionId)
+            .ToListAsync();
+
+        var newFeaturedTables = templateFeaturedTables.Select(templateFeaturedTable =>
         {
-            Id = guidGenerator.NewGuid(),
-            ReleaseVersionId = newReleaseVersion.Id,
-            Type = ContentSectionType.Generic,
-            Heading = templateSection.Heading,
-            Order = templateSection.Order,
-        };
+            var newDataBlockVersion = dataBlockVersionMap[templateFeaturedTable.DataBlockVersionId];
 
-        newReleaseVersion.Content.Add(destinationSection);
-        context.ContentSections.Add(destinationSection);
+            return new FeaturedTable
+            {
+                Id = guidGenerator.NewGuid(),
+                ReleaseVersionId = newReleaseVersionId,
+                // Repoint both ids at the new copies - unlike ReleaseAmendmentService's equivalent, which
+                // deliberately keeps DataBlockId shared (same identity, new version) because that's correct for
+                // an amendment. Rollover creates a brand-new DataBlock identity per copy, so both must repoint.
+                DataBlockVersionId = newDataBlockVersion.Id,
+                DataBlockId = newDataBlockVersion.DataBlockId,
+                Name = templateFeaturedTable.Name,
+                Description = templateFeaturedTable.Description,
+                Order = templateFeaturedTable.Order,
+                Created = DateTime.UtcNow,
+                CreatedById = userService.GetUserId(),
+            };
+        });
 
-        return destinationSection;
+        context.FeaturedTables.AddRange(newFeaturedTables);
+    }
+
+    // Only ever called from WithData - see CopyFeaturedTables.
+    private async Task CopyKeyStatisticDataBlocks(
+        Guid templateReleaseVersionId,
+        Guid newReleaseVersionId,
+        Dictionary<Guid, DataBlockVersion> dataBlockVersionMap
+    )
+    {
+        var templateKeyStatisticDataBlocks = await context
+            .KeyStatisticsDataBlock.Where(keyStatistic => keyStatistic.ReleaseVersionId == templateReleaseVersionId)
+            .ToListAsync();
+
+        var newKeyStatisticDataBlocks = templateKeyStatisticDataBlocks.Select(templateKeyStatisticDataBlock =>
+        {
+            var newDataBlockVersion = dataBlockVersionMap[templateKeyStatisticDataBlock.DataBlockVersionId];
+
+            return new KeyStatisticDataBlock
+            {
+                Id = guidGenerator.NewGuid(),
+                ReleaseVersionId = newReleaseVersionId,
+                // Repoint both ids - see CopyFeaturedTables.
+                DataBlockVersionId = newDataBlockVersion.Id,
+                DataBlockId = newDataBlockVersion.DataBlockId,
+                Trend = templateKeyStatisticDataBlock.Trend,
+                GuidanceTitle = templateKeyStatisticDataBlock.GuidanceTitle,
+                GuidanceText = templateKeyStatisticDataBlock.GuidanceText,
+                Order = templateKeyStatisticDataBlock.Order,
+                Created = DateTime.UtcNow,
+                CreatedById = userService.GetUserId(),
+            };
+        });
+
+        context.KeyStatisticsDataBlock.AddRange(newKeyStatisticDataBlocks);
     }
 }
