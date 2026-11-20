@@ -1,27 +1,27 @@
 import NotificationBanner from '@common/components/NotificationBanner';
 import { NavItem } from '@common/components/PageNavExpandable';
+import { useMobileMedia } from '@common/hooks/useMedia';
+import PublishingOrganisations from '@common/modules/find-statistics/components/PublishingOrganisations';
 import ReleasePageLayout from '@common/modules/release/components/ReleasePageLayout';
 import {
   PublicationSummary,
   ReleaseVersionSummary,
 } from '@common/services/publicationService';
+import FullPageTitle from '@frontend/components/FullPageTitle';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import ReleasePageIntro from '@frontend/modules/find-statistics/components/ReleasePageIntro';
+import styles from '@frontend/modules/find-statistics/components/ReleasePageShell.module.scss';
 import ReleasePageTabNav, {
   TabRouteItem,
 } from '@frontend/modules/find-statistics/components/ReleasePageTabNav';
-import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
 import {
   releasePageTabRouteItems,
   ReleasePageTabRouteKey,
 } from '@frontend/modules/find-statistics/PublicationReleasePage';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { NextPage } from 'next';
-import React, { ReactNode } from 'react';
-import { useMobileMedia } from '@common/hooks/useMedia';
-import styles from '@frontend/modules/find-statistics/components/ReleasePageShell.module.scss';
-import PublishingOrganisations from '@common/modules/find-statistics/components/PublishingOrganisations';
+import { ReactNode } from 'react';
 import ReleasePageTitleQuickLinks from './ReleasePageQuickLinks';
 
 interface Props {
@@ -59,9 +59,10 @@ const ReleasePageShell: NextPage<Props> = ({
             }
           />
           <div className={styles.releasePageTitleWrap}>
-            <ReleasePageTitle
-              publicationSummary={publicationSummary}
-              releaseTitle={releaseVersionSummary.title}
+            <FullPageTitle
+              caption={releaseVersionSummary.title}
+              summary={publicationSummary.summary}
+              title={publicationSummary.title}
             />
 
             {!isMobileMedia && (
