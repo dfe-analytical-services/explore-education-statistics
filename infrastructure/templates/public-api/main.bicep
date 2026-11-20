@@ -90,6 +90,9 @@ param containerAppEnvironmentZoneRedundant bool = false
 @description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this pipeline\'s apps. Only the param files in "parameters/elz" turn this on.')
 param adminUsesUserAssignedIdentity bool = false
 
+@description('Whether the Data Processor\'s Function App host and Durable Functions connect to their storage accounts with its managed identity, rather than with connection strings. Durable Functions orchestrations can\'t move between storage connections, so only the param files in "parameters/elz" turn this on, for the new environments.')
+param dataProcessorIdentityBasedStorageConnections bool = false
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -319,6 +322,7 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
 module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = if (deployDataProcessor) {
   name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
+    identityBasedStorageConnections: dataProcessorIdentityBasedStorageConnections
     adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
     storageAccountSku: storageAccountSku
     location: location
