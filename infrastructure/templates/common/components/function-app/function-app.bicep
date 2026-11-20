@@ -52,8 +52,8 @@ param linuxFxVersion string?
 @description('Name of the storage account in use by the Function App.')
 param storageAccountName string
 
-@description('Name of the Key Vault secret in which to store the storage account\'s connection string. The Function App reads it for its content share (WEBSITE_CONTENTAZUREFILECONNECTIONSTRING), when it has one.')
-param storageAccountConnectionStringSecretName string
+@description('Name of the Key Vault secret in which to store the storage account\'s connection string. The Function App reads it for its content share (WEBSITE_CONTENTAZUREFILECONNECTIONSTRING), so it\'s required when deployContentShare is on. Omit to not store it.')
+param storageAccountConnectionStringSecretName string?
 
 @description('Whether to create a file share in the storage account for the Function App\'s content, and point the Function App at it. Elastic Premium and Consumption plans need one, but Dedicated plans don\'t, as they keep the content in the App Service plan\'s own storage.')
 param deployContentShare bool = true
@@ -263,10 +263,12 @@ module storageAccountModule '../storage/storage-account.bicep' = {
     firewallRules: storageFirewallRules
     sku: storageAccountSku
     kind: 'StorageV2'
-    connectionStringSecret: {
-      keyVaultName: keyVaultName
-      secretName: storageAccountConnectionStringSecretName
-    }
+    connectionStringSecret: storageAccountConnectionStringSecretName != null
+      ? {
+          keyVaultName: keyVaultName
+          secretName: storageAccountConnectionStringSecretName!
+        }
+      : null
     privateEndpointSubnetIds: privateEndpoints != null ? {
       blob: privateEndpoints!.storageAccounts
       file: privateEndpoints!.storageAccounts
