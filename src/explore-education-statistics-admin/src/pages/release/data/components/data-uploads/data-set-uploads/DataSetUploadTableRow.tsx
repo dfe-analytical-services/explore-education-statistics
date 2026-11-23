@@ -2,7 +2,7 @@ import DataUploadsPermissions from '@admin/pages/release/data/types/dataUploadsP
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import { DataSetUpload } from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import styles from '@admin/pages/release/data/components/data-uploads/DataFilesTable.module.scss';
 import DataSetUploadDeleteModal from './DataSetUploadDeleteModal';
@@ -45,21 +45,24 @@ export default function DataSetUploadTableRow({
     // Don't poll if the upload has finished screening.
     enabled: !terminalScreeningStatuses.includes(dataSetUpload.screeningStatus),
     // Poll every 5 seconds until screening finishes.
-    refetchInterval: progress =>
-      progress && terminalScreeningStatuses.includes(progress.status)
+    refetchInterval: query =>
+      query.state.data &&
+      terminalScreeningStatuses.includes(query.state.data.status)
         ? false
         : 5000,
-    onSuccess: progress => {
-      // Refresh the list so the row picks up the screener results that come
-      // with the finished upload.
-      if (
-        progress.status !== dataSetUpload.screeningStatus &&
-        terminalScreeningStatuses.includes(progress.status)
-      ) {
-        onRefreshUploads();
-      }
-    },
   });
+
+  useEffect(() => {
+    if (!screenerProgress) return;
+    // Refresh the list so the row picks up the screener results that come
+    // with the finished upload.
+    if (
+      screenerProgress.status !== dataSetUpload.screeningStatus &&
+      terminalScreeningStatuses.includes(screenerProgress.status)
+    ) {
+      onRefreshUploads();
+    }
+  }, [screenerProgress, dataSetUpload.screeningStatus, onRefreshUploads]);
 
   const screeningStatus =
     screenerProgress?.status ?? dataSetUpload.screeningStatus;

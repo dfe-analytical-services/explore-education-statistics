@@ -40,6 +40,9 @@ export default function PublicationPublishedReleases({
 
   const [focusReleaseId, setFocusReleaseId] = useState<string>();
 
+  const publishedReleasesQuery =
+    publicationQueries.listPublishedReleaseVersions(publication.id, pageSize);
+
   const {
     data: releases,
     hasNextPage,
@@ -49,10 +52,9 @@ export default function PublicationPublishedReleases({
     isSuccess,
     refetch,
   } = useInfiniteQuery({
-    ...publicationQueries.listPublishedReleaseVersions(
-      publication.id,
-      pageSize,
-    ),
+    initialPageParam: 1,
+    ...publishedReleasesQuery,
+    queryFn: context => publishedReleasesQuery.queryFn(context),
     ...{
       getNextPageParam: (
         lastPage: PaginatedList<ReleaseVersionSummaryWithPermissions>,

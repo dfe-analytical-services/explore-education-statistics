@@ -3,7 +3,7 @@ import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
 import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 
 jest.mock('@admin/services/releaseDataFileService');
 
@@ -165,6 +165,42 @@ describe('ImporterStatus', () => {
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.queryByText('100% complete')).not.toBeInTheDocument();
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
+  });
+
+  test('notifies the parent of completion and stops polling', async () => {
+    const completedStatus = {
+      status: 'COMPLETE' as const,
+      percentageComplete: 100,
+      stagePercentageComplete: 100,
+      totalRows: 100,
+    };
+    releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+      completedStatus,
+    );
+    const dataFile = { ...testDataFile, status: 'STAGE_2' as const };
+    const onStatusChange = jest.fn();
+
+    render(
+      <ImporterStatus
+        releaseVersionId="release-1"
+        dataFile={dataFile}
+        onStatusChange={onStatusChange}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(onStatusChange).toHaveBeenCalledWith(dataFile, completedStatus),
+    );
+    expect(onStatusChange).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(15000);
+    });
+
+    expect(
+      releaseDataFileService.getDataFileImportStatus,
+    ).toHaveBeenCalledTimes(1);
+    expect(onStatusChange).toHaveBeenCalledTimes(1);
   });
 
   test('renders with error messages from service', async () => {

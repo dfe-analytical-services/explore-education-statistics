@@ -10,7 +10,7 @@ import ProgressBar from '@common/components/ProgressBar';
 import Tag, { TagProps } from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const getImportStatusLabel = (
   statusCode: ImportStatusCode,
@@ -98,16 +98,19 @@ const ImporterStatus = ({
     ...releaseDataFileQueries.importStatus(releaseVersionId, dataFile.id),
     enabled: dataFile.status !== 'COMPLETE',
     // Poll every 5 seconds until the import reaches a status it can't move on from.
-    refetchInterval: nextStatus =>
-      nextStatus && terminalImportStatuses.includes(nextStatus.status)
+    refetchInterval: query =>
+      query.state.data &&
+      terminalImportStatuses.includes(query.state.data.status)
         ? false
         : 5000,
-    onSuccess: nextStatus => {
-      if (nextStatus.status !== dataFile.status) {
-        onStatusChange?.(dataFile, nextStatus);
-      }
-    },
   });
+
+  useEffect(() => {
+    if (!data) return;
+    if (data.status !== dataFile.status) {
+      onStatusChange?.(dataFile, data);
+    }
+  }, [data, dataFile, onStatusChange]);
 
   const currentStatus: StatusState = data ?? {
     status: dataFile.status,

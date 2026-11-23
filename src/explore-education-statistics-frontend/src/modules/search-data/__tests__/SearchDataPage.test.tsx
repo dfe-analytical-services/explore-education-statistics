@@ -102,7 +102,7 @@ describe('SearchDataPage', () => {
       expect(screen.getByRole('combobox')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('heading', { name: '2 results' }),
+        await screen.findByRole('heading', { name: '2 results' }),
       ).toBeInTheDocument();
 
       expect(

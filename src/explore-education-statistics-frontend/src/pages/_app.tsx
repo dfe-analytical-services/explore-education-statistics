@@ -17,7 +17,8 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { ReactNode, useEffect, useState } from 'react';
 import {
-  Hydrate,
+  DehydratedState,
+  HydrationBoundary,
   QueryClient,
   QueryClientProvider as BaseQueryClientProvider,
 } from '@tanstack/react-query';
@@ -44,7 +45,7 @@ const ApplicationInsightsTracking = () => {
   return null;
 };
 
-type Props = AppProps<{ dehydratedState: unknown }> & {
+type Props = AppProps<{ dehydratedState?: DehydratedState }> & {
   cookies: Dictionary<string>;
 };
 
@@ -76,9 +77,9 @@ export default function App({ Component, pageProps, cookies }: Props) {
 
       <ApplicationInsightsTracking />
 
-      <Hydrate state={pageProps.dehydratedState}>
+      <HydrationBoundary state={pageProps.dehydratedState}>
         <Component {...pageProps} />
-      </Hydrate>
+      </HydrationBoundary>
     </Providers>
   );
 }
