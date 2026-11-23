@@ -29,8 +29,6 @@ public static class DataSetDocumentExtensions
     /// </summary>
     /// <remarks>
     /// Metadata key/value pairs are set using HTTP headers and must be valid headers containing only ASCII characters.
-    /// Values are Base64 encoded if non-ASCII characters might be present.
-    /// Collection values are serialised as JSON string arrays.
     /// </remarks>
     public static IDictionary<string, string> BuildMetadata(this DataSetDocument dataSetDocument) =>
         new Dictionary<string, string>

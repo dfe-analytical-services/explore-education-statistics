@@ -5,9 +5,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
 
-public class DataSetDocumentExtensionsTests
+public abstract class DataSetDocumentExtensionsTests
 {
-    public class ToJsonTests
+    public class ToJsonTests : DataSetDocumentExtensionsTests
     {
         [Fact]
         public void PropertiesAreNamedAsTheSearchIndexFields()
@@ -79,18 +79,21 @@ public class DataSetDocumentExtensionsTests
         }
     }
 
-    public class BuildMetadataTests
+    public class BuildMetadataTests : DataSetDocumentExtensionsTests
     {
         [Fact]
-        public void MetadataHasFileIdMatchingTheJson()
+        public void ReturnsExpectedMetadataKeysAndValues()
         {
-            var dataSetDocument = new DataSetDocumentBuilder().Build();
+            var fileId = new Guid("3e0c5a8f-1b2d-4c7e-9f6a-2d4b8e1c7a05");
+            var dataSetDocument = new DataSetDocumentBuilder().WithFileId(fileId).Build();
 
             var metadata = dataSetDocument.BuildMetadata();
 
-            var jsonFileId = JsonNode.Parse(dataSetDocument.ToJson())!["fileId"]!.GetValue<string>();
             Assert.Equal(
-                new Dictionary<string, string> { { DataSetDocumentAzureBlobMetadataKeys.FileId, jsonFileId } },
+                new Dictionary<string, string>
+                {
+                    { DataSetDocumentAzureBlobMetadataKeys.FileId, "3e0c5a8f-1b2d-4c7e-9f6a-2d4b8e1c7a05" },
+                },
                 metadata
             );
         }
