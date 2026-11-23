@@ -419,8 +419,6 @@ public class PermalinkServiceTests
             Assert.Equal("Test data set", permalink.DataSetTitle);
             Assert.Equal(releaseVersion.Id, permalink.ReleaseVersionId);
             Assert.Equal(subject.Id, permalink.SubjectId);
-
-            Assert.False(permalink.MigratedFromLegacy);
         }
     }
 
@@ -659,7 +657,6 @@ public class PermalinkServiceTests
             Assert.Equal("Test data set", permalink.DataSetTitle);
             Assert.Equal(releaseVersion.Id, permalink.ReleaseVersionId);
             Assert.Equal(subject.Id, permalink.SubjectId);
-            Assert.False(permalink.MigratedFromLegacy);
             Assert.False(permalink.IsCropped);
         }
     }
@@ -835,7 +832,6 @@ public class PermalinkServiceTests
             Assert.Equal("Test data set", permalink.DataSetTitle);
             Assert.Equal(releaseVersion.Id, permalink.ReleaseVersionId);
             Assert.Equal(subject.Id, permalink.SubjectId);
-            Assert.False(permalink.MigratedFromLegacy);
             Assert.True(permalink.IsCropped);
         }
     }
