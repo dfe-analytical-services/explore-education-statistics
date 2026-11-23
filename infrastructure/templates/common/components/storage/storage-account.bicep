@@ -62,7 +62,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   sku: {
     name: sku
   }
-  properties: union({
+  properties: {
     accessTier: accessTier
     supportsHttpsTrafficOnly: true
     minimumTlsVersion: 'TLS1_2'
@@ -80,10 +80,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
         action: 'Allow'
       })
     } : null
-  }, sharedKeyAccessEnabled ? {} : {
-    allowSharedKeyAccess: false
-    defaultToOAuthAuthentication: true
-  })
+    allowSharedKeyAccess: sharedKeyAccessEnabled
+    defaultToOAuthAuthentication: !sharedKeyAccessEnabled
+  }
   tags: tagValues
 }
 
