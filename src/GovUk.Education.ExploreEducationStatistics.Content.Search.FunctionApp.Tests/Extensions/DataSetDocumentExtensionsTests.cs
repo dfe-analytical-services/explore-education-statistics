@@ -5,9 +5,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Test
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Extensions;
 
-public class DataSetDocumentExtensionsTests
+public abstract class DataSetDocumentExtensionsTests
 {
-    public class ToJsonTests
+    public class ToJsonTests : DataSetDocumentExtensionsTests
     {
         [Fact]
         public void PropertiesAreNamedAsTheSearchIndexFields()
@@ -76,6 +76,26 @@ public class DataSetDocumentExtensionsTests
             var jsonObject = JsonNode.Parse(json)!.AsObject();
             Assert.True(jsonObject.ContainsKey("api"));
             Assert.Null(jsonObject["api"]);
+        }
+    }
+
+    public class BuildMetadataTests : DataSetDocumentExtensionsTests
+    {
+        [Fact]
+        public void ReturnsExpectedMetadataKeysAndValues()
+        {
+            var fileId = new Guid("3e0c5a8f-1b2d-4c7e-9f6a-2d4b8e1c7a05");
+            var dataSetDocument = new DataSetDocumentBuilder().WithFileId(fileId).Build();
+
+            var metadata = dataSetDocument.BuildMetadata();
+
+            Assert.Equal(
+                new Dictionary<string, string>
+                {
+                    { DataSetDocumentAzureBlobMetadataKeys.FileId, "3e0c5a8f-1b2d-4c7e-9f6a-2d4b8e1c7a05" },
+                },
+                metadata
+            );
         }
     }
 }
