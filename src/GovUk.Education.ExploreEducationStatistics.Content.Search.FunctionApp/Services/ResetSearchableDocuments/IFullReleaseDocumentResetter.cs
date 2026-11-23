@@ -3,7 +3,8 @@
 public interface IFullReleaseDocumentResetter
 {
     /// <summary>
-    /// Delete all Release Documents from Azure storage, and return a list of all live publications.
+    /// Delete all Release Documents from Azure storage, and return a list of all live publications. Nothing is deleted
+    /// if that list cannot be retrieved.
     /// </summary>
     Task<PerformResetResponse> PerformReset(CancellationToken cancellationToken = default);
 }
