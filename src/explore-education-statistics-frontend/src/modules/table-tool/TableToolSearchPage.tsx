@@ -15,7 +15,6 @@ import publicationService, {
 import { Dictionary } from '@common/types';
 import Page from '@frontend/components/Page';
 import SearchForm from '@frontend/components/SearchForm';
-import ReleasePageTitle from '@frontend/modules/find-statistics/components/ReleasePageTitle';
 import TableToolSearchFinalResult from '@frontend/modules/table-tool/components/TableToolSearchFinalResult';
 import TableToolSearchShortlistedResult from '@frontend/modules/table-tool/components/TableToolSearchShortlistedResult';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
@@ -30,6 +29,7 @@ import tableToolSearchService, {
 } from '@frontend/services/tableToolSearchService';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRef, useState } from 'react';
+import FullPageTitle from '@frontend/components/FullPageTitle';
 
 const GOOGLE_ANALYTICS_EVENT_CATEGORY = 'Table Tool Search';
 
@@ -191,9 +191,10 @@ const TableToolSearchPage: NextPage<TableToolSearchPageProps> = ({
             }
           />
           <div className="dfe-flex govuk-!-margin-bottom-8">
-            <ReleasePageTitle
-              publicationSummary={publicationSummary}
-              releaseTitle={latestReleaseVersion.title}
+            <FullPageTitle
+              caption={latestReleaseVersion.title}
+              summary={publicationSummary.summary}
+              title={publicationSummary.title}
             />
           </div>
         </>
