@@ -1,3 +1,4 @@
+import BackToDataFilesLink from '@admin/pages/release/data/components/BackToDataFilesLink';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -11,6 +12,7 @@ import reorder from '@common/utils/reorder';
 import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
+import isEqual from 'lodash/isEqual';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 
@@ -27,6 +29,7 @@ export type UpdateIndicatorsRequest = UpdatedIndicator[];
 interface Props {
   releaseVersionId: string;
   subject: Subject;
+  onBack: () => void;
   onCancel: () => void;
   onSave: (
     subjectId: string,
@@ -37,6 +40,7 @@ interface Props {
 export default function ReorderIndicatorsList({
   releaseVersionId,
   subject,
+  onBack,
   onCancel,
   onSave,
 }: Props) {
@@ -46,6 +50,9 @@ export default function ReorderIndicatorsList({
   );
 
   const [indicators, setIndicators] = useState<ReorderableListItem[]>([]);
+  const [initialIndicators, setInitialIndicators] = useState<
+    ReorderableListItem[]
+  >([]);
 
   useEffect(() => {
     if (isLoading || !subjectMeta) {
@@ -70,6 +77,7 @@ export default function ReorderIndicatorsList({
     });
 
     setIndicators(formattedIndicators);
+    setInitialIndicators(formattedIndicators);
   }, [isLoading, subjectMeta]);
 
   const handleReorder = ({
@@ -113,6 +121,10 @@ export default function ReorderIndicatorsList({
 
   return (
     <LoadingSpinner loading={isLoading}>
+      <BackToDataFilesLink
+        hasUnsavedChanges={!isEqual(indicators, initialIndicators)}
+        onBack={onBack}
+      />
       {indicators.length === 0 ? (
         <>
           <p>No indicators available.</p>
