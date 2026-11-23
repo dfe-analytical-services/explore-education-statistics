@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.
 /// </summary>
 public static class DataSetDocumentAzureBlobMetadataKeys
 {
-    public const string FileId = "FileId";
+    public const string FileId = "fileId";
 }
 
 public static class DataSetDocumentExtensions
