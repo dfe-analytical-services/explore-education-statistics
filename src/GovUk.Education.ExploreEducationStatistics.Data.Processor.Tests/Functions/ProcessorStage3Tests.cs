@@ -218,10 +218,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -439,10 +435,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -580,10 +572,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -736,10 +724,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -881,10 +865,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1056,10 +1036,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1205,10 +1181,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1326,10 +1298,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1487,10 +1455,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,
@@ -1667,10 +1631,6 @@ public class ProcessorStage3Tests
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
-            BuildStorageDataSetResolver(
-                InMemoryContentDbContext(_contentDbContextId),
-                InMemoryStatisticsDbContext(_statisticsDbContextId)
-            ),
             BuildStorageDataSetWriterResolver(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 databaseHelper,

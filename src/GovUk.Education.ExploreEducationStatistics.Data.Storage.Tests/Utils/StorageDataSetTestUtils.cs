@@ -119,7 +119,10 @@ public static class StorageDataSetTestUtils
             .AddTransient<ImporterLocationService>()
             .AddSingleton(Mock.Of<ILogger<ImporterLocationCache>>());
 
-        return new StatisticsDbDataSetWriterFactory(services.BuildServiceProvider());
+        return new StatisticsDbDataSetWriterFactory(
+            services.BuildServiceProvider(),
+            BuildStatisticsDbDataSetFactory(statisticsDbContext)
+        );
     }
 
     public static Mock<IStorageDataSetResolver> MockStorageDataSetResolver(Guid subjectId, IStorageDataSet dataSet)

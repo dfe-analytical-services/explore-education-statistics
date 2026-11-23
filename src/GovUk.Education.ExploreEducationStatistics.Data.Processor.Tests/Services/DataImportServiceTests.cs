@@ -285,7 +285,6 @@ public class DataImportServiceTests
 
         await service.WriteDataSetFileMeta(
             import,
-            BuildStatisticsDbDataSetFactory(InMemoryStatisticsDbContext(statisticsDbContextId)).Create(subject.Id),
             BuildStatisticsDbDataSetWriterFactory(
                     InMemoryStatisticsDbContext(statisticsDbContextId),
                     Mock.Of<IDatabaseHelper>(Strict)
@@ -434,7 +433,6 @@ public class DataImportServiceTests
 
         await service.WriteDataSetFileMeta(
             import,
-            BuildStatisticsDbDataSetFactory(InMemoryStatisticsDbContext(statisticsDbContextId)).Create(subject.Id),
             BuildStatisticsDbDataSetWriterFactory(
                     InMemoryStatisticsDbContext(statisticsDbContextId),
                     Mock.Of<IDatabaseHelper>(Strict)

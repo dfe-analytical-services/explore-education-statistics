@@ -31,7 +31,8 @@ public static class ServiceCollectionExtensions
 
     /// <summary>
     /// Registers <see cref="IStorageDataSetWriterResolver" /> together with everything needed to write data sets to
-    /// each supported storage when importing them. Hosts must also register <see cref="IDatabaseHelper" />,
+    /// each supported storage when importing them. Hosts must also call <see cref="AddStorageDataSets" />, as each
+    /// writer carries the data set it writes to, and register <see cref="IDatabaseHelper" />,
     /// <see cref="IGuidGenerator" /> and the StatisticsDbContext.
     /// </summary>
     public static IServiceCollection AddStorageDataSetWriters(this IServiceCollection services) =>

@@ -6,13 +6,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 /// <summary>
 /// Storage-agnostic methods used to write, or to support the writing of, a single data set's data while it is being
-/// imported. Other reads go through <see cref="IStorageDataSet" />.
+/// imported. Other reads go through <see cref="DataSet" />.
 ///
 /// All methods are scoped to <see cref="SubjectId" />.
 /// </summary>
 public interface IStorageDataSetWriter
 {
     Guid SubjectId { get; }
+
+    /// <summary>
+    /// The data set being written to, for reads made while it is being imported.
+    /// </summary>
+    IStorageDataSet DataSet { get; }
 
     /// <summary>
     /// Writes the data set's filters (not their groups and items), and its indicators together with their

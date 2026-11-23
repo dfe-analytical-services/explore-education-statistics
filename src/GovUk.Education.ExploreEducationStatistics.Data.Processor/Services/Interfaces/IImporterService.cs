@@ -10,7 +10,6 @@ public interface IImporterService
     Task<SubjectMeta> ImportMeta(
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
-        IStorageDataSet dataSet,
         IStorageDataSetWriter dataSetWriter
     );
 
@@ -18,7 +17,6 @@ public interface IImporterService
         DataImport dataImport,
         Func<Task<Stream>> dataFileStreamProvider,
         Func<Task<Stream>> metaFileStreamProvider,
-        IStorageDataSet dataSet,
         IStorageDataSetWriter dataSetWriter
     );
 

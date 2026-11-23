@@ -191,7 +191,6 @@ public class ProcessorStage1Tests
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             validatorService ?? Mock.Of<IValidatorService>(Strict),
-            Mock.Of<IStorageDataSetResolver>(Strict),
             Mock.Of<IStorageDataSetWriterResolver>(Strict)
         );
     }

@@ -42,11 +42,10 @@ public class ImporterService : IImporterService
     public Task<SubjectMeta> ImportMeta(
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
-        IStorageDataSet dataSet,
         IStorageDataSetWriter dataSetWriter
     )
     {
-        return _importerMetaService.Import(metaFileCsvHeaders, metaFileRows, dataSet, dataSetWriter);
+        return _importerMetaService.Import(metaFileCsvHeaders, metaFileRows, dataSetWriter);
     }
 
     private record FilterItemMeta(Guid FilterId, string FilterGroupLabel, string FilterItemLabel)
@@ -217,7 +216,6 @@ public class ImporterService : IImporterService
         DataImport import,
         Func<Task<Stream>> dataFileStreamProvider,
         Func<Task<Stream>> metaFileStreamProvider,
-        IStorageDataSet dataSet,
         IStorageDataSetWriter dataSetWriter
     )
     {
@@ -233,7 +231,11 @@ public class ImporterService : IImporterService
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-        var subjectMeta = await _importerMetaService.GetSubjectMeta(metaFileCsvHeaders, metaFileCsvRows, dataSet);
+        var subjectMeta = await _importerMetaService.GetSubjectMeta(
+            metaFileCsvHeaders,
+            metaFileCsvRows,
+            dataSetWriter.DataSet
+        );
 
         var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
         var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
@@ -295,7 +297,7 @@ public class ImporterService : IImporterService
 
                                 return ObservationFromCsv(
                                     cells,
-                                    dataSet.SubjectId,
+                                    dataSetWriter.SubjectId,
                                     subjectMeta.Filters.Select(meta => meta.Filter).ToList(),
                                     fixedInformationReader,
                                     filterAndIndicatorReader,

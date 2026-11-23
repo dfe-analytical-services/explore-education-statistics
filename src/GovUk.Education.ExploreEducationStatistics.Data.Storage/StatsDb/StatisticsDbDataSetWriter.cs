@@ -10,14 +10,16 @@ using Microsoft.EntityFrameworkCore;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 
 public class StatisticsDbDataSetWriter(
-    Guid subjectId,
+    StatisticsDbDataSet dataSet,
     StatisticsDbContext context,
     IDatabaseHelper databaseHelper,
     ImporterLocationService importerLocationService,
     IObservationBatchImporter observationBatchImporter
 ) : IStorageDataSetWriter
 {
-    public Guid SubjectId { get; } = subjectId;
+    public Guid SubjectId => dataSet.SubjectId;
+
+    public IStorageDataSet DataSet => dataSet;
 
     public Task WriteFiltersAndIndicators(
         IReadOnlyList<Filter> filters,

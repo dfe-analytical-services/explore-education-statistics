@@ -14,7 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorageDataSetResolver storageDataSetResolver)
     : IDataSetMappingService
 {
-    public async Task CreateInitialDataSetMappingIfReplacement(Guid replacementFileId)
+    public async Task CreateInitialDataSetMappingIfReplacement(
+        Guid replacementFileId,
+        IStorageDataSet replacementDataSet
+    )
     {
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
@@ -30,7 +33,6 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorag
         var originalFile = replacementFile.Replacing!;
 
         var originalDataSet = storageDataSetResolver.Resolve(originalFile);
-        var replacementDataSet = storageDataSetResolver.Resolve(replacementFile);
 
         var indicatorMappings = await GenerateInitialIndicatorMapping(originalDataSet, replacementDataSet);
 

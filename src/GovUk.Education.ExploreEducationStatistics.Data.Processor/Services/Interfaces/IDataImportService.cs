@@ -26,5 +26,5 @@ public interface IDataImportService
         int? lastProcessedRowIndex = null
     );
 
-    Task WriteDataSetFileMeta(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter);
+    Task WriteDataSetFileMeta(DataImport import, IStorageDataSetWriter dataSetWriter);
 }

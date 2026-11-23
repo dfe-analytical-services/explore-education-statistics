@@ -8,7 +8,6 @@ public interface IImporterMetaService
     Task<SubjectMeta> Import(
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
-        IStorageDataSet dataSet,
         IStorageDataSetWriter dataSetWriter
     );
 

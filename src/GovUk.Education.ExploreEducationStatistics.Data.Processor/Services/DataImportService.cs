@@ -129,13 +129,10 @@ public class DataImportService(IDbContextSupplier dbContextSupplier, ILogger<Dat
         await context.SaveChangesAsync();
     }
 
-    public async Task WriteDataSetFileMeta(
-        DataImport import,
-        IStorageDataSet dataSet,
-        IStorageDataSetWriter dataSetWriter
-    )
+    public async Task WriteDataSetFileMeta(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         var subjectId = import.SubjectId;
+        var dataSet = dataSetWriter.DataSet;
 
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
