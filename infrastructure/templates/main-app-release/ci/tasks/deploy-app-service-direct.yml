@@ -32,7 +32,6 @@ steps:
 
   - task: AzureCLI@2
     displayName: ${{ parameters.displayNamePrefix }} - deploying code directly to production
-    retryCountOnTaskFailure: 5
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash
@@ -40,11 +39,24 @@ steps:
       inlineScript: |
         set -e
 
-        az webapp deploy \
+        # Allow for multiple retry attempts to upload the zip in case the Kudu site isn't yet ready.
+        # We're not using "retryCountOnTaskFailure" because otherwise failures are logged as pipeline errors.
+        attempt=1
+        maxAttempts=5
+        until az webapp deploy \
           --name ${{ parameters.appName }} \
           --resource-group ${{ parameters.resourceGroupName }} \
           --type zip \
           --src-path "${{ parameters.artifactZipPath }}"
+        do
+          if [ "$attempt" -ge "$maxAttempts" ]; then
+            echo "Deploy failed after $maxAttempts attempts."
+            exit 1
+          fi
+          echo "Deploy attempt $attempt failed - retrying in 10s..."
+          sleep 10
+          attempt=$((attempt + 1))
+        done
 
   # Confirm the app service has actually restarted by waiting for it to report back this
   # deploy's marker. A successful response here also signifies that the app is healthy.
