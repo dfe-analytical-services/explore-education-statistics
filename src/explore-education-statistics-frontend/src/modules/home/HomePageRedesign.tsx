@@ -13,12 +13,10 @@ import PageMeta from '@frontend/components/PageMeta';
 import HomePageHeader from '@frontend/modules/home/components/HomePageHeader';
 import HomePageMasthead from '@frontend/modules/home/components/HomePageMasthead';
 import HomeReleaseLink from '@frontend/modules/home/components/HomeReleaseLink';
-import {
-  latestReleases,
-  popularReleases,
-} from '@frontend/modules/home/data/prototypeHomeReleasesData';
+import { latestReleases } from '@frontend/modules/home/data/prototypeHomeReleasesData';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
+import HomePageNav from '@frontend/modules/home/components/HomePageNav';
 
 const HomePageRedesign = () => {
   const logLinkClick = (label: string) =>
@@ -53,9 +51,30 @@ const HomePageRedesign = () => {
         <HomePageMasthead />
 
         <div className="govuk-width-container dfe-width-container--wide">
+          <HomePageNav
+            links={[
+              {
+                id: 'latest-releases',
+                label: 'Latest releases',
+              },
+              {
+                id: 'supporting-information',
+                label: 'Supporting information',
+              },
+              {
+                id: 'contact-us',
+                label: 'Contact us',
+              },
+              {
+                id: 'related-services',
+                label: 'Related services',
+              },
+            ]}
+          />
+
           <section className="govuk-!-padding-bottom-9">
-            <h2 className="govuk-!-margin-top-9">
-              Latest statistical releases
+            <h2 className="govuk-!-margin-top-9" id="latest-releases">
+              Latest releases
             </h2>
 
             <ol className="govuk-grid-row govuk-list">
@@ -69,28 +88,7 @@ const HomePageRedesign = () => {
               ))}
             </ol>
             <Link
-              to="/find-statistics"
-              onClick={() => logLinkClick('Find statistics')}
-            >
-              Explore all of our statistical releases
-            </Link>
-
-            <h2 className="govuk-!-margin-top-9">
-              Most popular statistical releases
-            </h2>
-
-            <ol className="govuk-grid-row govuk-list">
-              {popularReleases.map(release => (
-                <li
-                  className="govuk-grid-column-one-third"
-                  key={`${release.publicationSlug}-${release.releaseSlug}`}
-                >
-                  <HomeReleaseLink release={release} onClick={logLinkClick} />
-                </li>
-              ))}
-            </ol>
-            <Link
-              to="/find-statistics"
+              to="/search-releases"
               onClick={() => logLinkClick('Find statistics')}
             >
               Explore all of our statistical releases
@@ -99,7 +97,9 @@ const HomePageRedesign = () => {
 
           <hr />
 
-          <h2 className="govuk-!-margin-top-9">Supporting information</h2>
+          <h2 className="govuk-!-margin-top-9" id="supporting-information">
+            Supporting information
+          </h2>
 
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
@@ -162,8 +162,8 @@ const HomePageRedesign = () => {
 
           <hr />
 
-          <h2 className="govuk-!-margin-top-9">
-            Contact us for help and support
+          <h2 className="govuk-!-margin-top-9" id="contact-us">
+            Contact us
           </h2>
           <div className="govuk-grid-row govuk-!-margin-bottom-3">
             <div className="govuk-grid-column-two-thirds">
@@ -179,7 +179,7 @@ const HomePageRedesign = () => {
                 If you have any specific statistical or subject-related queries,
                 contact the team or named statistician listed in the 'Contact
                 us' sections of the pages found under{' '}
-                <Link to="/find-statistics">Find statistics and data</Link>.
+                <Link to="/search-releases">Find statistics and data</Link>.
               </p>
               <p>
                 For any further queries, contact the Explore education
@@ -210,8 +210,8 @@ const HomePageRedesign = () => {
 
           <hr />
 
-          <h2 className="govuk-!-margin-top-9">
-            Other services provided by the Department for Education (DfE)
+          <h2 className="govuk-!-margin-top-9" id="related-services">
+            Related services
           </h2>
           <div className="govuk-grid-row govuk-!-margin-bottom-3">
             <div className="govuk-grid-column-two-thirds">

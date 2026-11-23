@@ -38,12 +38,12 @@ const HomePageMasthead = () => (
             </h2>
             <ul className="govuk-list">
               <li>
-                <Link to="/find-statistics" className={styles.link}>
+                <Link to="/search-releases" className={styles.link}>
                   Explore publications
                 </Link>
               </li>
               <li>
-                <Link to="/data-catalogue" className={styles.link}>
+                <Link to="/search-data" className={styles.link}>
                   Browse data catalogue
                 </Link>
               </li>
