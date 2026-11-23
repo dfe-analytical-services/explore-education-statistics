@@ -349,13 +349,6 @@ public class StatisticsDbContext : DbContext
 
         modelBuilder
             .Entity<FilterFootnote>()
-            .HasOne<Filter>()
-            .WithMany()
-            .HasForeignKey(filterFootnote => filterFootnote.FilterId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder
-            .Entity<FilterFootnote>()
             .HasOne(filterFootnote => filterFootnote.Footnote)
             .WithMany(footnote => footnote.Filters)
             .HasForeignKey(filterFootnote => filterFootnote.FootnoteId)
@@ -370,13 +363,6 @@ public class StatisticsDbContext : DbContext
 
         modelBuilder
             .Entity<FilterGroupFootnote>()
-            .HasOne<FilterGroup>()
-            .WithMany()
-            .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FilterGroupId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder
-            .Entity<FilterGroupFootnote>()
             .HasOne(filterGroupFootnote => filterGroupFootnote.Footnote)
             .WithMany(footnote => footnote.FilterGroups)
             .HasForeignKey(filterGroupFootnote => filterGroupFootnote.FootnoteId)
@@ -388,13 +374,6 @@ public class StatisticsDbContext : DbContext
         modelBuilder.Entity<FilterItemFootnote>().HasKey(item => new { item.FilterItemId, item.FootnoteId });
 
         modelBuilder.Entity<FilterItemFootnote>().HasIndex(filterItemFootnote => filterItemFootnote.SubjectId);
-
-        modelBuilder
-            .Entity<FilterItemFootnote>()
-            .HasOne<FilterItem>()
-            .WithMany()
-            .HasForeignKey(filterItemFootnote => filterItemFootnote.FilterItemId)
-            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder
             .Entity<FilterItemFootnote>()
@@ -417,13 +396,6 @@ public class StatisticsDbContext : DbContext
         modelBuilder.Entity<IndicatorFootnote>().HasKey(item => new { item.IndicatorId, item.FootnoteId });
 
         modelBuilder.Entity<IndicatorFootnote>().HasIndex(indicatorFootnote => indicatorFootnote.SubjectId);
-
-        modelBuilder
-            .Entity<IndicatorFootnote>()
-            .HasOne<Indicator>()
-            .WithMany()
-            .HasForeignKey(indicatorFootnote => indicatorFootnote.IndicatorId)
-            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder
             .Entity<IndicatorFootnote>()
