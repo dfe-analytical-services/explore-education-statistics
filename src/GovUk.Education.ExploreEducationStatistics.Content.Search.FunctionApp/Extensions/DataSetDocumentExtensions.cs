@@ -29,6 +29,10 @@ public static class DataSetDocumentExtensions
     /// </summary>
     /// <remarks>
     /// Metadata key/value pairs are set using HTTP headers and must be valid headers containing only ASCII characters.
+    /// <para>
+    /// FileId is the search index key. The native blob soft delete detection policy needs the key in blob metadata
+    /// (not just the JSON content) to remove the document of a deleted blob from the index.
+    /// </para>
     /// </remarks>
     public static IDictionary<string, string> BuildMetadata(this DataSetDocument dataSetDocument) =>
         new Dictionary<string, string>
