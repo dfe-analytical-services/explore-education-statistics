@@ -18,11 +18,7 @@ public class FileImportService(
     IImporterService importerService
 ) : IFileImportService
 {
-    public async Task ImportObservations(
-        DataImport import,
-        IStorageDataSet dataSet,
-        IStorageDataSetWriter dataSetWriter
-    )
+    public async Task ImportObservations(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         logger.LogInformation("Importing Observations for {Filename}", import.File.Filename);
 
@@ -52,13 +48,7 @@ public class FileImportService(
         var datafileStreamProvider = privateBlobStorageService.GetDataFileStreamProvider(import);
         var metaFileStreamProvider = privateBlobStorageService.GetMetadataFileStreamProvider(import);
 
-        await importerService.ImportObservations(
-            import,
-            datafileStreamProvider,
-            metaFileStreamProvider,
-            dataSet,
-            dataSetWriter
-        );
+        await importerService.ImportObservations(import, datafileStreamProvider, metaFileStreamProvider, dataSetWriter);
     }
 
     public async Task ImportFiltersAndLocations(
@@ -74,7 +64,7 @@ public class FileImportService(
         await importerService.ImportFiltersAndLocations(import, datafileStreamProvider, subjectMeta, dataSetWriter);
     }
 
-    public async Task CompleteImport(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter)
+    public async Task CompleteImport(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         if (import.Status.IsFinished())
         {
@@ -119,16 +109,16 @@ public class FileImportService(
             return;
         }
 
-        await FinalImportTasks(import, dataSet, dataSetWriter);
+        await FinalImportTasks(import, dataSetWriter);
         await dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
     }
 
-    private async Task FinalImportTasks(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter)
+    private async Task FinalImportTasks(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         try
         {
-            await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId);
-            await dataImportService.WriteDataSetFileMeta(import, dataSet, dataSetWriter);
+            await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId, dataSetWriter.DataSet);
+            await dataImportService.WriteDataSetFileMeta(import, dataSetWriter);
         }
         catch (Exception e)
         {

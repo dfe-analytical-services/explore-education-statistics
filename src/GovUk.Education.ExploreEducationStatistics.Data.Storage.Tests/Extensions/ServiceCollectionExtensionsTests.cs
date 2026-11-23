@@ -44,8 +44,11 @@ public class ServiceCollectionExtensionsTests
 
         var factory = scope.ServiceProvider.GetRequiredService<StatisticsDbDataSetWriterFactory>();
 
-        var writer = factory.Create(Guid.NewGuid());
-        Assert.IsType<StatisticsDbDataSetWriter>(writer);
+        var subjectId = Guid.NewGuid();
+
+        var writer = Assert.IsType<StatisticsDbDataSetWriter>(factory.Create(subjectId));
+        var dataSet = Assert.IsType<StatisticsDbDataSet>(writer.DataSet);
+        Assert.Equal(subjectId, dataSet.SubjectId);
     }
 
     [Fact]
@@ -70,9 +73,11 @@ public class ServiceCollectionExtensionsTests
     {
         return new ServiceCollection()
             .AddLogging()
+            .AddScoped(_ => InMemoryContentDbContext())
             .AddScoped(_ => InMemoryStatisticsDbContext())
             .AddSingleton(Mock.Of<IDatabaseHelper>())
             .AddSingleton(Mock.Of<IGuidGenerator>())
+            .AddStorageDataSets()
             .AddStorageDataSetWriters()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
     }

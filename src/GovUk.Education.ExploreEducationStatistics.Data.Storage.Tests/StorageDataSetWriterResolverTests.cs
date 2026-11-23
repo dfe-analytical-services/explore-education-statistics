@@ -26,6 +26,9 @@ public class StorageDataSetWriterResolverTests
 
         var writer = Assert.IsType<StatisticsDbDataSetWriter>(result);
         Assert.Equal(dataFile.SubjectId, writer.SubjectId);
+
+        var dataSet = Assert.IsType<StatisticsDbDataSet>(writer.DataSet);
+        Assert.Equal(dataFile.SubjectId, dataSet.SubjectId);
     }
 
     [Fact]

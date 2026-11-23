@@ -8,10 +8,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
+using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
@@ -158,7 +161,10 @@ public class DataSetMappingServiceTests
 
         var service = BuildDataSetMappingService(contentDbContextId, statisticsDbContextId);
 
-        await service.CreateInitialDataSetMappingIfReplacement(replacementFileId: replacementDataFileId);
+        await service.CreateInitialDataSetMappingIfReplacement(
+            replacementFileId: replacementDataFileId,
+            replacementDataSet: BuildDataSet(statisticsDbContextId, replacementSubjectId)
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -382,7 +388,10 @@ public class DataSetMappingServiceTests
 
         var service = BuildDataSetMappingService(contentDbContextId, statisticsDbContextId);
 
-        await service.CreateInitialDataSetMappingIfReplacement(replacementFileId: replacementDataFileId);
+        await service.CreateInitialDataSetMappingIfReplacement(
+            replacementFileId: replacementDataFileId,
+            replacementDataSet: BuildDataSet(statisticsDbContextId, replacementSubjectId)
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -770,7 +779,10 @@ public class DataSetMappingServiceTests
             statisticsDbContextId: statisticsDbContextId
         );
 
-        await service.CreateInitialDataSetMappingIfReplacement(replacementFileId: file.Id);
+        await service.CreateInitialDataSetMappingIfReplacement(
+            replacementFileId: file.Id,
+            replacementDataSet: Mock.Of<IStorageDataSet>(Strict)
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -833,7 +845,10 @@ public class DataSetMappingServiceTests
 
         var service = BuildDataSetMappingService(contentDbContextId, statisticsDbContextId);
 
-        await service.CreateInitialDataSetMappingIfReplacement(replacementFile.Id);
+        await service.CreateInitialDataSetMappingIfReplacement(
+            replacementFile.Id,
+            BuildDataSet(statisticsDbContextId, replacementSubject.Id)
+        );
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
@@ -862,6 +877,11 @@ public class DataSetMappingServiceTests
                 InMemoryStatisticsDbContext(statisticsDbContextId)
             )
         );
+    }
+
+    private static IStorageDataSet BuildDataSet(string statisticsDbContextId, Guid subjectId)
+    {
+        return BuildStatisticsDbDataSetFactory(InMemoryStatisticsDbContext(statisticsDbContextId)).Create(subjectId);
     }
 
     private static FilterMapping CreateFilterMapping(

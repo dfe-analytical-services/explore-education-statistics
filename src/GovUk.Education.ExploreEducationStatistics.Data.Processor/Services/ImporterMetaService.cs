@@ -42,10 +42,11 @@ public class ImporterMetaService : IImporterMetaService
     public async Task<SubjectMeta> Import(
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
-        IStorageDataSet dataSet,
         IStorageDataSetWriter dataSetWriter
     )
     {
+        var dataSet = dataSetWriter.DataSet;
+
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
         metaRows = IgnoreFiltersUsedForGrouping(metaRows);

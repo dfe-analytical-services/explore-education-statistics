@@ -17,7 +17,6 @@ public class ProcessorService(
     IImporterService importerService,
     IDataImportService dataImportService,
     IValidatorService validatorService,
-    IStorageDataSetResolver storageDataSetResolver,
     IStorageDataSetWriterResolver storageDataSetWriterResolver
 ) : IProcessorService
 {
@@ -46,7 +45,6 @@ public class ProcessorService(
     {
         var import = await dataImportService.GetImport(importId);
 
-        var dataSet = storageDataSetResolver.Resolve(import.File);
         var dataSetWriter = storageDataSetWriterResolver.Resolve(import.File);
 
         var metaFileStreamProvider = privateBlobStorageService.GetMetadataFileStreamProvider(import);
@@ -54,7 +52,7 @@ public class ProcessorService(
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-        var subjectMeta = await importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, dataSet, dataSetWriter);
+        var subjectMeta = await importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, dataSetWriter);
         await fileImportService.ImportFiltersAndLocations(import.Id, subjectMeta, dataSetWriter);
     }
 
@@ -64,12 +62,11 @@ public class ProcessorService(
 
         try
         {
-            var dataSet = storageDataSetResolver.Resolve(import.File);
             var dataSetWriter = storageDataSetWriterResolver.Resolve(import.File);
-            await fileImportService.ImportObservations(import, dataSet, dataSetWriter);
+            await fileImportService.ImportObservations(import, dataSetWriter);
 
             var completedImport = await dataImportService.GetImport(import.Id);
-            await fileImportService.CompleteImport(completedImport, dataSet, dataSetWriter);
+            await fileImportService.CompleteImport(completedImport, dataSetWriter);
         }
         catch (Exception e)
         {

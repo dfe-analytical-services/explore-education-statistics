@@ -6,9 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
 
 public interface IFileImportService
 {
-    Task ImportObservations(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter);
+    Task ImportObservations(DataImport import, IStorageDataSetWriter dataSetWriter);
 
     Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, IStorageDataSetWriter dataSetWriter);
 
-    Task CompleteImport(DataImport import, IStorageDataSet dataSet, IStorageDataSetWriter dataSetWriter);
+    Task CompleteImport(DataImport import, IStorageDataSetWriter dataSetWriter);
 }
