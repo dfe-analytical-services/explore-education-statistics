@@ -354,7 +354,8 @@ Navigate to api data set on public frontend website
     user waits until h2 is visible    Data set details
 
 Verify the highest patch version is displayed in the data set public frontend page
-    user waits until element is visible    xpath://div[span[text()='API data set version'] and contains(., '1.0.2')]
+    user waits until element is visible
+    ...    xpath://dd[@data-testid='API data set version-value' and contains(., '1.0.2')]
 
 Verify that the two patch versions are collated on a single page
     user clicks link    API data set changelog

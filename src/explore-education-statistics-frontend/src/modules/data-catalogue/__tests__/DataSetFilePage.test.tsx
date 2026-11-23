@@ -19,7 +19,21 @@ const downloadService = _downloadService as jest.Mocked<
   typeof _downloadService
 >;
 
+let mockIsMedia = false;
+jest.mock('@common/hooks/useMedia', () => ({
+  ...jest.requireActual('@common/hooks/useMedia'),
+  useMobileMedia: () => {
+    return {
+      isMedia: mockIsMedia,
+    };
+  },
+}));
+
 describe('DataSetFilePage', () => {
+  beforeEach(() => {
+    mockIsMedia = false;
+  });
+
   test('renders the data set file heading, summary and info', async () => {
     render(
       <DataSetFilePage
@@ -30,18 +44,138 @@ describe('DataSetFilePage', () => {
 
     expect(await screen.findByText('On this page')).toBeInTheDocument();
 
+    expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
+      'Data set from Publication 1',
+    );
     expect(
-      screen.getByRole('heading', { name: 'Data set 1' }),
+      screen.getByRole('heading', { name: 'Data set 1', level: 1 }),
     ).toBeInTheDocument();
-
-    const infoSection = within(screen.getByTestId('data-set-file-info'));
-    expect(infoSection.getByText('Latest data')).toBeInTheDocument();
-    expect(infoSection.getByText('1 January 2024')).toBeInTheDocument();
-    expect(
-      infoSection.getByRole('button', { name: 'Download data set (ZIP)' }),
-    ).toBeInTheDocument();
-
     expect(screen.getByText('Data set 1 summary')).toBeInTheDocument();
+
+    const infoRow = within(screen.getByTestId('data-set-file-info-row'));
+    expect(infoRow.getByText('Latest data')).toBeInTheDocument();
+
+    const infoContainer = within(
+      screen.getByTestId('data-set-file-info-container'),
+    );
+    const published = within(infoContainer.getByTestId('Published'));
+    expect(published.getByTestId('Published-key')).toHaveTextContent(
+      'Published',
+    );
+    expect(published.getByTestId('Published-value')).toHaveTextContent(
+      '1 January 2024',
+    );
+    const lastUpdated = within(infoContainer.getByTestId('Last updated'));
+    expect(lastUpdated.getByTestId('Last updated-key')).toHaveTextContent(
+      'Last updated',
+    );
+    expect(lastUpdated.getByTestId('Last updated-value')).toBeInTheDocument();
+  });
+
+  describe('desktop', () => {
+    test('renders the quick links in the page title, not in the info container', async () => {
+      render(
+        <DataSetFilePage
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(screen.getAllByTestId('quick-links')).toHaveLength(1);
+
+      expect(
+        within(
+          screen.getByTestId('data-set-file-info-container'),
+        ).queryByTestId('quick-links'),
+      ).not.toBeInTheDocument();
+
+      const quickLinks = within(screen.getByTestId('quick-links'));
+      expect(
+        quickLinks.getByRole('button', { name: 'Download data set (ZIP)' }),
+      ).toBeInTheDocument();
+      expect(
+        quickLinks.getByRole('link', { name: 'Create your own tables' }),
+      ).toHaveAttribute(
+        'href',
+        '/data-tables/publication-1-slug/release-1-slug?subjectId=subject-id',
+      );
+    });
+  });
+
+  describe('mobile', () => {
+    beforeEach(() => {
+      mockIsMedia = true;
+    });
+
+    test('does not render the summary', async () => {
+      render(
+        <DataSetFilePage
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('heading', { name: 'Data set 1', level: 1 }),
+      ).toBeInTheDocument();
+      expect(screen.queryByText('Data set 1 summary')).not.toBeInTheDocument();
+    });
+
+    test('renders the quick links in the info container, not in the page title', async () => {
+      render(
+        <DataSetFilePage
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(screen.getAllByTestId('quick-links')).toHaveLength(1);
+
+      const quickLinks = within(
+        within(screen.getByTestId('data-set-file-info-container')).getByTestId(
+          'quick-links',
+        ),
+      );
+      expect(
+        quickLinks.getByRole('button', { name: 'Download data set (ZIP)' }),
+      ).toBeInTheDocument();
+      expect(
+        quickLinks.getByRole('link', { name: 'Create your own tables' }),
+      ).toHaveAttribute(
+        'href',
+        '/data-tables/publication-1-slug/release-1-slug?subjectId=subject-id',
+      );
+    });
+
+    test('renders the subscribe link in the quick links for an API data set', async () => {
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(
+        within(
+          within(
+            screen.getByTestId('data-set-file-info-container'),
+          ).getByTestId('quick-links'),
+        ).getByRole('link', { name: 'Get email alerts' }),
+      ).toHaveAttribute(
+        'href',
+        '/api-subscriptions/new-subscription/data-set-file-id',
+      );
+    });
   });
 
   test('renders the `latest data` tag when it is the latest data', async () => {
@@ -261,9 +395,29 @@ describe('DataSetFilePage', () => {
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
-      const infoSection = within(screen.getByTestId('data-set-file-info'));
+      const infoSection = within(
+        screen.getByTestId('data-set-file-info-container'),
+      );
       expect(
         infoSection.queryByText('API data set version'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('does not render the API data set versions link', async () => {
+      render(
+        <DataSetFilePage
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(
+        within(screen.getByTestId('data-set-file-info-row')).queryByRole(
+          'link',
+          { name: 'API data set versions' },
+        ),
       ).not.toBeInTheDocument();
     });
 
@@ -281,13 +435,14 @@ describe('DataSetFilePage', () => {
         screen.getByRole('navigation', { name: 'On this page' }),
       );
       const navLinks = nav.getAllByRole('link');
-      expect(navLinks).toHaveLength(6);
+      expect(navLinks).toHaveLength(7);
       expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
       expect(navLinks[3]).toHaveAttribute('href', '#dataSetFootnotes');
       expect(navLinks[4]).toHaveAttribute('href', '#dataSetUsage');
       expect(navLinks[5]).toHaveAttribute('href', '#dataSetContact');
+      expect(navLinks[6]).toHaveAttribute('href', '#top');
     });
 
     test('renders the page navigation correctly when there are no footnotes', async () => {
@@ -304,12 +459,13 @@ describe('DataSetFilePage', () => {
         screen.getByRole('navigation', { name: 'On this page' }),
       );
       const navLinks = nav.getAllByRole('link');
-      expect(navLinks).toHaveLength(5);
+      expect(navLinks).toHaveLength(6);
       expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
       expect(navLinks[3]).toHaveAttribute('href', '#dataSetUsage');
       expect(navLinks[4]).toHaveAttribute('href', '#dataSetContact');
+      expect(navLinks[5]).toHaveAttribute('href', '#top');
     });
 
     test('does not render the API version history section', async () => {
@@ -356,9 +512,35 @@ describe('DataSetFilePage', () => {
 
       expect(await screen.findByText('On this page')).toBeInTheDocument();
 
-      const infoSection = within(screen.getByTestId('data-set-file-info'));
-      expect(infoSection.getByText('API data set version')).toBeInTheDocument();
-      expect(infoSection.getByText('1.0')).toBeInTheDocument();
+      const infoSection = within(
+        screen.getByTestId('data-set-file-info-container'),
+      );
+      const version = within(infoSection.getByTestId('API data set version'));
+      expect(version.getByTestId('API data set version-key')).toHaveTextContent(
+        'API data set version',
+      );
+      expect(
+        version.getByTestId('API data set version-value'),
+      ).toHaveTextContent('1.0');
+    });
+
+    test('renders the API data set versions link', async () => {
+      render(
+        <DataSetFilePage
+          apiDataSet={testApiDataSet}
+          apiDataSetVersion={testApiDataSetVersion}
+          dataSetFile={testDataSetFile}
+          publicationSummary={testPublicationSummary}
+        />,
+      );
+
+      expect(await screen.findByText('On this page')).toBeInTheDocument();
+
+      expect(
+        within(screen.getByTestId('data-set-file-info-row')).getByRole('link', {
+          name: 'API data set versions',
+        }),
+      ).toHaveAttribute('href', '#apiVersionHistory');
     });
 
     test('renders the subscribe link if has an `apiDataSetId`', async () => {
@@ -398,7 +580,7 @@ describe('DataSetFilePage', () => {
       );
 
       const navLinks = nav.getAllByRole('link');
-      expect(navLinks).toHaveLength(8);
+      expect(navLinks).toHaveLength(9);
       expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
@@ -407,6 +589,7 @@ describe('DataSetFilePage', () => {
       expect(navLinks[5]).toHaveAttribute('href', '#api');
       expect(navLinks[6]).toHaveAttribute('href', '#apiVersionHistory');
       expect(navLinks[7]).toHaveAttribute('href', '#dataSetContact');
+      expect(navLinks[8]).toHaveAttribute('href', '#top');
     });
 
     test('renders the page navigation correctly when there are no footnotes', async () => {
@@ -426,7 +609,7 @@ describe('DataSetFilePage', () => {
       );
 
       const navLinks = nav.getAllByRole('link');
-      expect(navLinks).toHaveLength(7);
+      expect(navLinks).toHaveLength(8);
       expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
       expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
       expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
@@ -434,6 +617,7 @@ describe('DataSetFilePage', () => {
       expect(navLinks[4]).toHaveAttribute('href', '#api');
       expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
       expect(navLinks[6]).toHaveAttribute('href', '#dataSetContact');
+      expect(navLinks[7]).toHaveAttribute('href', '#top');
     });
 
     test('renders the page navigation correctly when there is an API changelog', async () => {
@@ -690,7 +874,7 @@ describe('DataSetFilePage', () => {
 
 function assertNavigationIncludesChangelog(nav: ReturnType<typeof within>) {
   const navLinks = nav.getAllByRole('link');
-  expect(navLinks).toHaveLength(8);
+  expect(navLinks).toHaveLength(9);
   expect(navLinks[0]).toHaveAttribute('href', '#dataSetDetails');
   expect(navLinks[1]).toHaveAttribute('href', '#dataSetPreview');
   expect(navLinks[2]).toHaveAttribute('href', '#dataSetVariables');
@@ -699,4 +883,5 @@ function assertNavigationIncludesChangelog(nav: ReturnType<typeof within>) {
   expect(navLinks[5]).toHaveAttribute('href', '#apiVersionHistory');
   expect(navLinks[6]).toHaveAttribute('href', '#apiChangelog');
   expect(navLinks[7]).toHaveAttribute('href', '#dataSetContact');
+  expect(navLinks[8]).toHaveAttribute('href', '#top');
 }

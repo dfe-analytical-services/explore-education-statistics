@@ -175,27 +175,9 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var locationIds = locationAttributePaths.Select(location => location.Id).ToHashSet();
 
-        // If possible, use the locations from the database as these contain
-        // all the attributes from when it was originally created.
-        // Locations in the database are immutable, but they may have been deleted
-        // if they have been orphaned from any subject for too long.
-        var locations = await _statisticsDbContext
+        return await _statisticsDbContext
             .Location.Where(location => locationIds.Contains(location.Id))
-            .ToDictionaryAsync(location => location.Id);
-
-        // For any locations that no longer exist in the database, fallback to using the
-        // permalink's location hierarchy metadata. It should be noted that this meta
-        // doesn't provide the full set of location attributes so the location will
-        // most likely be missing columns that existed in the original CSV.
-        return locationAttributePaths.ToDictionary(
-            location => location.Id,
-            location =>
-                locations.ContainsKey(location.Id)
-                    ? locations[location.Id].GetCsvValues()
-                    : location
-                        .Path.SelectMany(node => ParseLocationAttribute(node).CsvValues)
-                        .ToDictionary(colValue => colValue.Key, colValue => colValue.Value)
-        );
+            .ToDictionaryAsync(location => location.Id, location => location.GetCsvValues());
     }
 
     private static List<LocationAttributePath> GetLocationAttributePaths(
@@ -228,42 +210,6 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         }
 
         return leafPaths;
-    }
-
-    private static LocationAttribute ParseLocationAttribute(LocationAttributeViewModel viewModel)
-    {
-        return viewModel.Level switch
-        {
-            GeographicLevel.Country => new Country(viewModel.Value, viewModel.Label),
-            GeographicLevel.EnglishDevolvedArea => new EnglishDevolvedArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.LocalAuthority => new LocalAuthority(viewModel.Value, null, viewModel.Label),
-            GeographicLevel.LocalAuthorityDistrict => new LocalAuthorityDistrict(viewModel.Value, viewModel.Label),
-            GeographicLevel.LocalEnterprisePartnership => new LocalEnterprisePartnership(
-                viewModel.Value,
-                viewModel.Label
-            ),
-            GeographicLevel.LocalSkillsImprovementPlanArea => new LocalSkillsImprovementPlanArea(
-                viewModel.Value,
-                viewModel.Label
-            ),
-            GeographicLevel.Institution => new Institution(viewModel.Value, viewModel.Label),
-            GeographicLevel.MayoralCombinedAuthority => new MayoralCombinedAuthority(viewModel.Value, viewModel.Label),
-            GeographicLevel.MultiAcademyTrust => new MultiAcademyTrust(viewModel.Value, viewModel.Label),
-            GeographicLevel.OpportunityArea => new OpportunityArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.ParliamentaryConstituency => new ParliamentaryConstituency(
-                viewModel.Value,
-                viewModel.Label
-            ),
-            GeographicLevel.PlanningArea => new PlanningArea(viewModel.Value, viewModel.Label),
-            GeographicLevel.Provider => new Provider(viewModel.Value, viewModel.Label),
-            GeographicLevel.Region => new Region(viewModel.Value, viewModel.Label),
-            GeographicLevel.RscRegion => new RscRegion(viewModel.Value),
-            GeographicLevel.School => new School(viewModel.Value, viewModel.Label),
-            GeographicLevel.Sponsor => new Sponsor(viewModel.Value, viewModel.Label),
-            GeographicLevel.Ward => new Ward(viewModel.Value, viewModel.Label),
-            GeographicLevel.PoliceForceArea => new PoliceForceArea(viewModel.Value, viewModel.Label),
-            _ => throw new ArgumentOutOfRangeException(),
-        };
     }
 
     private record LocationAttributePath(Guid Id, IList<LocationAttributeViewModel> Path);

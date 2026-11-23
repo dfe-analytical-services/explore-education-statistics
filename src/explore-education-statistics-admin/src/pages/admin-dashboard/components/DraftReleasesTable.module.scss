@@ -1,3 +1,13 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
 .issuesColumn {
-  width: 300px;
+  width: 160px;
+}
+
+.actions {
+  --verticalSpacing: #{govuk-spacing(1)};
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 0;
+  white-space: nowrap;
 }

@@ -2,6 +2,52 @@ import { LocationsMapping } from '@admin/services/apiDataSetVersionService';
 
 const testLocationsMapping: LocationsMapping = {
   levels: {
+    // autoMapped = 13 - 15
+    englishDevolvedArea: {
+      candidates: {
+        Location13Key: {
+          label: 'Location 13',
+          code: 'location-13-code',
+        },
+        Location14Key: {
+          label: 'Location 14',
+          code: 'location-14-code',
+        },
+        Location15Key: {
+          label: 'Location 15',
+          code: 'location-15-code',
+        },
+      },
+      mappings: {
+        Location13Key: {
+          candidateKey: 'Location13Key',
+          publicId: 'location-13-public-id',
+          source: {
+            label: 'Location 13',
+            code: 'location-13-code',
+          },
+          type: 'AutoMapped',
+        },
+        Location14Key: {
+          candidateKey: 'Location14Key',
+          publicId: 'location-14-public-id',
+          source: {
+            label: 'Location 14',
+            code: 'location-14-code',
+          },
+          type: 'AutoMapped',
+        },
+        Location15Key: {
+          candidateKey: 'Location15Key',
+          publicId: 'location-15-public-id',
+          source: {
+            label: 'Location 15',
+            code: 'location-15-code',
+          },
+          type: 'AutoMapped',
+        },
+      },
+    },
     // autoMapped = 1 & 5
     // autoNone = 2
     // manualMapped = 3
@@ -140,52 +186,6 @@ const testLocationsMapping: LocationsMapping = {
         },
       },
     },
-    // autoMapped = 13 - 15
-    englishDevolvedArea: {
-      candidates: {
-        Location13Key: {
-          label: 'Location 13',
-          code: 'location-13-code',
-        },
-        Location14Key: {
-          label: 'Location 14',
-          code: 'location-14-code',
-        },
-        Location15Key: {
-          label: 'Location 15',
-          code: 'location-15-code',
-        },
-      },
-      mappings: {
-        Location13Key: {
-          candidateKey: 'Location13Key',
-          publicId: 'location-13-public-id',
-          source: {
-            label: 'Location 13',
-            code: 'location-13-code',
-          },
-          type: 'AutoMapped',
-        },
-        Location14Key: {
-          candidateKey: 'Location14Key',
-          publicId: 'location-14-public-id',
-          source: {
-            label: 'Location 14',
-            code: 'location-14-code',
-          },
-          type: 'AutoMapped',
-        },
-        Location15Key: {
-          candidateKey: 'Location15Key',
-          publicId: 'location-15-public-id',
-          source: {
-            label: 'Location 15',
-            code: 'location-15-code',
-          },
-          type: 'AutoMapped',
-        },
-      },
-    },
   },
 };
 
@@ -194,28 +194,6 @@ export default testLocationsMapping;
 export const testLocationsMappingGroups: LocationsMapping = {
   levels: {
     ...testLocationsMapping.levels,
-    // Group has been deleted
-    sponsor: {
-      candidates: {},
-      mappings: {
-        Location16Key: {
-          publicId: 'location-16-public-id',
-          source: {
-            label: 'Location 16',
-            code: 'location-16-code',
-          },
-          type: 'AutoNone',
-        },
-        Location17Key: {
-          publicId: 'location-17-public-id',
-          source: {
-            label: 'Location 17',
-            code: 'location-17-code',
-          },
-          type: 'AutoNone',
-        },
-      },
-    },
     // Group has been deleted
     localAuthorityDistrict: {
       candidates: {},
@@ -239,20 +217,6 @@ export const testLocationsMappingGroups: LocationsMapping = {
       },
     },
     // Group has been added
-    ward: {
-      candidates: {
-        Location20Key: {
-          label: 'Location 20',
-          code: 'location-20-code',
-        },
-        Location21Key: {
-          label: 'Location 21',
-          code: 'location-21-code',
-        },
-      },
-      mappings: {},
-    },
-    // Group has been added
     opportunityArea: {
       candidates: {
         Location22Key: {
@@ -262,6 +226,42 @@ export const testLocationsMappingGroups: LocationsMapping = {
         Location23Key: {
           label: 'Location 23',
           code: 'location-23-code',
+        },
+      },
+      mappings: {},
+    },
+    // Group has been deleted
+    sponsor: {
+      candidates: {},
+      mappings: {
+        Location16Key: {
+          publicId: 'location-16-public-id',
+          source: {
+            label: 'Location 16',
+            code: 'location-16-code',
+          },
+          type: 'AutoNone',
+        },
+        Location17Key: {
+          publicId: 'location-17-public-id',
+          source: {
+            label: 'Location 17',
+            code: 'location-17-code',
+          },
+          type: 'AutoNone',
+        },
+      },
+    },
+    // Group has been added
+    ward: {
+      candidates: {
+        Location20Key: {
+          label: 'Location 20',
+          code: 'location-20-code',
+        },
+        Location21Key: {
+          label: 'Location 21',
+          code: 'location-21-code',
         },
       },
       mappings: {},

@@ -6,118 +6,160 @@ import {
 } from '@admin/pages/publication/components/PublicationGuidance';
 import { DashboardReleaseVersionSummary } from '@admin/services/releaseVersionService';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Dictionary } from '@common/types';
+import ButtonText from '@common/components/ButtonText';
+import Pagination from '@common/components/Pagination';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import orderBy from 'lodash/orderBy';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
-interface PublicationRowProps {
-  isBauUser: boolean;
-  publication: string;
+const releasesPerPage = 25;
+
+interface PublicationGroup {
+  id: string;
   releases: DashboardReleaseVersionSummary[];
-  onChangeRelease: () => void;
 }
 
-const PublicationRow = ({
-  isBauUser,
-  publication,
-  releases,
-  onChangeRelease,
-}: PublicationRowProps) => {
-  return (
-    <>
-      <tr key={publication}>
-        <th className="govuk-!-padding-top-6" colSpan={isBauUser ? 3 : 4}>
-          {publication}
-        </th>
-      </tr>
-      {releases.map(release => (
-        <DraftReleaseRow
-          key={release.id}
-          isBauUser={isBauUser}
-          release={release}
-          onChangeRelease={onChangeRelease}
-        />
-      ))}
-    </>
-  );
-};
-
 interface DraftReleasesTableProps {
-  isBauUser: boolean;
+  showIssues: boolean;
+  showMethodology: boolean;
   releases: DashboardReleaseVersionSummary[];
   onChangeRelease: () => void;
 }
 
 const DraftReleasesTable = ({
-  isBauUser,
+  showIssues,
+  showMethodology,
   releases,
   onChangeRelease,
 }: DraftReleasesTableProps) => {
-  const releasesByPublication: Dictionary<DashboardReleaseVersionSummary[]> =
-    useMemo(() => {
-      return releases.reduce<Dictionary<DashboardReleaseVersionSummary[]>>(
-        (acc, release) => {
-          if (acc[release.publication.title]) {
-            acc[release.publication.title].push(release);
-          } else {
-            acc[release.publication.title] = [release];
-          }
+  const [currentPage, setCurrentPage] = useState(1);
 
-          return acc;
-        },
-        {},
-      );
-    }, [releases]);
+  const orderedReleases = useMemo(
+    () =>
+      orderBy(
+        releases,
+        [
+          release => release.publication.title.toLowerCase(),
+          release => release.publication.id,
+          release => release.year,
+          release => release.title.toLowerCase(),
+          release => release.id,
+        ],
+        ['asc', 'asc', 'desc', 'asc', 'asc'],
+      ),
+    [releases],
+  );
+
+  const totalPages = Math.ceil(orderedReleases.length / releasesPerPage);
+  const page = Math.min(currentPage, totalPages);
+  const pageReleases = orderedReleases.slice(
+    (page - 1) * releasesPerPage,
+    page * releasesPerPage,
+  );
+
+  const publicationGroups = useMemo(() => {
+    return pageReleases.reduce<PublicationGroup[]>((groups, release) => {
+      const currentGroup = groups[groups.length - 1];
+
+      if (currentGroup?.id === release.publication.id) {
+        currentGroup.releases.push(release);
+      } else {
+        groups.push({
+          id: release.publication.id,
+          releases: [release],
+        });
+      }
+
+      return groups;
+    }, []);
+  }, [pageReleases]);
 
   return (
     <>
+      <VisuallyHidden>
+        <p aria-atomic aria-live="polite">
+          {orderedReleases.length === 0
+            ? '0 results'
+            : `${orderedReleases.length} results, showing page ${page} of ${totalPages}`}
+        </p>
+      </VisuallyHidden>
       {releases.length === 0 ? (
         <p>There are currently no draft releases</p>
       ) : (
         <>
-          {releasesByPublication &&
-            Object.keys(releasesByPublication).length > 0 && (
-              <>
-                <table>
-                  <thead>
-                    <tr>
-                      <th
-                        className={
-                          isBauUser ? 'govuk-!-width-one-half' : undefined
-                        }
-                      >
-                        Publication / Release period
-                      </th>
-                      <th className="dfe-white-space--nowrap">Status</th>
-                      {/* Don't render the issues for BAU users to prevent performance problems. */}
-                      {!isBauUser && (
-                        <th
-                          className={`${styles.issuesColumn} dfe-white-space--nowrap`}
-                        >
-                          Issues
-                        </th>
-                      )}
-                      <th>Actions</th>
-                    </tr>
-                    {orderBy(Object.keys(releasesByPublication)).map(
-                      publication => (
-                        <PublicationRow
-                          key={publication}
-                          isBauUser={isBauUser}
-                          publication={publication}
-                          releases={releasesByPublication[publication]}
-                          onChangeRelease={onChangeRelease}
-                        />
-                      ),
-                    )}
-                  </thead>
-                </table>
-                <ButtonGroup>
-                  {!isBauUser && <IssuesGuidanceModal />}
-                  <DraftStatusGuidanceModal />
-                </ButtonGroup>
-              </>
+          <div className="table-container">
+            <table>
+              <caption className="govuk-visually-hidden">
+                Draft releases grouped by publication
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">Publication title</th>
+                  <th scope="col">Release</th>
+                  <th scope="col" className="dfe-white-space--nowrap">
+                    Draft status
+                  </th>
+                  {showIssues && (
+                    <th
+                      scope="col"
+                      className={`${styles.issuesColumn} dfe-white-space--nowrap`}
+                    >
+                      Issues
+                    </th>
+                  )}
+                  {showMethodology && (
+                    <th scope="col" className="dfe-white-space--nowrap">
+                      Methodology status
+                    </th>
+                  )}
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              {publicationGroups.map(group => (
+                <tbody key={group.id}>
+                  {group.releases.map((release, index) => (
+                    <DraftReleaseRow
+                      key={release.id}
+                      publicationRowSpan={
+                        index === 0 ? group.releases.length : undefined
+                      }
+                      release={release}
+                      showIssues={showIssues}
+                      showMethodology={showMethodology}
+                      onChangeRelease={onChangeRelease}
+                    />
+                  ))}
+                </tbody>
+              ))}
+            </table>
+          </div>
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            renderLink={({
+              'aria-current': ariaCurrent,
+              'aria-label': ariaLabel,
+              'data-testid': testId,
+              children,
+              className,
+              onClick,
+            }) => (
+              <ButtonText
+                ariaCurrent={ariaCurrent}
+                ariaLabel={ariaLabel}
+                className={`govuk-link ${className}`}
+                testId={testId}
+                onClick={onClick}
+              >
+                {children}
+              </ButtonText>
             )}
+            onClick={setCurrentPage}
+          />
+          <ButtonGroup>
+            {showIssues && <IssuesGuidanceModal />}
+            <DraftStatusGuidanceModal />
+          </ButtonGroup>
         </>
       )}
     </>

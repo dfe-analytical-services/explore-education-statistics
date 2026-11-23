@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Doma
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 
 /// <summary>
-/// The Metadata Keys used to enrich a Release Document blob
+/// The Azure Blob metadata keys used for release documents.
 /// </summary>
 public static class ReleaseDocumentAzureBlobMetadataKeys
 {
@@ -26,12 +26,16 @@ public static class ReleaseDocumentAzureBlobMetadataKeys
 
 public static class ReleaseDocumentExtensions
 {
-    public static IDictionary<string, string> BuildMetadata(this ReleaseDocument releaseDocument)
-    {
-        // Metadata key/value pairs are set using HTTP headers and must be valid headers containing only ASCII characters.
-        // Values are Base64 encoded if non-ASCII characters might be present.
-        // Collection values are serialised as JSON string arrays.
-        var metadata = new Dictionary<string, string>
+    /// <summary>
+    /// Build release document metadata as Azure Blob metadata key/value pairs.
+    /// </summary>
+    /// <remarks>
+    /// Metadata key/value pairs are set using HTTP headers and must be valid headers containing only ASCII characters.
+    /// Values are Base64 encoded if non-ASCII characters might be present.
+    /// Collection values are serialised as JSON string arrays.
+    /// </remarks>
+    public static IDictionary<string, string> BuildMetadata(this ReleaseDocument releaseDocument) =>
+        new Dictionary<string, string>
         {
             { ReleaseDocumentAzureBlobMetadataKeys.ReleaseId, releaseDocument.ReleaseId.ToString() },
             { ReleaseDocumentAzureBlobMetadataKeys.ReleaseSlug, releaseDocument.ReleaseSlug.ToBase64String() },
@@ -65,6 +69,4 @@ public static class ReleaseDocumentExtensions
                 )
             },
         };
-        return metadata;
-    }
 }

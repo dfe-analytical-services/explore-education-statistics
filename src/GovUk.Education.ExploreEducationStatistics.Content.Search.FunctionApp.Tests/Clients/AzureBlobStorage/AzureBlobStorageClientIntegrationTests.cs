@@ -134,6 +134,23 @@ public class AzureBlobStorageClientIntegrationTests
                 // ASSERT
                 Assert.NotEmpty(blobNames);
             }
+
+            [Fact(
+                Skip = "This integration test lists the blobs with a prefix from the specified container in the Azure Storage Account."
+            )]
+            public async Task ListBlobsInContainerWithPrefix()
+            {
+                // ARRANGE
+                var sut = GetSut();
+                const string prefix = "-- insert blob name prefix here --";
+
+                // ACT
+                var blobNames = await sut.ListBlobsInContainer(IntegrationTestContainerName, prefix);
+
+                // ASSERT
+                Assert.NotEmpty(blobNames);
+                Assert.All(blobNames, blobName => Assert.StartsWith(prefix, blobName));
+            }
         }
     }
 }
