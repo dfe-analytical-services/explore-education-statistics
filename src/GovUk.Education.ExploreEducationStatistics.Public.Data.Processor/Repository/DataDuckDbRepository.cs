@@ -79,8 +79,13 @@ public class DataDuckDbRepository(
             {
                 var codeColumns = GetLocationCodeColumns(location.Level);
 
+                // The location options table contains options for every geographic level, so
+                // we must restrict the join to this level. Otherwise, options from different
+                // levels with the same code and label (e.g. a ward and a parliamentary
+                // constituency both coded 'z' / 'Unknown') would both match, duplicating rows.
                 string[] conditions =
                 [
+                    $"{LocationOptionsTable.Ref(location).Level} = '{location.Level.GetEnumValue()}'",
                     .. codeColumns.Select(col =>
                         $"{LocationOptionsTable.Ref(location).Col(col.Name)} = {DataSourceTable.Ref.Col(col.CsvName)}"
                     ),
