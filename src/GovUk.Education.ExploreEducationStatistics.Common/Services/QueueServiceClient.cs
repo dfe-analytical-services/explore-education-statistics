@@ -1,15 +1,17 @@
 using System.Text.Json;
 using Azure.Storage.Queues;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 public class QueueServiceClient(string connectionString) : IQueueServiceClient
 {
-    private readonly Azure.Storage.Queues.QueueServiceClient _queueServiceClient = new(
-        connectionString,
-        new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 }
-    );
+    private readonly Azure.Storage.Queues.QueueServiceClient _queueServiceClient =
+        StorageClientFactory.CreateQueueServiceClient(
+            connectionString,
+            new QueueClientOptions { MessageEncoding = QueueMessageEncoding.Base64 }
+        );
 
     public async Task SendMessagesAsJson<T>(
         string queueName,

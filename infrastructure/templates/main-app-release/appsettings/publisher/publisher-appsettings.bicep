@@ -1,5 +1,5 @@
 import { getResourceNamesForEnvironment } from '../../../common/resource-names.bicep'
-import { secretRefsFromSecrets } from '../../../common/functions.bicep'
+import { keylessStorageConnectionString, secretRefsFromSecrets } from '../../../common/functions.bicep'
 
 @description('Identifier for resources in this environment, used as a prefix for all resources e.g. s101d01. Supplied by the pipeline from the environment\'s variable group ("subscription").')
 param environmentIdentifier string = ''
@@ -9,6 +9,10 @@ param environmentName string
 
 @description('Whether to use the naming convention for the DfE Enterprise Landing Zone (ELZ) subscriptions. Set to true by the param files in "parameters/elz".')
 param elz bool = false
+
+// TODO EES-7502 - remove the Key Vault alternative once every environment has moved to the ELZ.
+@description('Whether the app connects to storage accounts with its managed identity, given keyless connection strings, rather than with connection strings from Key Vault. Only the param files in "parameters/elz" turn this on.')
+param identityBasedStorageConnections bool = false
 
 @description('The main domain of this environment e.g. dev.explore-education-statistics.service.gov.uk.')
 param domain string
@@ -66,15 +70,22 @@ var frontDoorEndpointResourceId = resourceId(
 )
 
 var secretNames = [
-  resourceNames.keyVault.secrets.coreStorageAccountConnectionString
-  resourceNames.keyVault.secrets.notifierStorageAccountConnectionString
-  resourceNames.keyVault.secrets.publicStorageAccountConnectionString
-  resourceNames.keyVault.secrets.publisherStorageAccountConnectionString
   resourceNames.keyVault.secrets.bauEmail
   resourceNames.keyVault.secrets.publisher.notifyApiKey
 ]
 
-resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for secretName in secretNames: {
+// The storage connection string secrets, only looked up when the app doesn't connect to storage with its managed
+// identity. They aren't stored in that case.
+var storageSecretNames = identityBasedStorageConnections
+  ? []
+  : [
+      resourceNames.keyVault.secrets.coreStorageAccountConnectionString
+      resourceNames.keyVault.secrets.notifierStorageAccountConnectionString
+      resourceNames.keyVault.secrets.publicStorageAccountConnectionString
+      resourceNames.keyVault.secrets.publisherStorageAccountConnectionString
+    ]
+
+resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for secretName in concat(secretNames, storageSecretNames): {
   name: '${keyVaultName}/${secretName}'
 }]
 
@@ -83,6 +94,22 @@ resource secrets 'Microsoft.KeyVault/vaults/secrets@2023-07-01' existing = [for 
 // the secret is rotated - see admin-appsettings.bicep for why that matters.
 var secretRefs = secretRefsFromSecrets(secrets)
 
+// Each storage account's connection string: keyless, so that the app connects with its managed identity, or else a
+// Key Vault reference.
+var storageConnectionStrings = identityBasedStorageConnections
+  ? {
+      core: keylessStorageConnectionString(resourceNames.storageAccounts.core)
+      notifier: keylessStorageConnectionString(resourceNames.notifier.storageAccount)
+      public: keylessStorageConnectionString(resourceNames.storageAccounts.public)
+      publisher: keylessStorageConnectionString(resourceNames.publisher.storageAccount)
+    }
+  : {
+      core: secretRefs[resourceNames.keyVault.secrets.coreStorageAccountConnectionString]
+      notifier: secretRefs[resourceNames.keyVault.secrets.notifierStorageAccountConnectionString]
+      public: secretRefs[resourceNames.keyVault.secrets.publicStorageAccountConnectionString]
+      publisher: secretRefs[resourceNames.keyVault.secrets.publisherStorageAccountConnectionString]
+    }
+
 @description('Application-specific appsettings for Publisher, applied to it ahead of each code deploy.')
 output appSettings object = {
   WEBSITE_TIME_ZONE: functionAppTimeZone
@@ -90,10 +117,10 @@ output appSettings object = {
   'AzureWebJobs.PublishScheduledReleaseVersionsNow.Disabled': string(!publishScheduledReleaseVersionsNowEnabled)
   App__PrepareScheduledReleaseVersionsFunctionCronSchedule: prepareScheduledReleaseVersionsFunctionCronSchedule
   App__PublishScheduledReleaseVersionsFunctionCronSchedule: publishScheduledReleaseVersionsFunctionCronSchedule
-  App__PrivateStorageConnectionString: secretRefs[resourceNames.keyVault.secrets.coreStorageAccountConnectionString]
-  App__NotifierStorageConnectionString: secretRefs[resourceNames.keyVault.secrets.notifierStorageAccountConnectionString]
-  App__PublicStorageConnectionString: secretRefs[resourceNames.keyVault.secrets.publicStorageAccountConnectionString]
-  App__PublisherStorageConnectionString: secretRefs[resourceNames.keyVault.secrets.publisherStorageAccountConnectionString]
+  App__PrivateStorageConnectionString: storageConnectionStrings.core
+  App__NotifierStorageConnectionString: storageConnectionStrings.notifier
+  App__PublicStorageConnectionString: storageConnectionStrings.public
+  App__PublisherStorageConnectionString: storageConnectionStrings.publisher
   App__BauEmail: secretRefs[resourceNames.keyVault.secrets.bauEmail]
   App__AdminAppUrl: adminAppUrl
   App__PublicAppUrl: publicAppUrl

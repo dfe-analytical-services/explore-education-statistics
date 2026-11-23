@@ -21,12 +21,14 @@ type ResourceNames = {
     serverName: string
   }
   admin: {
+    identity: string
     appService: string
     appServicePlan: string
     appInsights: string
     signalRName: string
   }
   analytics: {
+    identity: string
     functionApp: string
     appServicePlan: string
     appInsights: string
@@ -73,11 +75,13 @@ type ResourceNames = {
   }
   containerAppEnvironment: string
   contentApi: {
+    identity: string
     appService: string
     appServicePlan: string
     appInsights: string
   }
   dataApi: {
+    identity: string
     appService: string
     appServicePlan: string
     appInsights: string
@@ -105,17 +109,20 @@ type ResourceNames = {
     }
   }
   importer: {
+    identity: string
     functionApp: string
     appServicePlan: string
     appInsights: string
     storageAccount: string
   }
   nlSearch: {
+    identity: string
     functionApp: string
     appServicePlan: string
     functionStorageAccount: string
   }
   notifier: {
+    identity: string
     functionApp: string
     appServicePlan: string
     appInsights: string
@@ -138,17 +145,20 @@ type ResourceNames = {
     }
   }
   publicSite: {
+    identity: string
     appService: string
     appServicePlan: string
     appInsights: string
   }
   publisher: {
+    identity: string
     functionApp: string
     appServicePlan: string
     appInsights: string
     storageAccount: string
   }
   screener: {
+    identity: string
     functionApp: string
     appServicePlan: string
     appInsights: string
@@ -162,6 +172,7 @@ type ResourceNames = {
     appInsights: string
   }
   searchDocs: {
+    identity: string
     functionApp: string
     appServicePlan: string
     functionStorageAccount: string
@@ -334,12 +345,14 @@ func getResourceNames(
       serverName: 'eesacr'
     }
     admin: {
+    identity: '${legacyResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-ees-admin'
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-admin'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-admin'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-admin'
     signalRName: '${legacyResourcePrefix}-${abbreviations.signalRServiceSignalR}-ees-admin'
   }
   analytics: {
+    identity: '${newResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-analytics'
     functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-analytics'
     appServicePlan: '${newResourcePrefix}-${abbreviations.webServerFarms}-analytics'
     appInsights: '${newResourcePrefix}-${abbreviations.insightsComponents}-analytics'
@@ -385,11 +398,13 @@ func getResourceNames(
   }
   containerAppEnvironment: '${newResourcePrefix}-${abbreviations.appManagedEnvironments}-01'
   contentApi: {
+    identity: '${legacyResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-ees-content'
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-content'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-content'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-content'
   }
   dataApi: {
+    identity: '${legacyResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-ees-data'
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-data'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-data'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-data'
@@ -420,17 +435,20 @@ func getResourceNames(
     }
   }
   importer: {
+    identity: '${legacyResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-ees-importer'
     functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-importer'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-importer'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-importer'
     storageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}importer'
   }
   nlSearch: {
+    identity: '${newResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-nlsearch'
     functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-nlsearch'
     appServicePlan: '${newResourcePrefix}-${abbreviations.webServerFarms}-nlsearch'
     functionStorageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}nlsearchfn'
   }
   notifier: {
+    identity: '${legacyResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-ees-notify'
     functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-notify'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-notify'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-notify'
@@ -455,17 +473,20 @@ func getResourceNames(
     }
   }
   publicSite: {
+    identity: '${legacyResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-ees-public-site'
     appService: '${legacyResourcePrefix}-${abbreviations.webSitesAppService}-ees-public-site'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-public-site'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-public-site'
   }
   publisher: {
+    identity: '${legacyResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-ees-publisher'
     functionApp: '${legacyResourcePrefix}-${abbreviations.webSitesFunctions}-ees-publisher'
     appServicePlan: '${legacyResourcePrefix}-${abbreviations.webServerFarms}-ees-publisher'
     appInsights: '${legacyResourcePrefix}-${abbreviations.insightsComponents}-ees-publisher'
     storageAccount: '${legacyResourcePrefix}${abbreviations.storageStorageAccounts}eespublisher'
   }
   screener: {
+    identity: '${screenerResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-screener'
     functionApp: '${screenerResourcePrefix}-${abbreviations.webSitesFunctions}-screener'
     // TODO EES-7502 - the Screener's App Service Plan was given the same name as the Function App itself,
     // rather than a name using the App Service Plan abbreviation.
@@ -481,6 +502,7 @@ func getResourceNames(
     appInsights: '${newResourcePrefix}-${abbreviations.insightsComponents}-search'
   }
   searchDocs: {
+    identity: '${newResourcePrefix}-${abbreviations.managedIdentityUserAssignedIdentities}-searchdocs'
     functionApp: '${newResourcePrefix}-${abbreviations.webSitesFunctions}-searchdocs'
     appServicePlan: '${newResourcePrefix}-${abbreviations.webServerFarms}-searchdocs'
     functionStorageAccount: '${replace(newResourcePrefix, '-', '')}${abbreviations.storageStorageAccounts}searchdocsfn'
@@ -657,12 +679,14 @@ func getElzResourceNames(env string) ResourceNames => {
     serverName: '${env}${elzAbbreviations.containerRegistryRegistries}uksees01'
   }
   admin: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'admin')
     appService: elzName(env, elzAbbreviations.webSitesAppService, 'admin')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'admin')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'admin')
     signalRName: elzName(env, elzAbbreviations.signalRServiceSignalR, 'admin')
   }
   analytics: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'analytics')
     functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'analytics')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'analytics')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'analytics')
@@ -709,11 +733,13 @@ func getElzResourceNames(env string) ResourceNames => {
   }
   containerAppEnvironment: elzName(env, elzAbbreviations.appManagedEnvironments, 'ees')
   contentApi: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'contentapi')
     appService: elzName(env, elzAbbreviations.webSitesAppService, 'contentapi')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'contentapi')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'contentapi')
   }
   dataApi: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'dataapi')
     appService: elzName(env, elzAbbreviations.webSitesAppService, 'dataapi')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'dataapi')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'dataapi')
@@ -742,17 +768,20 @@ func getElzResourceNames(env string) ResourceNames => {
     }
   }
   importer: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'importer')
     functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'importer')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'importer')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'importer')
     storageAccount: elzStorageAccountName(env, 'importer')
   }
   nlSearch: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'nlsearch')
     functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'nlsearch')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'nlsearch')
     functionStorageAccount: elzStorageAccountName(env, 'nlsearchfn')
   }
   notifier: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'notifier')
     functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'notifier')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'notifier')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'notifier')
@@ -777,17 +806,20 @@ func getElzResourceNames(env string) ResourceNames => {
     }
   }
   publicSite: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'publicsite')
     appService: elzName(env, elzAbbreviations.webSitesAppService, 'publicsite')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'publicsite')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'publicsite')
   }
   publisher: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'publisher')
     functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'publisher')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'publisher')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'publisher')
     storageAccount: elzStorageAccountName(env, 'publisher')
   }
   screener: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'screener')
     functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'screener')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'screener')
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'screener')
@@ -801,6 +833,7 @@ func getElzResourceNames(env string) ResourceNames => {
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'search')
   }
   searchDocs: {
+    identity: elzName(env, elzAbbreviations.managedIdentityUserAssignedIdentities, 'searchdocs')
     functionApp: elzName(env, elzAbbreviations.webSitesFunctions, 'searchdocs')
     appServicePlan: elzName(env, elzAbbreviations.webServerFarms, 'searchdocs')
     functionStorageAccount: elzStorageAccountName(env, 'searchdocsfn')

@@ -17,3 +17,17 @@ param appOperatingSystem = 'Linux'
 // Spread the Admin, Content API, Data API and Public Site instances across availability zones. These plans already run
 // Premium SKUs with at least 2 instances, so this costs little.
 param zoneRedundantAppServicePlans = true
+
+// Deploy a user-assigned managed identity for each of this pipeline's apps.
+param deployAppIdentities = true
+
+// No content shares for the Function Apps on Dedicated plans.
+param functionAppContentShares = false
+
+// The apps connect to the Importer's, Notifier's and Publisher's storage accounts with their managed identities, so their
+// connection strings aren't stored.
+param storeStorageAccountConnectionStrings = false
+
+// Everything connects to the Importer's, Notifier's and Publisher's storage accounts with managed identities, so they
+// don't accept account keys.
+param storageSharedKeyAccessEnabled = false

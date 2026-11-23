@@ -18,6 +18,12 @@ param elz bool = false
 @description('SKU of the Screener logs storage account and the Function App storage account, which sets their redundancy. Legacy accounts can\'t be converted to zone-redundant by a deploy, so only the param files in "parameters/elz" set a zone-redundant SKU.')
 param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
+@description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps, for them to use instead of system-assigned ones. Only the param files in "parameters/elz" turn this on.')
+param deployAppIdentities bool = false
+
+@description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this pipeline\'s apps. Only the param files in "parameters/elz" turn this on.')
+param adminUsesUserAssignedIdentity bool = false
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -80,6 +86,17 @@ var maintenanceFirewallRules = [
 ]
 
 // Create a shared Application Insights resource for Search resources to use.
+module appIdentitiesModule '../common/components/managed-identity/user-assigned-identities.bicep' = if (deployAppIdentities) {
+  name: 'appIdentitiesModuleDeploy'
+  params: {
+    identityNames: [
+      resourceNames.screener.identity
+    ]
+    location: location
+    tagValues: tagValues
+  }
+}
+
 module applicationInsightsModule 'application/screenerApplicationInsights.bicep' = {
   name: 'screenerApplicationInsightsModule'
   params: {
@@ -110,6 +127,8 @@ module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
 module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.bicep' = {
   name: 'screenerFunctionModuleDeploy'
   params: {
+    adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
+    useUserAssignedIdentity: deployAppIdentities
     storageAccountSku: storageAccountSku
     location: location
     functionAppImageName: 'ees-screener-api'
@@ -142,6 +161,7 @@ module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.b
     deployAlerts: deployAlerts
   }
   dependsOn: [
+    appIdentitiesModule
     screenerLogsStorageModule
   ]
 }

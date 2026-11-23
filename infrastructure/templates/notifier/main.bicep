@@ -19,6 +19,18 @@ param operatingSystem 'Windows' | 'Linux'
 @description('SKU of the Function App\'s storage account, which sets its redundancy.')
 param storageAccountSku StorageAccountSku
 
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
+
+@description('Whether to create a content share for the Function App, which is used to store its code in Consumption and Elastic plans.')
+param deployContentShare bool = true
+
+@description('Whether to store the storage account\'s connection string in Key Vault, for the apps that connect to it with a connection string rather than a managed identity.')
+param storeStorageAccountConnectionString bool = true
+
+@description('Whether the storage account accepts its account keys, for the apps that connect to it with a connection string rather than a managed identity.')
+param storageAccountSharedKeyAccessEnabled bool = true
+
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -90,11 +102,16 @@ module appInsightsModule '../common/components/monitoring/appInsights.bicep' = {
 module functionAppModule '../common/components/function-app/function-app.bicep' = {
   name: 'notifierFunctionAppModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.notifier.identity : ''
     functionAppName: resourceNames.notifier.functionApp
     appServicePlanName: resourceNames.notifier.appServicePlan
     storageAccountName: resourceNames.notifier.storageAccount
     storageAccountSku: storageAccountSku
-    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.notifierStorageAccountConnectionString
+    deployContentShare: deployContentShare
+    storageAccountSharedKeyAccessEnabled: storageAccountSharedKeyAccessEnabled
+    storageAccountConnectionStringSecretName: storeStorageAccountConnectionString
+      ? resourceNames.keyVault.secrets.notifierStorageAccountConnectionString
+      : null
     keyVaultName: resourceNames.keyVault.keyVault
     keyVaultRoles: {
       secretsUser: true
@@ -117,6 +134,9 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     storageAccountPublicNetworkAccessEnabled: true
     ipSecurityRestrictionsDefaultAction: 'Allow'
     deployQueueRoleAssignment: true
+    // The Notifier keeps its subscriptions in tables.
+    // TODO EES-7502 - grant this unconditionally once every environment has moved to the ELZ.
+    deployTableRoleAssignment: useUserAssignedIdentity
     minTlsVersion: minTlsVersion
     connectionStrings: [
       {
@@ -156,4 +176,21 @@ module storageAccountBlobServiceModule '../common/components/blobService.bicep' 
   dependsOn: [
     functionAppModule
   ]
+}
+
+// When the release apps use their user-assigned identities, allow the Publisher to send messages to the Notifier's
+// queues. Nothing uses this role until the Publisher connects to storage with its identity rather than a connection
+// string.
+// TODO EES-7502 - make this grant unconditional once every environment has moved to the ELZ.
+resource publisherIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.publisher.identity
+}
+
+module publisherStorageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'notifierPublisherStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: functionAppModule.outputs.storageAccountName
+    principalIds: [publisherIdentity!.properties.principalId]
+    role: 'Storage Queue Data Contributor'
+  }
 }

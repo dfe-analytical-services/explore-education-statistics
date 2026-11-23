@@ -48,6 +48,10 @@ param databaseAuditBlobRetentionDays int = 365
 @description('Name of the storage account that database audit logs and vulnerability assessment scans are written to.')
 param loggingStorageAccountName string
 
+// TODO EES-7502 - remove the access key alternative once every environment has moved to the ELZ.
+@description('Whether to give the SQL Server a system-assigned identity, with which auditing and vulnerability assessment write to the logging storage account rather than with the account\'s access key.')
+param identityBasedAuditStorage bool = false
+
 @description('The databases to create on this SQL Server.')
 param databases SqlDatabaseDefinition[]
 
@@ -66,6 +70,7 @@ param tagValues object
 resource sqlServer 'Microsoft.Sql/servers@2025-01-01' = {
   name: serverName
   location: location
+  identity: identityBasedAuditStorage ? { type: 'SystemAssigned' } : null
   properties: {
     administratorLogin: sqlAdministratorLogin
     administratorLoginPassword: sqlAdministratorLoginPassword
@@ -100,6 +105,7 @@ module diagnosticsAndAuditingModule 'diagnostics-and-auditing.bicep' = {
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
     loggingStorageAccountName: loggingStorageAccountName
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    identityBasedAuditStorage: identityBasedAuditStorage
   }
 }
 
