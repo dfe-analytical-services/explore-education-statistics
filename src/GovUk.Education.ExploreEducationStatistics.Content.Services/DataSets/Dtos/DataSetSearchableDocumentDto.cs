@@ -74,18 +74,14 @@ public record DataSetSearchableDocumentDto
         var releaseVersion = releaseFile.ReleaseVersion;
         var release = releaseVersion.Release;
         var publication = release.Publication;
-        var meta =
-            file.DataSetFileMeta
-            ?? throw new ArgumentException("File must include data set metadata", nameof(releaseFile));
+        var meta = file.DataSetFileMeta ?? throw InvalidReleaseFile(releaseFile, "File must include data set metadata");
 
         return new DataSetSearchableDocumentDto
         {
             FileId = releaseFile.FileId,
             DataSetFileId =
-                file.DataSetFileId
-                ?? throw new ArgumentException("File must include a data set file ID", nameof(releaseFile)),
-            SubjectId =
-                file.SubjectId ?? throw new ArgumentException("File must include a subject ID", nameof(releaseFile)),
+                file.DataSetFileId ?? throw InvalidReleaseFile(releaseFile, "File must include a data set file ID"),
+            SubjectId = file.SubjectId ?? throw InvalidReleaseFile(releaseFile, "File must include a subject ID"),
             Filename = file.Filename,
             FileExtension = Path.GetExtension(file.Filename).TrimStart('.'),
             FileSize = file.DisplaySize(),
@@ -105,10 +101,10 @@ public record DataSetSearchableDocumentDto
             IsSuperseded = publication.SupersededBy?.LatestPublishedReleaseVersionId != null,
             Published =
                 releaseVersion.PublishedDisplayDate
-                ?? throw new ArgumentException("Release version must be published", nameof(releaseFile)),
+                ?? throw InvalidReleaseFile(releaseFile, "Release version must be published"),
             LastUpdated = new DateTimeOffset(
                 releaseFile.Published
-                    ?? throw new ArgumentException("Data set file must have a published date", nameof(releaseFile)),
+                    ?? throw InvalidReleaseFile(releaseFile, "Data set file must have a published date"),
                 TimeSpan.Zero
             ),
             Api = DataSetSearchableDocumentApiDto.FromReleaseFile(releaseFile),
@@ -132,6 +128,13 @@ public record DataSetSearchableDocumentDto
             ],
         };
     }
+
+    private static ArgumentException InvalidReleaseFile(ReleaseFile releaseFile, string message) =>
+        new(
+            $"{message}. ReleaseVersionId: {releaseFile.ReleaseVersionId}, FileId: {releaseFile.FileId}, "
+                + $"Filename: '{releaseFile.File.Filename}'",
+            nameof(releaseFile)
+        );
 }
 
 public record DataSetSearchableDocumentApiDto

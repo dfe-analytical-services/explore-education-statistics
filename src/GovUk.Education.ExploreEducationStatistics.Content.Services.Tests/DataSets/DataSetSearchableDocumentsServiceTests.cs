@@ -297,6 +297,39 @@ public abstract class DataSetSearchableDocumentsServiceTests
         }
 
         [Fact]
+        public async Task WhenDataSetHasNoDataSetFileMeta_ThrowsExceptionIdentifyingReleaseFile()
+        {
+            // Arrange
+            Publication publication = _dataFixture
+                .DefaultPublication()
+                .WithTheme(_dataFixture.DefaultTheme())
+                .WithReleases(_ => [_dataFixture.DefaultRelease(publishedVersions: 1)]);
+            var release = publication.Releases[0];
+
+            ReleaseFile releaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(release.Versions[0])
+                .WithFile(_dataFixture.DefaultFile(FileType.Data).WithDataSetFileMeta(null));
+
+            var contextId = await SeedDatabase([publication], [releaseFile]);
+
+            await using var context = InMemoryContentDbContext(contextId);
+            var sut = BuildService(context);
+
+            // Act
+            var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                sut.GetReleaseDataSetSearchableDocuments(publication.Slug, release.Slug)
+            );
+
+            // Assert
+            Assert.StartsWith("File must include data set metadata", exception.Message);
+            Assert.Contains($"ReleaseVersionId: {releaseFile.ReleaseVersionId}", exception.Message);
+            Assert.Contains($"FileId: {releaseFile.FileId}", exception.Message);
+            Assert.Contains($"Filename: '{releaseFile.File.Filename}'", exception.Message);
+            Assert.Equal("releaseFile", exception.ParamName);
+        }
+
+        [Fact]
         public async Task WhenReleaseHasDraftAmendment_ReturnsDataSetsOfLatestPublishedVersion()
         {
             // Arrange

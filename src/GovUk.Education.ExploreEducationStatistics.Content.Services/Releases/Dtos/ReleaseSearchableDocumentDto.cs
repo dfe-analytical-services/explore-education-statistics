@@ -37,7 +37,10 @@ public record ReleaseSearchableDocumentDto
             PublicationTitle = releaseVersion.Release.Publication.Title,
             Published =
                 releaseVersion.PublishedDisplayDate
-                ?? throw new ArgumentException("Release must have a published date"),
+                ?? throw new ArgumentException(
+                    $"Release version {releaseVersion.Id} must have a published date",
+                    nameof(releaseVersion)
+                ),
             ThemeId = releaseVersion.Release.Publication.ThemeId,
             ThemeTitle = releaseVersion.Release.Publication.Theme.Title,
             Type = releaseVersion.Type.ToString(),
