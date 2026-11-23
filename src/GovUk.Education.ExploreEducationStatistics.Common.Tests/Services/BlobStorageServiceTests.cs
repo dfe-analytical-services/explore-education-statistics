@@ -1,19 +1,25 @@
 #nullable enable
 using System.Collections.Immutable;
+using System.IO.Compression;
 using System.Net.Mime;
 using System.Text.RegularExpressions;
 using Azure;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Moq.Protected;
 using Newtonsoft.Json;
 using Xunit;
 using static Azure.Storage.Blobs.Models.BlobsModelFactory;
@@ -40,7 +46,10 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         Assert.True(await service.CheckBlobExists(PublicReleaseFiles, path));
     }
@@ -55,9 +64,76 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         Assert.False(await service.CheckBlobExists(PublicReleaseFiles, path));
+    }
+
+    [Fact]
+    public async Task FindBlob()
+    {
+        const string path = "path/to/test.pdf";
+
+        var blobClient = MockBlobClient(name: path, contentType: MediaTypeNames.Application.Pdf, exists: true);
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
+
+        var blob = await service.FindBlob(PublicReleaseFiles, path);
+
+        Assert.NotNull(blob);
+        Assert.Equal(path, blob.Path);
+    }
+
+    [Fact]
+    public async Task GetBlobs()
+    {
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        blobContainerClient
+            .Setup(s => s.GetBlobsAsync(It.IsAny<GetBlobsOptions>(), CancellationToken.None))
+            .Returns(new TestAsyncPageable<BlobItem>(CreatePages(new List<BlobItem> { BlobItem("item-1") })));
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
+
+        Assert.Equal(["item-1"], await service.GetBlobs(PublicReleaseFiles));
+    }
+
+    [Fact]
+    public async Task GetBlobs_ContainerNotFound_ReturnsNoBlobs()
+    {
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        blobContainerClient
+            .Setup(s => s.GetBlobsAsync(It.IsAny<GetBlobsOptions>(), CancellationToken.None))
+            .Throws(
+                new RequestFailedException(
+                    status: 404,
+                    message: "The specified container does not exist.",
+                    errorCode: BlobErrorCode.ContainerNotFound.ToString(),
+                    innerException: null
+                )
+            );
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
+
+        Assert.Empty(await service.GetBlobs(PublicReleaseFiles));
     }
 
     [Fact]
@@ -78,7 +154,10 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         var result = await service.DownloadBlobText(containerName: PublicReleaseFiles, path: path);
 
@@ -103,7 +182,10 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         var result = await service.DownloadBlobText(containerName: PublicReleaseFiles, path: path);
 
@@ -128,7 +210,10 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         await using var targetStream = new MemoryStream();
         await service.DownloadToStream(containerName: PublicReleaseFiles, path: path, targetStream: targetStream);
@@ -154,7 +239,10 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         var result = await service.DownloadToStream(containerName: PublicReleaseFiles, path: path, new MemoryStream());
 
@@ -162,36 +250,7 @@ public class BlobStorageServiceTests
     }
 
     [Fact]
-    public async Task DownloadToStream_DoesNotCreateContainer()
-    {
-        const string path = "path/to/test.pdf";
-
-        var blobClient = MockBlobClient(name: path);
-
-        blobClient.SetupDownloadToAsync("Test content");
-
-        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
-        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
-
-        // Strict, so the test fails if the service tries to create the container, which needs write access.
-        var service = SetupTestBlobStorageService(
-            blobServiceClient: blobServiceClient.Object,
-            storageInstanceCreationUtil: Mock.Of<IStorageInstanceCreationUtil>(Strict)
-        );
-
-        await using var targetStream = new MemoryStream();
-        var result = await service.DownloadToStream(
-            containerName: PublicReleaseFiles,
-            path: path,
-            targetStream: targetStream
-        );
-
-        result.AssertRight();
-        Assert.Equal("Test content", targetStream.ReadToEnd());
-    }
-
-    [Fact]
-    public async Task GetDownloadStream_DoesNotCreateContainer()
+    public async Task GetDownloadStream()
     {
         const string path = "path/to/test.csv";
 
@@ -202,10 +261,9 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        // Strict, so the test fails if the service tries to create the container, which needs write access.
         var service = SetupTestBlobStorageService(
             blobServiceClient: blobServiceClient.Object,
-            storageInstanceCreationUtil: Mock.Of<IStorageInstanceCreationUtil>(Strict)
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
         );
 
         var result = await service.GetDownloadStream(containerName: PublicReleaseFiles, path: path, decompress: false);
@@ -248,7 +306,8 @@ public class BlobStorageServiceTests
 
         var service = SetupTestBlobStorageService(
             blobServiceClient: blobServiceClient.Object,
-            blobSasService: blobSasService.Object
+            blobSasService: blobSasService.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
         );
 
         var result = await service.GetBlobDownloadToken(
@@ -296,7 +355,8 @@ public class BlobStorageServiceTests
 
         var service = SetupTestBlobStorageService(
             blobServiceClient: blobServiceClient.Object,
-            blobSasService: blobSasService.Object
+            blobSasService: blobSasService.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
         );
 
         var result = await service.StreamWithToken(token: token, cancellationToken: CancellationToken.None);
@@ -326,7 +386,10 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         var result = await service.GetDeserializedJson<TestClass>(PublicReleaseFiles, path);
 
@@ -351,7 +414,10 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         var result = await service.GetDeserializedJson(PublicReleaseFiles, path, typeof(TestClass));
 
@@ -376,7 +442,10 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         var result = await service.GetDeserializedJson<object>(PublicReleaseFiles, path);
 
@@ -401,7 +470,10 @@ public class BlobStorageServiceTests
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatMustNotBeCalled()
+        );
 
         var exception = await Assert.ThrowsAsync<JsonException>(() =>
             service.GetDeserializedJson(PublicReleaseFiles, path, typeof(TestClass))
@@ -414,6 +486,8 @@ public class BlobStorageServiceTests
     public async Task DeleteBlobs()
     {
         var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+        blobContainerClient.SetupCreateIfNotExistsAsync();
+
         var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
         var pages = CreatePages(
@@ -433,7 +507,10 @@ public class BlobStorageServiceTests
             .Setup(s => s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, CancellationToken.None))
             .ReturnsAsync(Response.FromValue(true, null!));
 
-        var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatCreates()
+        );
 
         await service.DeleteBlobs(PublicReleaseFiles, "directory");
 
@@ -722,6 +799,331 @@ public class BlobStorageServiceTests
         // Assert
         Assert.False(result);
     }
+
+    [Fact]
+    public async Task UploadFile()
+    {
+        const string path = "path/to/test.csv";
+
+        var blobClient = MockBlobClient(name: path);
+
+        string? uploadedContent = null;
+        BlobHttpHeaders? uploadedHeaders = null;
+
+        blobClient
+            .Setup(client =>
+                client.UploadAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<BlobHttpHeaders>(),
+                    It.IsAny<IDictionary<string, string>>(),
+                    It.IsAny<BlobRequestConditions>(),
+                    It.IsAny<IProgress<long>>(),
+                    It.IsAny<AccessTier?>(),
+                    It.IsAny<StorageTransferOptions>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .Callback(
+                (
+                    string filePath,
+                    BlobHttpHeaders headers,
+                    IDictionary<string, string> _,
+                    BlobRequestConditions _,
+                    IProgress<long> _,
+                    AccessTier? _,
+                    StorageTransferOptions _,
+                    CancellationToken _
+                ) =>
+                {
+                    uploadedContent = File.ReadAllText(filePath);
+                    uploadedHeaders = headers;
+                }
+            )
+            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        blobContainerClient.SetupCreateIfNotExistsAsync();
+
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatCreates()
+        );
+
+        var content = "a,b,c"u8.ToArray();
+        var file = new FormFile(new MemoryStream(content), 0, content.Length, "file", "test.csv")
+        {
+            Headers = new HeaderDictionary(),
+            ContentType = MediaTypeNames.Text.Csv,
+        };
+
+        await service.UploadFile(PublicReleaseFiles, path, file);
+
+        blobContainerClient.VerifyCreateIfNotExistsAsync();
+        Assert.Equal("a,b,c", uploadedContent);
+        Assert.Equal(MediaTypeNames.Text.Csv, uploadedHeaders?.ContentType);
+    }
+
+    [Fact]
+    public async Task UploadStream()
+    {
+        const string path = "path/to/test.csv";
+
+        var blobClient = MockBlobClient(name: path);
+
+        var upload = blobClient.SetupUploadStreamAsync();
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        blobContainerClient.SetupCreateIfNotExistsAsync();
+
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatCreates()
+        );
+
+        // Not at the start of the stream, which the upload should start from regardless.
+        var sourceStream = new MemoryStream("a,b,c"u8.ToArray());
+        sourceStream.Seek(0, SeekOrigin.End);
+
+        await service.UploadStream(PublicReleaseFiles, path, sourceStream, MediaTypeNames.Text.Csv);
+
+        blobContainerClient.VerifyCreateIfNotExistsAsync();
+        Assert.Equal("a,b,c", upload.Content);
+        Assert.Equal(MediaTypeNames.Text.Csv, upload.Headers?.ContentType);
+        Assert.Null(upload.Headers?.ContentEncoding);
+    }
+
+    [Fact]
+    public async Task UploadStream_Compressed()
+    {
+        const string path = "path/to/test.csv";
+
+        var blobClient = MockBlobClient(name: path);
+
+        // The service writes the compressed content through this stream, which it disposes when done.
+        var blobStream = new MemoryStream();
+        BlobOpenWriteOptions? openWriteOptions = null;
+
+        blobClient
+            .Setup(client =>
+                client.OpenWriteAsync(true, It.IsAny<BlobOpenWriteOptions>(), It.IsAny<CancellationToken>())
+            )
+            .Callback((bool _, BlobOpenWriteOptions options, CancellationToken _) => openWriteOptions = options)
+            .ReturnsAsync(blobStream);
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        blobContainerClient.SetupCreateIfNotExistsAsync();
+
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatCreates()
+        );
+
+        await service.UploadStream(
+            PublicReleaseFiles,
+            path,
+            new MemoryStream("a,b,c"u8.ToArray()),
+            MediaTypeNames.Text.Csv,
+            contentEncoding: ContentEncodings.Gzip
+        );
+
+        blobContainerClient.VerifyCreateIfNotExistsAsync();
+        Assert.Equal(MediaTypeNames.Text.Csv, openWriteOptions?.HttpHeaders.ContentType);
+        Assert.Equal(ContentEncodings.Gzip, openWriteOptions?.HttpHeaders.ContentEncoding);
+
+        await using var decompressed = new GZipStream(
+            new MemoryStream(blobStream.ToArray()),
+            CompressionMode.Decompress
+        );
+        Assert.Equal("a,b,c", await new StreamReader(decompressed).ReadToEndAsync());
+    }
+
+    [Fact]
+    public async Task UploadAsJson()
+    {
+        const string path = "path/to/test.json";
+
+        var blobClient = MockBlobClient(name: path);
+
+        var upload = blobClient.SetupUploadStreamAsync();
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        blobContainerClient.SetupCreateIfNotExistsAsync();
+
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatCreates()
+        );
+
+        await service.UploadAsJson(PublicReleaseFiles, path, new TestClass("test value"));
+
+        blobContainerClient.VerifyCreateIfNotExistsAsync();
+        Assert.Equal("{\"Value\":\"test value\"}", upload.Content);
+        Assert.Equal(MediaTypeNames.Application.Json, upload.Headers?.ContentType);
+    }
+
+    [Fact]
+    public async Task DeleteBlob()
+    {
+        const string path = "path/to/test.csv";
+
+        var blobClient = MockBlobClient(name: path);
+
+        blobClient
+            .Setup(client =>
+                client.DeleteIfExistsAsync(
+                    It.IsAny<DeleteSnapshotsOption>(),
+                    It.IsAny<BlobRequestConditions>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(Response.FromValue(true, null!));
+
+        var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+        blobContainerClient.SetupCreateIfNotExistsAsync();
+
+        var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatCreates()
+        );
+
+        await service.DeleteBlob(PublicReleaseFiles, path);
+
+        blobContainerClient.VerifyCreateIfNotExistsAsync();
+        blobClient.Verify(
+            client =>
+                client.DeleteIfExistsAsync(
+                    It.IsAny<DeleteSnapshotsOption>(),
+                    It.IsAny<BlobRequestConditions>(),
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public async Task MoveBlob_ToAnotherContainer()
+    {
+        const string sourcePath = "path/to/test.pdf";
+        const string destinationPath = "new/path/to/test.pdf";
+        var sourceUri = new Uri(
+            $"https://testaccount.blob.core.windows.net/{PrivateReleaseTempFiles.Name}/{sourcePath}"
+        );
+
+        var sourceBlobClient = MockBlobClient(name: sourcePath, exists: true);
+        sourceBlobClient.SetupGet(client => client.Uri).Returns(sourceUri);
+        sourceBlobClient
+            .Setup(client =>
+                client.DeleteAsync(
+                    It.IsAny<DeleteSnapshotsOption>(),
+                    It.IsAny<BlobRequestConditions>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(Mock.Of<Response>());
+
+        // The source blob is leased while it's copied.
+        var lease = new Mock<BlobLeaseClient>(Strict);
+        lease
+            .Setup(client =>
+                client.AcquireAsync(It.IsAny<TimeSpan>(), It.IsAny<RequestConditions>(), It.IsAny<CancellationToken>())
+            )
+            .ReturnsAsync(Mock.Of<Response<Azure.Storage.Blobs.Models.BlobLease>>());
+        lease
+            .Setup(client => client.ReleaseAsync(It.IsAny<RequestConditions>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Mock.Of<Response<ReleasedObjectInfo>>());
+        sourceBlobClient
+            .Protected()
+            .Setup<BlobLeaseClient>("GetBlobLeaseClientCore", ItExpr.IsAny<string>())
+            .Returns(lease.Object);
+
+        var destinationBlobClient = MockBlobClient(name: destinationPath, exists: false);
+        destinationBlobClient
+            .Setup(client =>
+                client.StartCopyFromUriAsync(
+                    sourceUri,
+                    It.IsAny<IDictionary<string, string>>(),
+                    It.IsAny<AccessTier?>(),
+                    It.IsAny<BlobRequestConditions>(),
+                    It.IsAny<BlobRequestConditions>(),
+                    It.IsAny<RehydratePriority?>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(Mock.Of<CopyFromUriOperation>());
+        destinationBlobClient
+            .Setup(client =>
+                client.GetPropertiesAsync(It.IsAny<BlobRequestConditions>(), It.IsAny<CancellationToken>())
+            )
+            .ReturnsAsync(Response.FromValue(BlobProperties(blobCopyStatus: CopyStatus.Success), null!));
+
+        var sourceBlobContainerClient = MockBlobContainerClient(PrivateReleaseTempFiles.Name, sourceBlobClient);
+        sourceBlobContainerClient.SetupCreateIfNotExistsAsync();
+
+        var destinationBlobContainerClient = MockBlobContainerClient(PrivateReleaseFiles.Name, destinationBlobClient);
+        destinationBlobContainerClient.SetupCreateIfNotExistsAsync();
+
+        var blobServiceClient = MockBlobServiceClient(sourceBlobContainerClient, destinationBlobContainerClient);
+
+        var service = SetupTestBlobStorageService(
+            blobServiceClient: blobServiceClient.Object,
+            storageInstanceCreationUtil: StorageInstanceCreationUtilThatCreates()
+        );
+
+        var moved = await service.MoveBlob(
+            sourceContainer: PrivateReleaseTempFiles,
+            sourcePath: sourcePath,
+            destinationPath: destinationPath,
+            destinationContainer: PrivateReleaseFiles
+        );
+
+        Assert.True(moved);
+        sourceBlobContainerClient.VerifyCreateIfNotExistsAsync();
+        destinationBlobContainerClient.VerifyCreateIfNotExistsAsync();
+        MockUtils.VerifyAllMocks(lease);
+        sourceBlobClient.Verify(
+            client =>
+                client.DeleteAsync(
+                    It.IsAny<DeleteSnapshotsOption>(),
+                    It.IsAny<BlobRequestConditions>(),
+                    It.IsAny<CancellationToken>()
+                ),
+            Times.Once
+        );
+    }
+
+    // Runs the container creation it's given, as StorageInstanceCreationUtil does the first time it sees a container.
+    private static IStorageInstanceCreationUtil StorageInstanceCreationUtilThatCreates()
+    {
+        var storageInstanceCreationUtil = new Mock<IStorageInstanceCreationUtil>(Strict);
+
+        storageInstanceCreationUtil
+            .Setup(util =>
+                util.CreateInstanceIfNotExistsAsync(
+                    It.IsAny<string>(),
+                    AzureStorageType.Blob,
+                    It.IsAny<string>(),
+                    It.IsAny<Func<Task>>()
+                )
+            )
+            .Returns((string _, AzureStorageType _, string _, Func<Task> createIfNotExists) => createIfNotExists());
+
+        return storageInstanceCreationUtil.Object;
+    }
+
+    // Strict, so a read test fails if the service tries to create a container. Reads mustn't, as creating a container
+    // needs write access, which read-only identities don't have.
+    private static IStorageInstanceCreationUtil StorageInstanceCreationUtilThatMustNotBeCalled() =>
+        Mock.Of<IStorageInstanceCreationUtil>(Strict);
 
     private static TestBlobStorageService SetupTestBlobStorageService(
         BlobServiceClient? blobServiceClient = null,

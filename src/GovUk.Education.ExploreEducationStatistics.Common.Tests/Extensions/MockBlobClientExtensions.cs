@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using Azure;
+using Azure.Storage;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Sas;
@@ -126,5 +127,53 @@ public static class MockBlobClientExtensions
     )
     {
         return blobClient.Setup(c => c.OpenReadAsync(0, null, null, cancellationToken)).ReturnsAsync(content.ToStream);
+    }
+
+    /// <summary>
+    /// Sets up uploading a stream to the blob, capturing what was uploaded.
+    /// </summary>
+    public static CapturedUpload SetupUploadStreamAsync(this Mock<BlobClient> blobClient)
+    {
+        var upload = new CapturedUpload();
+
+        blobClient
+            .Setup(client =>
+                client.UploadAsync(
+                    It.IsAny<Stream>(),
+                    It.IsAny<BlobHttpHeaders>(),
+                    It.IsAny<IDictionary<string, string>>(),
+                    It.IsAny<BlobRequestConditions>(),
+                    It.IsAny<IProgress<long>>(),
+                    It.IsAny<AccessTier?>(),
+                    It.IsAny<StorageTransferOptions>(),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .Callback(
+                (
+                    Stream content,
+                    BlobHttpHeaders headers,
+                    IDictionary<string, string> _,
+                    BlobRequestConditions _,
+                    IProgress<long> _,
+                    AccessTier? _,
+                    StorageTransferOptions _,
+                    CancellationToken _
+                ) =>
+                {
+                    upload.Content = new StreamReader(content, leaveOpen: true).ReadToEnd();
+                    upload.Headers = headers;
+                }
+            )
+            .ReturnsAsync(Mock.Of<Response<BlobContentInfo>>());
+
+        return upload;
+    }
+
+    public class CapturedUpload
+    {
+        public string? Content { get; set; }
+
+        public BlobHttpHeaders? Headers { get; set; }
     }
 }

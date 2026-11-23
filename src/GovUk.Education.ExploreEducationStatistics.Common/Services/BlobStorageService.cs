@@ -62,29 +62,37 @@ public abstract partial class BlobStorageService(
         CancellationToken cancellationToken = default
     )
     {
-        var container = await GetBlobContainer(containerName);
+        var container = GetBlobContainerForReading(containerName);
 
-        return string.IsNullOrWhiteSpace(prefixFilter)
-            ? await container
-                .GetBlobsAsync(cancellationToken: cancellationToken)
-                .Select(blob => blob.Name)
-                .ToListAsync(cancellationToken)
-            : await container
-                .GetBlobsAsync(cancellationToken: cancellationToken)
-                .Where(blob =>
-                {
-                    var releaseIdFilePrefix = GuidPattern();
-                    var blobKey = releaseIdFilePrefix.Replace(blob.Name, string.Empty);
+        try
+        {
+            return string.IsNullOrWhiteSpace(prefixFilter)
+                ? await container
+                    .GetBlobsAsync(cancellationToken: cancellationToken)
+                    .Select(blob => blob.Name)
+                    .ToListAsync(cancellationToken)
+                : await container
+                    .GetBlobsAsync(cancellationToken: cancellationToken)
+                    .Where(blob =>
+                    {
+                        var releaseIdFilePrefix = GuidPattern();
+                        var blobKey = releaseIdFilePrefix.Replace(blob.Name, string.Empty);
 
-                    return blobKey.StartsWith(prefixFilter);
-                })
-                .Select(blob => blob.Name)
-                .ToListAsync(cancellationToken);
+                        return blobKey.StartsWith(prefixFilter);
+                    })
+                    .Select(blob => blob.Name)
+                    .ToListAsync(cancellationToken);
+        }
+        catch (RequestFailedException e) when (e.ErrorCode == BlobErrorCode.ContainerNotFound)
+        {
+            // A container that doesn't exist yet has no blobs.
+            return [];
+        }
     }
 
     public async Task<bool> CheckBlobExists(IBlobContainer containerName, string path)
     {
-        var blob = await GetBlobClient(containerName, path);
+        var blob = GetBlobClientForReading(containerName, path);
         return await blob.ExistsAsync();
     }
 
@@ -468,7 +476,7 @@ public abstract partial class BlobStorageService(
         CancellationToken cancellationToken = default
     )
     {
-        var blob = await GetBlobClient(containerName, path);
+        var blob = GetBlobClientForReading(containerName, path);
 
         try
         {
@@ -655,10 +663,31 @@ public abstract partial class BlobStorageService(
         );
     }
 
+    /// <summary>
+    /// Gets a client for writing to or deleting a blob, creating its container first if it doesn't exist yet.
+    /// </summary>
     private async Task<BlobClient> GetBlobClient(IBlobContainer containerName, string path)
     {
         var blobContainer = await GetBlobContainer(containerName);
         return blobContainer.GetBlobClient(path);
+    }
+
+    /// <summary>
+    /// Gets a client for reading a blob, without creating its container if it doesn't exist. Creating a container
+    /// needs write access to the storage account, which identities that only read from it, like the Public API Data
+    /// Processor's, don't have. A blob in a container that doesn't exist reads as not found.
+    /// </summary>
+    private BlobClient GetBlobClientForReading(IBlobContainer containerName, string path)
+    {
+        return GetBlobContainerForReading(containerName).GetBlobClient(path);
+    }
+
+    /// <summary>
+    /// Gets a client for reading a container's blobs, without creating the container if it doesn't exist.
+    /// </summary>
+    private BlobContainerClient GetBlobContainerForReading(IBlobContainer container)
+    {
+        return client.GetBlobContainerClient(GetContainerName(container));
     }
 
     private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(
@@ -666,10 +695,7 @@ public abstract partial class BlobStorageService(
         string path
     )
     {
-        // Unlike GetBlobClient, this doesn't create the container if it's missing, as it's only used for
-        // reading. Creating it would need write access to the storage account, and so services needing use
-        // of this method just for read access would need overly-elevated permissions.
-        var blobClient = client.GetBlobContainerClient(GetContainerName(containerName)).GetBlobClient(path);
+        var blobClient = GetBlobClientForReading(containerName, path);
         if (await blobClient.ExistsAsync())
         {
             return blobClient;
@@ -740,7 +766,7 @@ public abstract partial class BlobStorageService(
 
     private async Task<BlobInfo> GetBlob(IBlobContainer containerName, string path)
     {
-        var blob = await GetBlobClient(containerName, path);
+        var blob = GetBlobClientForReading(containerName, path);
         BlobProperties properties = await blob.GetPropertiesAsync();
 
         return new BlobInfo(
