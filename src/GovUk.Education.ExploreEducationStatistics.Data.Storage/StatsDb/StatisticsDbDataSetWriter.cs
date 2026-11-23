@@ -21,44 +21,55 @@ public class StatisticsDbDataSetWriter(
 
     public IStorageDataSet DataSet => dataSet;
 
-    public Task WriteFiltersAndIndicators(
-        IReadOnlyList<Filter> filters,
-        IReadOnlyList<Indicator> indicators,
-        CancellationToken cancellationToken = default
-    )
+    public Task<bool> HasIndicators(CancellationToken cancellationToken = default)
+    {
+        return context.IndicatorGroup.AnyAsync(group => group.SubjectId == SubjectId, cancellationToken);
+    }
+
+    public Task WriteIndicators(IReadOnlyList<Indicator> indicators, CancellationToken cancellationToken = default)
     {
         return databaseHelper.DoInTransaction(
             context,
             async ctxDelegate =>
             {
-                await ctxDelegate.Filter.AddRangeAsync(filters, cancellationToken);
+                // We don't add indicator groups explicitly, as they are included in `indicators`
                 await ctxDelegate.Indicator.AddRangeAsync(indicators, cancellationToken);
                 await ctxDelegate.SaveChangesAsync(cancellationToken);
             }
         );
     }
 
-    public Task WriteFilterItems(
-        IReadOnlyList<FilterItem> filterItems,
-        IReadOnlyDictionary<Guid, FilterItem?> autoSelectFilterItemsByFilterId,
-        CancellationToken cancellationToken = default
-    )
+    public Task<bool> HasFilters(CancellationToken cancellationToken = default)
     {
-        var filterIds = autoSelectFilterItemsByFilterId.Keys.ToList();
+        return context.Filter.AnyAsync(filter => filter.SubjectId == SubjectId, cancellationToken);
+    }
+
+    public Task WriteFilters(IReadOnlyList<Filter> filters, CancellationToken cancellationToken = default)
+    {
+        // EF Core can't insert a filter in the same save as the filter item its AutoSelectFilterItemId references, as
+        // that item depends on the filter through its filter group. So we insert without it and set it afterwards.
+        // We capture the ids out here so that they survive the execution strategy retrying the transaction.
+        var autoSelectFilterItemIds = filters.ToDictionary(
+            filter => filter.Id,
+            filter => filter.AutoSelectFilterItemId
+        );
 
         return databaseHelper.DoInTransaction(
             context,
             async ctxDelegate =>
             {
-                // We don't add filter groups explicitly, as they are included in `filterItems`
-                await ctxDelegate.FilterItem.AddRangeAsync(filterItems, cancellationToken);
-
-                var filters = ctxDelegate.Filter.Where(f => filterIds.Contains(f.Id)).ToList();
                 foreach (var filter in filters)
                 {
-                    var filterItem = autoSelectFilterItemsByFilterId[filter.Id];
-                    filter.AutoSelectFilterItemId = filterItem?.Id;
-                    filter.AutoSelectFilterItemLabel = filterItem?.Label;
+                    filter.AutoSelectFilterItemId = null;
+                }
+
+                // We don't add filter groups and items explicitly, as they are included in `filters`
+                await ctxDelegate.Filter.AddRangeAsync(filters, cancellationToken);
+                await ctxDelegate.SaveChangesAsync(cancellationToken);
+
+                foreach (var filter in filters)
+                {
+                    filter.AutoSelectFilterItemId = autoSelectFilterItemIds[filter.Id];
                 }
 
                 await ctxDelegate.SaveChangesAsync(cancellationToken);
@@ -90,7 +101,7 @@ public class StatisticsDbDataSetWriter(
         return importerLocationService.Get(location).Id;
     }
 
-    public Task WriteObservations(IReadOnlyList<Observation> observations)
+    public Task AppendObservations(IReadOnlyList<Observation> observations)
     {
         return databaseHelper.DoInTransaction(
             context,

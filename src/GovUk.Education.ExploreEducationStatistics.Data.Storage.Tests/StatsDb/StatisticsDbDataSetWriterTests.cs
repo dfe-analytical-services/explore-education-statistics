@@ -25,18 +25,41 @@ public abstract class StatisticsDbDataSetWriterTests
 
     private readonly string _statisticsDbContextId = Guid.NewGuid().ToString();
 
-    public class WriteFiltersAndIndicatorsTests : StatisticsDbDataSetWriterTests
+    public class HasIndicatorsTests : StatisticsDbDataSetWriterTests
     {
         [Fact]
-        public async Task FiltersAndIndicatorsWrittenWithIndicatorGroups()
+        public async Task SubjectHasIndicatorGroup_ReturnsTrue()
         {
             var subjectId = Guid.NewGuid();
 
-            var filters = new List<Filter>
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
             {
-                new() { Id = Guid.NewGuid(), SubjectId = subjectId },
-                new() { Id = Guid.NewGuid(), SubjectId = subjectId },
-            };
+                statisticsDbContext.IndicatorGroup.Add(new IndicatorGroup("Group", subjectId));
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Assert.True(await BuildWriter(subjectId).HasIndicators());
+        }
+
+        [Fact]
+        public async Task OnlyOtherSubjectHasIndicatorGroup_ReturnsFalse()
+        {
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+            {
+                statisticsDbContext.IndicatorGroup.Add(new IndicatorGroup("Group", Guid.NewGuid()));
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Assert.False(await BuildWriter(Guid.NewGuid()).HasIndicators());
+        }
+    }
+
+    public class WriteIndicatorsTests : StatisticsDbDataSetWriterTests
+    {
+        [Fact]
+        public async Task IndicatorsWrittenWithIndicatorGroups()
+        {
+            var subjectId = Guid.NewGuid();
 
             var indicatorGroup = new IndicatorGroup("Group", subjectId);
             var indicators = new List<Indicator>
@@ -45,14 +68,15 @@ public abstract class StatisticsDbDataSetWriterTests
                 new() { Id = Guid.NewGuid(), IndicatorGroup = indicatorGroup },
             };
 
-            await BuildWriter(subjectId).WriteFiltersAndIndicators(filters, indicators);
+            var writer = BuildWriter(subjectId);
+
+            Assert.False(await writer.HasIndicators());
+
+            await writer.WriteIndicators(indicators);
+
+            Assert.True(await writer.HasIndicators());
 
             await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
-
-            Assert.Equal(
-                filters.Select(f => f.Id).Order(),
-                await statisticsDbContext.Filter.Select(f => f.Id).OrderBy(id => id).ToListAsync()
-            );
 
             var savedIndicatorGroup = Assert.Single(
                 await statisticsDbContext.IndicatorGroup.Include(ig => ig.Indicators).ToListAsync()
@@ -65,67 +89,93 @@ public abstract class StatisticsDbDataSetWriterTests
         }
     }
 
-    public class WriteFilterItemsTests : StatisticsDbDataSetWriterTests
+    public class HasFiltersTests : StatisticsDbDataSetWriterTests
     {
         [Fact]
-        public async Task FilterItemsWrittenWithFilterGroupsAndAutoSelectFilterItemsSet()
+        public async Task SubjectHasFilter_ReturnsTrue()
         {
             var subjectId = Guid.NewGuid();
 
-            var filterWithAutoSelect = new Filter
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = subjectId,
-                AutoSelectFilterItemLabel = "total",
-            };
-            var filterWithoutAutoSelect = new Filter
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = subjectId,
-                AutoSelectFilterItemLabel = "Missing",
-            };
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
             {
-                statisticsDbContext.Filter.AddRange(filterWithAutoSelect, filterWithoutAutoSelect);
+                statisticsDbContext.Filter.Add(new Filter { Id = Guid.NewGuid(), SubjectId = subjectId });
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var group1 = new FilterGroup(filterWithAutoSelect.Id, "Group 1");
-            var group2 = new FilterGroup(filterWithoutAutoSelect.Id, "Group 2");
-            var totalItem = new FilterItem("Total", group1);
-            var filterItems = new List<FilterItem> { totalItem, new("Item", group1), new("Item", group2) };
+            Assert.True(await BuildWriter(subjectId).HasFilters());
+        }
 
-            await BuildWriter(subjectId)
-                .WriteFilterItems(
-                    filterItems,
-                    new Dictionary<Guid, FilterItem?>
-                    {
-                        { filterWithAutoSelect.Id, totalItem },
-                        { filterWithoutAutoSelect.Id, null },
-                    }
-                );
-
+        [Fact]
+        public async Task OnlyOtherSubjectHasFilter_ReturnsFalse()
+        {
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
             {
-                var filters = await statisticsDbContext
-                    .Filter.Include(f => f.FilterGroups)
-                        .ThenInclude(fg => fg.FilterItems)
-                    .ToDictionaryAsync(f => f.Id);
-
-                var savedFilterWithAutoSelect = filters[filterWithAutoSelect.Id];
-                Assert.Equal(totalItem.Id, savedFilterWithAutoSelect.AutoSelectFilterItemId);
-                Assert.Equal("Total", savedFilterWithAutoSelect.AutoSelectFilterItemLabel);
-                var savedGroup1 = Assert.Single(savedFilterWithAutoSelect.FilterGroups);
-                Assert.Equal(group1.Id, savedGroup1.Id);
-                Assert.Equal(2, savedGroup1.FilterItems.Count);
-
-                var savedFilterWithoutAutoSelect = filters[filterWithoutAutoSelect.Id];
-                Assert.Null(savedFilterWithoutAutoSelect.AutoSelectFilterItemId);
-                Assert.Null(savedFilterWithoutAutoSelect.AutoSelectFilterItemLabel);
-                var savedGroup2 = Assert.Single(savedFilterWithoutAutoSelect.FilterGroups);
-                Assert.Single(savedGroup2.FilterItems);
+                statisticsDbContext.Filter.Add(new Filter { Id = Guid.NewGuid(), SubjectId = Guid.NewGuid() });
+                await statisticsDbContext.SaveChangesAsync();
             }
+
+            Assert.False(await BuildWriter(Guid.NewGuid()).HasFilters());
+        }
+    }
+
+    public class WriteFiltersTests : StatisticsDbDataSetWriterTests
+    {
+        [Fact]
+        public async Task FiltersWrittenWithFilterGroupsFilterItemsAndAutoSelectFilterItems()
+        {
+            var subjectId = Guid.NewGuid();
+
+            var filter1 = new Filter
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = subjectId,
+                FilterGroups = [],
+            };
+            var filter2 = new Filter
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = subjectId,
+                FilterGroups = [],
+            };
+
+            var group1 = new FilterGroup(filter1.Id, "Group 1");
+            var group2 = new FilterGroup(filter2.Id, "Group 2");
+            filter1.FilterGroups.Add(group1);
+            filter2.FilterGroups.Add(group2);
+
+            var totalItem = new FilterItem("Total", group1);
+            group1.FilterItems.AddRange([totalItem, new FilterItem("Item", group1)]);
+            group2.FilterItems.Add(new FilterItem("Item", group2));
+
+            filter1.AutoSelectFilterItemId = totalItem.Id;
+            filter1.AutoSelectFilterItemLabel = totalItem.Label;
+
+            var writer = BuildWriter(subjectId);
+
+            Assert.False(await writer.HasFilters());
+
+            await writer.WriteFilters([filter1, filter2]);
+
+            Assert.True(await writer.HasFilters());
+
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
+
+            var filters = await statisticsDbContext
+                .Filter.Include(f => f.FilterGroups)
+                    .ThenInclude(fg => fg.FilterItems)
+                .ToDictionaryAsync(f => f.Id);
+
+            var savedFilter1 = filters[filter1.Id];
+            Assert.Equal(totalItem.Id, savedFilter1.AutoSelectFilterItemId);
+            Assert.Equal("Total", savedFilter1.AutoSelectFilterItemLabel);
+            var savedGroup1 = Assert.Single(savedFilter1.FilterGroups);
+            Assert.Equal(group1.Id, savedGroup1.Id);
+            Assert.Equal(2, savedGroup1.FilterItems.Count);
+
+            var savedFilter2 = filters[filter2.Id];
+            Assert.Null(savedFilter2.AutoSelectFilterItemId);
+            var savedGroup2 = Assert.Single(savedFilter2.FilterGroups);
+            Assert.Single(savedGroup2.FilterItems);
         }
     }
 
@@ -181,7 +231,7 @@ public abstract class StatisticsDbDataSetWriterTests
         }
     }
 
-    public class WriteObservationsTests : StatisticsDbDataSetWriterTests
+    public class AppendObservationsTests : StatisticsDbDataSetWriterTests
     {
         [Fact]
         public async Task ObservationsPassedToBatchImporter()
@@ -198,7 +248,7 @@ public abstract class StatisticsDbDataSetWriterTests
                 .Returns(Task.CompletedTask);
 
             await BuildWriter(Guid.NewGuid(), observationBatchImporter: observationBatchImporter.Object)
-                .WriteObservations(observations);
+                .AppendObservations(observations);
 
             VerifyAllMocks(observationBatchImporter);
         }

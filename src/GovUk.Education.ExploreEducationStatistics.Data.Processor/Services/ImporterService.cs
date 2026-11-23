@@ -18,7 +18,6 @@ public class ImporterService : IImporterService
 {
     private readonly AppOptions _appOptions;
     private readonly IGuidGenerator _guidGenerator;
-    private readonly IImporterMetaService _importerMetaService;
     private readonly IDataImportService _dataImportService;
     private readonly ILogger<ImporterService> _logger;
 
@@ -27,25 +26,14 @@ public class ImporterService : IImporterService
     public ImporterService(
         IOptions<AppOptions> appOptions,
         IGuidGenerator guidGenerator,
-        IImporterMetaService importerMetaService,
         IDataImportService dataImportService,
         ILogger<ImporterService> logger
     )
     {
         _appOptions = appOptions.Value;
         _guidGenerator = guidGenerator;
-        _importerMetaService = importerMetaService;
         _dataImportService = dataImportService;
         _logger = logger;
-    }
-
-    public Task<SubjectMeta> ImportMeta(
-        List<string> metaFileCsvHeaders,
-        List<List<string>> metaFileRows,
-        IStorageDataSetWriter dataSetWriter
-    )
-    {
-        return _importerMetaService.Import(metaFileCsvHeaders, metaFileRows, dataSetWriter);
     }
 
     private record FilterItemMeta(Guid FilterId, string FilterGroupLabel, string FilterItemLabel)
@@ -88,7 +76,7 @@ public class ImporterService : IImporterService
     public async Task ImportFiltersAndLocations(
         DataImport dataImport,
         Func<Task<Stream>> dataFileStreamProvider,
-        SubjectMeta subjectMeta,
+        List<Filter> filters,
         IStorageDataSetWriter dataSetWriter
     )
     {
@@ -99,7 +87,7 @@ public class ImporterService : IImporterService
         var filterGroupsFromCsv = new HashSet<FilterGroupMeta>();
         var locations = new HashSet<Location>();
 
-        var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
+        var filterValuesReader = new FilterValuesReader(csvHeaders, filters);
         var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
 
         await CsvUtils.ForEachRow(
@@ -129,21 +117,13 @@ public class ImporterService : IImporterService
 
                 if (IsRowAllowed(soleGeographicLevel, rowValues, fixedInformationReader))
                 {
-                    foreach (var filterMeta in subjectMeta.Filters)
+                    foreach (var filter in filters)
                     {
-                        var filterItemLabel = filterAndIndicatorReader.GetFilterItemLabel(
-                            rowValues,
-                            filterMeta.Filter.Id
-                        );
-                        var filterGroupLabel = filterAndIndicatorReader.GetFilterGroupLabel(
-                            rowValues,
-                            filterMeta.Filter.Id
-                        );
+                        var filterItemLabel = filterValuesReader.GetFilterItemLabel(rowValues, filter.Id);
+                        var filterGroupLabel = filterValuesReader.GetFilterGroupLabel(rowValues, filter.Id);
 
-                        filterGroupsFromCsv.Add(new FilterGroupMeta(filterMeta.Filter.Id, filterGroupLabel));
-                        filterItemsFromCsv.Add(
-                            new FilterItemMeta(filterMeta.Filter.Id, filterGroupLabel, filterItemLabel)
-                        );
+                        filterGroupsFromCsv.Add(new FilterGroupMeta(filter.Id, filterGroupLabel));
+                        filterItemsFromCsv.Add(new FilterItemMeta(filter.Id, filterGroupLabel, filterItemLabel));
                     }
 
                     locations.Add(fixedInformationReader.GetLocation(rowValues));
@@ -172,9 +152,9 @@ public class ImporterService : IImporterService
 
         var filterIds = filterGroups.Select(group => group.FilterId).Distinct().ToList();
 
-        var autoSelectFilterItemLabels = subjectMeta.Filters.ToDictionary(
-            filterMeta => filterMeta.Filter.Id,
-            filterMeta => filterMeta.Filter.AutoSelectFilterItemLabel
+        var autoSelectFilterItemLabels = filters.ToDictionary(
+            filter => filter.Id,
+            filter => filter.AutoSelectFilterItemLabel
         );
 
         var filterIdToAutoSelectFilterItem = filterIds.ToDictionary(
@@ -207,7 +187,21 @@ public class ImporterService : IImporterService
             }
         );
 
-        await dataSetWriter.WriteFilterItems(filterItems, filterIdToAutoSelectFilterItem);
+        if (!await dataSetWriter.HasFilters())
+        {
+            var filtersById = filters.ToDictionary(filter => filter.Id);
+
+            filterGroups.ForEach(filterGroup => filtersById[filterGroup.FilterId].FilterGroups.Add(filterGroup));
+            filterItems.ForEach(filterItem => filterItem.FilterGroup.FilterItems.Add(filterItem));
+
+            foreach (var (filterId, autoSelectFilterItem) in filterIdToAutoSelectFilterItem)
+            {
+                filtersById[filterId].AutoSelectFilterItemId = autoSelectFilterItem?.Id;
+                filtersById[filterId].AutoSelectFilterItemLabel = autoSelectFilterItem?.Label;
+            }
+
+            await dataSetWriter.WriteFilters(filtersById.Values.ToList());
+        }
 
         await dataSetWriter.WriteLocations(locations);
     }
@@ -215,7 +209,6 @@ public class ImporterService : IImporterService
     public async Task ImportObservations(
         DataImport import,
         Func<Task<Stream>> dataFileStreamProvider,
-        Func<Task<Stream>> metaFileStreamProvider,
         IStorageDataSetWriter dataSetWriter
     )
     {
@@ -228,17 +221,12 @@ public class ImporterService : IImporterService
         var startingRowIndex = lastProcessedRowIndex + 1;
         var startingBatchIndex = startingRowIndex / importObservationsBatchSize;
 
-        var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
-        var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
-
-        var subjectMeta = await _importerMetaService.GetSubjectMeta(
-            metaFileCsvHeaders,
-            metaFileCsvRows,
-            dataSetWriter.DataSet
-        );
+        var filters = await dataSetWriter.DataSet.ListFilters(includeItems: true);
+        var indicators = await dataSetWriter.DataSet.ListIndicators();
 
         var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
-        var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
+        var filterValuesReader = new FilterValuesReader(csvHeaders, filters);
+        var indicatorValuesReader = new IndicatorValuesReader(csvHeaders, indicators);
 
         await CsvUtils.Batch(
             dataFileStreamProvider,
@@ -297,9 +285,10 @@ public class ImporterService : IImporterService
 
                                 return ObservationFromCsv(
                                     cells,
-                                    subjectMeta.Filters.Select(meta => meta.Filter).ToList(),
+                                    filters,
                                     fixedInformationReader,
-                                    filterAndIndicatorReader,
+                                    filterValuesReader,
+                                    indicatorValuesReader,
                                     dataSetWriter,
                                     csvRow
                                 );
@@ -311,7 +300,7 @@ public class ImporterService : IImporterService
                     .WhereNotNull()
                     .ToList();
 
-                await dataSetWriter.WriteObservations(allowedRows);
+                await dataSetWriter.AppendObservations(allowedRows);
 
                 importedRowsSoFar += allowedRows.Count;
                 lastProcessedRowIndex += unprocessedRows.Count;
@@ -349,7 +338,8 @@ public class ImporterService : IImporterService
         List<string> rowValues,
         List<Filter> filters,
         FixedInformationDataFileReader fixedInformationReader,
-        FilterAndIndicatorValuesReader filterAndIndicatorReader,
+        FilterValuesReader filterValuesReader,
+        IndicatorValuesReader indicatorValuesReader,
         IStorageDataSetWriter dataSetWriter,
         int csvRowNum
     )
@@ -361,9 +351,9 @@ public class ImporterService : IImporterService
         return new Observation
         {
             Id = observationId,
-            FilterItems = GetFilterItems(rowValues, filters, filterAndIndicatorReader, observationId),
+            FilterItems = GetFilterItems(rowValues, filters, filterValuesReader, observationId),
             LocationId = dataSetWriter.GetLocationId(location),
-            Measures = filterAndIndicatorReader.GetMeasures(rowValues),
+            Measures = indicatorValuesReader.GetMeasures(rowValues),
             SubjectId = subjectId,
             TimeIdentifier = fixedInformationReader.GetTimeIdentifier(rowValues),
             Year = fixedInformationReader.GetYear(rowValues),
@@ -374,14 +364,14 @@ public class ImporterService : IImporterService
     private List<ObservationFilterItem> GetFilterItems(
         IReadOnlyList<string> rowValues,
         List<Filter> filters,
-        FilterAndIndicatorValuesReader filterAndIndicatorReader,
+        FilterValuesReader filterValuesReader,
         Guid observationId
     )
     {
         return filters
             .Select(filter =>
             {
-                var filterItem = filterAndIndicatorReader.GetFilterItem(rowValues, filter);
+                var filterItem = filterValuesReader.GetFilterItem(rowValues, filter);
 
                 return new ObservationFilterItem
                 {

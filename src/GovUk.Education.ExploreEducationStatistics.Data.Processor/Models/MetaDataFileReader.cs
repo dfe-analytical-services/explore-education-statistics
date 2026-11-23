@@ -47,32 +47,24 @@ public class MetaDataFileReader
         };
     }
 
-    public List<(Filter Filter, string Column)> ReadFiltersFromCsv(IEnumerable<MetaRow> metaRows, Guid subjectId)
+    public List<Filter> ReadFiltersFromCsv(IEnumerable<MetaRow> metaRows, Guid subjectId)
     {
         return metaRows
             .Where(row => row.ColumnType == ColumnType.Filter)
-            .Select(filterMetaRow =>
-                (
-                    filter: new Filter(
-                        hint: filterMetaRow.FilterHint,
-                        label: filterMetaRow.Label,
-                        name: filterMetaRow.ColumnName,
-                        groupCsvColumn: filterMetaRow.FilterGroupingColumn,
-                        parentFilter: filterMetaRow.ParentFilter,
-                        autoSelectFilterItemLabel: filterMetaRow.AutoSelectFilterItemLabel,
-                        // NOTE: AutoSelectFilterItemId is set later, after filter items are created
-                        subjectId: subjectId
-                    ),
-                    column: filterMetaRow.ColumnName
-                )
-            )
+            .Select(filterMetaRow => new Filter(
+                hint: filterMetaRow.FilterHint,
+                label: filterMetaRow.Label,
+                name: filterMetaRow.ColumnName,
+                groupCsvColumn: filterMetaRow.FilterGroupingColumn,
+                parentFilter: filterMetaRow.ParentFilter,
+                autoSelectFilterItemLabel: filterMetaRow.AutoSelectFilterItemLabel,
+                // NOTE: AutoSelectFilterItemId is set later, after filter items are created
+                subjectId: subjectId
+            ))
             .ToList();
     }
 
-    public List<(Indicator Indicator, string Column)> ReadIndicatorsFromCsv(
-        IEnumerable<MetaRow> metaRows,
-        Guid subjectId
-    )
+    public List<Indicator> ReadIndicatorsFromCsv(IEnumerable<MetaRow> metaRows, Guid subjectId)
     {
         var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
 
@@ -89,21 +81,13 @@ public class MetaDataFileReader
             .ToDictionary(rows => rows.Key, rows => new IndicatorGroup(rows.Key, subjectId));
 
         return indicatorRows
-            .Select(row =>
+            .Select(row => new Indicator
             {
-                var indicatorGroup = indicatorGroups[row.IndicatorGrouping!];
-
-                return (
-                    indicator: new Indicator
-                    {
-                        IndicatorGroup = indicatorGroup,
-                        Label = row.Label,
-                        Name = row.ColumnName,
-                        Unit = row.IndicatorUnit,
-                        DecimalPlaces = row.DecimalPlaces,
-                    },
-                    column: row.ColumnName
-                );
+                IndicatorGroup = indicatorGroups[row.IndicatorGrouping!],
+                Label = row.Label,
+                Name = row.ColumnName,
+                Unit = row.IndicatorUnit,
+                DecimalPlaces = row.DecimalPlaces,
             })
             .ToList();
     }

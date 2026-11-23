@@ -20,27 +20,32 @@ public interface IStorageDataSetWriter
     IStorageDataSet DataSet { get; }
 
     /// <summary>
-    /// Writes the data set's filters (not their groups and items), and its indicators together with their
-    /// IndicatorGroups.
+    /// Whether <see cref="WriteIndicators" /> has already run, e.g. in an earlier attempt at the import.
     /// </summary>
-    Task WriteFiltersAndIndicators(
-        IReadOnlyList<Filter> filters,
-        IReadOnlyList<Indicator> indicators,
-        CancellationToken cancellationToken = default
-    );
+    Task<bool> HasIndicators(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Writes filter items together with their FilterGroups, and sets the auto select filter item of each filter in
-    /// <paramref name="autoSelectFilterItemsByFilterId" />, clearing it where the filter has none.
+    /// Writes all of the data set's indicators together with their IndicatorGroups.
+    ///
+    /// Must never leave a partial write behind if it fails.
     /// </summary>
-    Task WriteFilterItems(
-        IReadOnlyList<FilterItem> filterItems,
-        IReadOnlyDictionary<Guid, FilterItem?> autoSelectFilterItemsByFilterId,
-        CancellationToken cancellationToken = default
-    );
+    Task WriteIndicators(IReadOnlyList<Indicator> indicators, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Writes those of the given locations that have not been written already.
+    /// Whether <see cref="WriteFilters" /> has already run, e.g. in an earlier attempt at the import.
+    /// </summary>
+    Task<bool> HasFilters(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Writes all of the data set's filters together with their FilterGroups, FilterItems and auto select filter
+    /// items.
+    ///
+    /// Must never leave a partial write behind if it fails.
+    /// </summary>
+    Task WriteFilters(IReadOnlyList<Filter> filters, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Writes all of the data set's locations, giving an id to any location that doesn't have one.
     /// </summary>
     Task WriteLocations(IReadOnlyCollection<Location> locations, CancellationToken cancellationToken = default);
 
@@ -51,9 +56,9 @@ public interface IStorageDataSetWriter
     Guid GetLocationId(Location location);
 
     /// <summary>
-    /// Writes a batch of observations together with their ObservationFilterItems.
+    /// Appends a batch of observations together with their ObservationFilterItems.
     /// </summary>
-    Task WriteObservations(IReadOnlyList<Observation> observations);
+    Task AppendObservations(IReadOnlyList<Observation> observations);
 
     /// <summary>
     /// The number of observations in the data set.

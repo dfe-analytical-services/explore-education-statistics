@@ -123,7 +123,6 @@ public class ProcessorStage1Tests
         var importerService = new ImporterService(
             new AppOptions().ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -146,7 +145,7 @@ public class ProcessorStage1Tests
         var processorService = BuildProcessorService(
             dataImportService: dataImportService,
             privateBlobStorageService: privateBlobStorageService.Object,
-            importerService: importerService,
+            importerMetaService: importerMetaService,
             fileImportService: fileImportService,
             validatorService: validatorService
         );
@@ -179,7 +178,7 @@ public class ProcessorStage1Tests
     private static ProcessorService BuildProcessorService(
         IDataImportService? dataImportService = null,
         IPrivateBlobStorageService? privateBlobStorageService = null,
-        IImporterService? importerService = null,
+        IImporterMetaService? importerMetaService = null,
         IFileImportService? fileImportService = null,
         IValidatorService? validatorService = null
     )
@@ -188,7 +187,7 @@ public class ProcessorStage1Tests
             Mock.Of<ILogger<ProcessorService>>(),
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             fileImportService ?? Mock.Of<IFileImportService>(Strict),
-            importerService ?? Mock.Of<IImporterService>(Strict),
+            importerMetaService ?? Mock.Of<IImporterMetaService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             validatorService ?? Mock.Of<IValidatorService>(Strict),
             Mock.Of<IStorageDataSetWriterResolver>(Strict)

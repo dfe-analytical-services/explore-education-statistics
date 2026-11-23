@@ -14,7 +14,7 @@ public class ProcessorService(
     ILogger<ProcessorService> logger,
     IPrivateBlobStorageService privateBlobStorageService,
     IFileImportService fileImportService,
-    IImporterService importerService,
+    IImporterMetaService importerMetaService,
     IDataImportService dataImportService,
     IValidatorService validatorService,
     IStorageDataSetWriterResolver storageDataSetWriterResolver
@@ -52,8 +52,18 @@ public class ProcessorService(
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-        var subjectMeta = await importerService.ImportMeta(metaFileCsvHeaders, metaFileCsvRows, dataSetWriter);
-        await fileImportService.ImportFiltersAndLocations(import.Id, subjectMeta, dataSetWriter);
+        var (filters, indicators) = importerMetaService.ReadMetaCsv(
+            metaFileCsvHeaders,
+            metaFileCsvRows,
+            dataSetWriter.SubjectId
+        );
+
+        if (!await dataSetWriter.HasIndicators())
+        {
+            await dataSetWriter.WriteIndicators(indicators);
+        }
+
+        await fileImportService.ImportFiltersAndLocations(import.Id, filters, dataSetWriter);
     }
 
     public async Task ProcessStage3(Guid importId)

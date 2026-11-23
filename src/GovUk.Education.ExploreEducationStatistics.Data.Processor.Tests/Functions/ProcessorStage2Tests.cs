@@ -61,26 +61,54 @@ public class ProcessorStage2Tests
     }
 
     [Fact]
-    public async Task ProcessStage2_SubjectMetaAlreadyImported()
+    public async Task ProcessStage2_IndicatorsAlreadyImported()
     {
         var subjectId = Guid.NewGuid();
         var scenario = new OrderingCsvStage2Scenario(subjectId);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
-            // Save the Filters without any FilterGroups attached - the FilterGroups are added later as part of the
-            // CSV row-by-row scanning.
-            var filtersWithoutGroups = scenario.GetExpectedFilters();
-            filtersWithoutGroups.ForEach(filter => filter.FilterGroups = new List<FilterGroup>());
-            await statisticsDbContext.Filter.AddRangeAsync(filtersWithoutGroups);
-
-            // Save the IndicatorGroups too. This completes the data that is saved when atomically saving the
-            // Subject Meta as the first step of Stage 2 import.
+            // The indicators are saved as soon as the meta file has been read, whereas the filters are saved
+            // with their FilterGroups and FilterItems once the CSV has been scanned.
             await statisticsDbContext.IndicatorGroup.AddRangeAsync(scenario.GetExpectedIndicatorGroups());
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        // Now assert that the Stage 2 import completes successfully when the Subject Meta is already pre-existing.
+        // Now assert that the Stage 2 import completes successfully when the indicators are already pre-existing.
+        await AssertStage2ItemsImportedCorrectly(scenario);
+    }
+
+    [Fact]
+    public async Task ProcessStage2_FiltersAndIndicatorsAlreadyImported()
+    {
+        var subjectId = Guid.NewGuid();
+        var scenario = new OrderingCsvStage2Scenario(subjectId);
+
+        var filters = scenario.GetExpectedFilters();
+
+        scenario
+            .GetAutoSelectFilterValues()
+            .ForEach(autoSelect =>
+            {
+                var filter = filters.Single(f => f.Label == autoSelect.FilterLabel);
+                var filterItem = filter
+                    .FilterGroups.SelectMany(group => group.FilterItems)
+                    .Single(item => item.Label == autoSelect.AutoSelectFilterItemLabel);
+
+                filterItem.Id = Guid.NewGuid();
+                filter.AutoSelectFilterItemId = filterItem.Id;
+                filter.AutoSelectFilterItemLabel = filterItem.Label;
+            });
+
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
+        {
+            await statisticsDbContext.Filter.AddRangeAsync(filters);
+            await statisticsDbContext.IndicatorGroup.AddRangeAsync(scenario.GetExpectedIndicatorGroups());
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        // Now assert that the Stage 2 import completes successfully, without saving the filters again, when the
+        // filters and indicators are already pre-existing.
         await AssertStage2ItemsImportedCorrectly(scenario);
     }
 
@@ -250,7 +278,6 @@ public class ProcessorStage2Tests
         var importerService = new ImporterService(
             new AppOptions().ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -272,7 +299,7 @@ public class ProcessorStage2Tests
             ),
             dataImportService: dataImportService,
             privateBlobStorageService: privateBlobStorageService.Object,
-            importerService: importerService,
+            importerMetaService: importerMetaService,
             fileImportService: fileImportService
         );
 
@@ -473,7 +500,7 @@ public class ProcessorStage2Tests
         IStorageDataSetWriterResolver storageDataSetWriterResolver,
         IDataImportService? dataImportService = null,
         IPrivateBlobStorageService? privateBlobStorageService = null,
-        IImporterService? importerService = null,
+        IImporterMetaService? importerMetaService = null,
         IFileImportService? fileImportService = null
     )
     {
@@ -481,7 +508,7 @@ public class ProcessorStage2Tests
             Mock.Of<ILogger<ProcessorService>>(),
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             fileImportService ?? Mock.Of<IFileImportService>(Strict),
-            importerService ?? Mock.Of<IImporterService>(Strict),
+            importerMetaService ?? Mock.Of<IImporterMetaService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             Mock.Of<IValidatorService>(Strict),
             storageDataSetWriterResolver

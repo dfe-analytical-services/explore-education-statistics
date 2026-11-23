@@ -5,8 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
-using static System.StringComparison;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
@@ -39,68 +37,23 @@ public class ImporterMetaService : IImporterMetaService
         _guidGenerator = guidGenerator;
     }
 
-    public async Task<SubjectMeta> Import(
+    public (List<Filter> Filters, List<Indicator> Indicators) ReadMetaCsv(
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
-        IStorageDataSetWriter dataSetWriter
-    )
-    {
-        var dataSet = dataSetWriter.DataSet;
-
-        var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
-        var metaRows = metaFileReader.GetMetaRows(metaFileRows);
-        metaRows = IgnoreFiltersUsedForGrouping(metaRows);
-
-        var filtersAndMeta = metaFileReader.ReadFiltersFromCsv(metaRows, dataSet.SubjectId);
-        var indicatorsAndMeta = metaFileReader.ReadIndicatorsFromCsv(metaRows, dataSet.SubjectId);
-
-        // These load every filter and indicator group only to check whether there are any. A possible performance
-        // improvement is to add HasFilters and HasIndicatorGroups to IStorageDataSet.
-        var filtersAlreadyImported = filtersAndMeta.Count > 0 && (await dataSet.ListFilters()).Count > 0;
-
-        var indicatorsAlreadyImported = indicatorsAndMeta.Count > 0 && (await dataSet.ListIndicatorGroups()).Count > 0;
-
-        if (!filtersAlreadyImported || !indicatorsAlreadyImported)
-        {
-            var filters = filtersAndMeta.Select(f => f.Filter).ToList();
-            filters.ForEach(filter => filter.Id = _guidGenerator.NewGuid());
-
-            var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
-            indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
-
-            await dataSetWriter.WriteFiltersAndIndicators(filters, indicators);
-        }
-
-        return await GetSubjectMeta(metaFileCsvHeaders, metaFileRows, dataSet);
-    }
-
-    public async Task<SubjectMeta> GetSubjectMeta(
-        List<string> metaFileCsvHeaders,
-        List<List<string>> metaFileRows,
-        IStorageDataSet dataSet
+        Guid subjectId
     )
     {
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
         metaRows = IgnoreFiltersUsedForGrouping(metaRows);
 
-        var filters = await GetFilters(metaRows, dataSet);
-        var indicators = await GetIndicators(metaRows, dataSet);
+        var indicators = metaFileReader.ReadIndicatorsFromCsv(metaRows, subjectId);
+        indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
 
-        return new SubjectMeta { Filters = filters, Indicators = indicators };
-    }
+        var filters = metaFileReader.ReadFiltersFromCsv(metaRows, subjectId);
+        filters.ForEach(filter => filter.Id = _guidGenerator.NewGuid());
 
-    private static async Task<List<(Filter Filter, string Column)>> GetFilters(
-        IEnumerable<MetaRow> metaRows,
-        IStorageDataSet dataSet
-    )
-    {
-        var filters = await dataSet.ListFilters(includeItems: true);
-
-        return metaRows
-            .Where(row => row.ColumnType == ColumnType.Filter)
-            .Select(filter => (filter: filters.Single(f => f.Name == filter.ColumnName), column: filter.ColumnName))
-            .ToList();
+        return (filters, indicators);
     }
 
     private static List<MetaRow> IgnoreFiltersUsedForGrouping(List<MetaRow> metaRows)
@@ -109,45 +62,6 @@ public class ImporterMetaService : IImporterMetaService
 
         return metaRows
             .Where(r => r.ColumnType != ColumnType.Filter || !groupingColumns.Contains(r.ColumnName.ToLower()))
-            .ToList();
-    }
-
-    private static async Task<List<(Indicator Indicator, string Column)>> GetIndicators(
-        IEnumerable<MetaRow> metaRows,
-        IStorageDataSet dataSet
-    )
-    {
-        var indicatorRows = metaRows.Where(row => row.ColumnType == ColumnType.Indicator).ToList();
-
-        indicatorRows.ForEach(row =>
-        {
-            if (string.IsNullOrWhiteSpace(row.IndicatorGrouping))
-            {
-                row.IndicatorGrouping = "Default";
-            }
-        });
-
-        var dataSetIndicatorGroups = await dataSet.ListIndicatorGroups();
-
-        var indicatorGroups = indicatorRows
-            .GroupBy(row => row.IndicatorGrouping!)
-            .ToDictionary(
-                rows => rows.Key,
-                rows => dataSetIndicatorGroups.Single(ig => string.Equals(ig.Label, rows.Key, CurrentCultureIgnoreCase))
-            );
-
-        return indicatorRows
-            .Select(row =>
-            {
-                var indicatorGroup = indicatorGroups[row.IndicatorGrouping!];
-
-                return (
-                    indicator: indicatorGroup.Indicators.Single(i =>
-                        string.Equals(i.Label, row.Label, CurrentCultureIgnoreCase) && i.Unit == row.IndicatorUnit
-                    ),
-                    column: row.ColumnName
-                );
-            })
             .ToList();
     }
 }

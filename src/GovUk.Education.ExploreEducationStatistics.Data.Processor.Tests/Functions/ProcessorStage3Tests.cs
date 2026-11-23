@@ -107,8 +107,8 @@ public class ProcessorStage3Tests
                     .WithIndicators(
                         _fixture
                             .DefaultIndicator()
-                            .ForIndex(0, s => s.SetLabel("Indicator one"))
-                            .ForIndex(1, s => s.SetLabel("Indicator two"))
+                            .ForIndex(0, s => s.SetLabel("Indicator one").Set(i => i.Name, "ind_one"))
+                            .ForIndex(1, s => s.SetLabel("Indicator two").Set(i => i.Name, "ind_two"))
                             .GenerateList()
                     )
                     .Generate(1)
@@ -148,22 +148,10 @@ public class ProcessorStage3Tests
             import.File.Filename
         );
 
-        var metaFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources",
-            import.MetaFile.Filename
-        );
-
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath
-        );
-
-        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
-            PrivateReleaseFiles,
-            import.MetaFile.Path(),
-            metaFilePath
         );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -198,7 +186,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -215,7 +202,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
@@ -326,7 +313,7 @@ public class ProcessorStage3Tests
 
             file.DataSetFileMeta.Indicators.Select(i => (i.Label, i.ColumnName))
                 .ToList()
-                .AssertDeepEqualTo([("Indicator one", "indicator_one"), ("Indicator two", "indicator_two")]);
+                .AssertDeepEqualTo([("Indicator one", "ind_one"), ("Indicator two", "ind_two")]);
         }
     }
 
@@ -365,22 +352,10 @@ public class ProcessorStage3Tests
             import.File.Filename
         );
 
-        var metaFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources",
-            import.MetaFile.Filename
-        );
-
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath
-        );
-
-        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
-            PrivateReleaseFiles,
-            import.MetaFile.Path(),
-            metaFilePath
         );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -415,7 +390,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -432,7 +406,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
@@ -502,22 +476,10 @@ public class ProcessorStage3Tests
             import.File.Filename
         );
 
-        var metaFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources",
-            import.MetaFile.Filename
-        );
-
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath
-        );
-
-        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
-            PrivateReleaseFiles,
-            import.MetaFile.Path(),
-            metaFilePath
         );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -552,7 +514,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -569,7 +530,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
@@ -654,22 +615,10 @@ public class ProcessorStage3Tests
             import.File.Filename
         );
 
-        var metaFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources",
-            import.MetaFile.Filename
-        );
-
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath
-        );
-
-        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
-            PrivateReleaseFiles,
-            import.MetaFile.Path(),
-            metaFilePath
         );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -704,7 +653,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -721,7 +669,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
@@ -765,6 +713,9 @@ public class ProcessorStage3Tests
     [Fact]
     public async Task ProcessStage3_IgnoredRows()
     {
+        _subject.Filters.RemoveAt(1);
+        _subject.IndicatorGroups[0].Indicators.RemoveAt(1);
+
         // This import expects only 8 out of 16 rows to be imported, as 8 of them are ignored.
         var import = _fixture
             .DefaultDataImport()
@@ -795,22 +746,10 @@ public class ProcessorStage3Tests
             import.File.Filename
         );
 
-        var metaFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources",
-            import.MetaFile.Filename
-        );
-
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath
-        );
-
-        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
-            PrivateReleaseFiles,
-            import.MetaFile.Path(),
-            metaFilePath
         );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -845,7 +784,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -862,7 +800,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
@@ -921,6 +859,9 @@ public class ProcessorStage3Tests
     [Fact]
     public async Task ProcessStage3_IgnoredRows_PartiallyImported()
     {
+        _subject.Filters.RemoveAt(1);
+        _subject.IndicatorGroups[0].Indicators.RemoveAt(1);
+
         // This import expects only 8 out of 16 rows to be imported, as 8 of them are ignored.
         // This import was interrupted and is restarting. So far, 7 rows have been processed, and of those 7,
         // 4 are LA-level data that has been imported, and 3 are School-level data that has been ignored.
@@ -966,22 +907,10 @@ public class ProcessorStage3Tests
             import.File.Filename
         );
 
-        var metaFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources",
-            import.MetaFile.Filename
-        );
-
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath
-        );
-
-        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
-            PrivateReleaseFiles,
-            import.MetaFile.Path(),
-            metaFilePath
         );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -1016,7 +945,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -1033,7 +961,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
@@ -1111,22 +1039,10 @@ public class ProcessorStage3Tests
             import.File.Filename
         );
 
-        var metaFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources",
-            import.MetaFile.Filename
-        );
-
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath
-        );
-
-        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
-            PrivateReleaseFiles,
-            import.MetaFile.Path(),
-            metaFilePath
         );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -1161,7 +1077,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -1178,7 +1093,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
@@ -1278,7 +1193,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 3 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -1295,7 +1209,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
@@ -1334,6 +1248,9 @@ public class ProcessorStage3Tests
     [Fact]
     public async Task ProcessStage3_AdditionalFiltersAndIndicators()
     {
+        _subject.Filters.RemoveAt(1);
+        _subject.IndicatorGroups[0].Indicators.RemoveAt(1);
+
         var additionalFilter = _fixture
             .DefaultFilter()
             .WithSubject(_subject)
@@ -1385,22 +1302,10 @@ public class ProcessorStage3Tests
             import.File.Filename
         );
 
-        var metaFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources",
-            import.MetaFile.Filename
-        );
-
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath
-        );
-
-        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
-            PrivateReleaseFiles,
-            import.MetaFile.Path(),
-            metaFilePath
         );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -1435,7 +1340,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -1452,7 +1356,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
@@ -1527,7 +1431,12 @@ public class ProcessorStage3Tests
             .WithIndicatorGroups(
                 _fixture
                     .DefaultIndicatorGroup()
-                    .WithIndicators(_fixture.DefaultIndicator().WithLabel("Indicator one").GenerateList(1))
+                    .WithIndicators(
+                        _fixture
+                            .DefaultIndicator()
+                            .ForInstance(s => s.SetLabel("Indicator one").Set(i => i.Name, "ind_one"))
+                            .GenerateList(1)
+                    )
                     .Generate(1)
             )
             .Generate();
@@ -1561,22 +1470,10 @@ public class ProcessorStage3Tests
             import.File.Filename
         );
 
-        var metaFilePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "Resources",
-            import.MetaFile.Filename
-        );
-
         privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath
-        );
-
-        privateBlobStorageService.SetupGetDownloadStreamWithFilePath(
-            PrivateReleaseFiles,
-            import.MetaFile.Path(),
-            metaFilePath
         );
 
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -1611,7 +1508,6 @@ public class ProcessorStage3Tests
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5000 }.ToOptionsWrapper(),
             guidGenerator,
-            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>()
         );
@@ -1628,7 +1524,7 @@ public class ProcessorStage3Tests
             Mock.Of<ILogger<ProcessorService>>(Strict),
             privateBlobStorageService.Object,
             fileImportService,
-            importerService,
+            importerMetaService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             BuildStorageDataSetWriterResolver(
