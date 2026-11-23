@@ -700,6 +700,294 @@ public abstract class ReleaseRolloverServiceTests
         }
 
         [Fact]
+        public async Task GivenWithDataMode_CopiesContentBlankingHtmlAndRelinkingDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            HtmlBlock headlinesHtmlBlock = _dataFixture
+                .DefaultHtmlBlock()
+                .WithBody("Last year's headline")
+                .WithOrder(1)
+                .Generate();
+            headlinesHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            ContentSection headlinesSection = _dataFixture
+                .DefaultContentSection(ContentSectionType.Headlines)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithContentBlocks([headlinesHtmlBlock])
+                .Generate();
+
+            HtmlBlock genericHtmlBlock = _dataFixture.DefaultHtmlBlock().WithBody("Some text").WithOrder(1).Generate();
+            genericHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            DataBlockVersionLink genericDataBlockVersionLink = _dataFixture
+                .DefaultDataVersionBlockVersionLink()
+                .WithDataBlockVersion(templateDataBlockVersion)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithOrder(2)
+                .Generate();
+
+            EmbedBlockLink genericEmbedBlockLink = _dataFixture.DefaultEmbedBlockLink().WithOrder(3).Generate();
+            genericEmbedBlockLink.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            ContentSection genericSection = _dataFixture
+                .DefaultContentSection(ContentSectionType.Generic)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithHeading("Custom section")
+                .WithOrder(5)
+                .WithContentBlocks([genericHtmlBlock, genericDataBlockVersionLink, genericEmbedBlockLink])
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                context.ContentSections.AddRange(headlinesSection, genericSection);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var newDataBlockVersion = await context.DataBlockVersions.SingleAsync(dataBlockVersion =>
+                    dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                );
+
+                var newHeadlinesSection = await context
+                    .ContentSections.Include(section => section.Content)
+                    .SingleAsync(section =>
+                        section.ReleaseVersionId == newReleaseVersionId && section.Type == ContentSectionType.Headlines
+                    );
+
+                var newHeadlinesHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(newHeadlinesSection.Content));
+                Assert.Equal(string.Empty, newHeadlinesHtmlBlock.Body);
+                Assert.Equal(headlinesHtmlBlock.Order, newHeadlinesHtmlBlock.Order);
+                Assert.NotEqual(headlinesHtmlBlock.Id, newHeadlinesHtmlBlock.Id);
+
+                var newGenericSection = await context
+                    .ContentSections.Include(section => section.Content)
+                    .SingleAsync(section =>
+                        section.ReleaseVersionId == newReleaseVersionId && section.Type == ContentSectionType.Generic
+                    );
+
+                Assert.NotEqual(genericSection.Id, newGenericSection.Id);
+                Assert.Equal(genericSection.Heading, newGenericSection.Heading);
+                Assert.Equal(genericSection.Order, newGenericSection.Order);
+
+                // The EmbedBlockLink is dropped - only the HtmlBlock and the relinked DataBlockVersionLink remain.
+                Assert.Equal(2, newGenericSection.Content.Count);
+
+                var newGenericHtmlBlock = Assert.IsType<HtmlBlock>(
+                    Assert.Single(newGenericSection.Content, block => block is HtmlBlock)
+                );
+                Assert.Equal(string.Empty, newGenericHtmlBlock.Body);
+                Assert.Equal(genericHtmlBlock.Order, newGenericHtmlBlock.Order);
+
+                var newDataBlockVersionLink = Assert.IsType<DataBlockVersionLink>(
+                    Assert.Single(newGenericSection.Content, block => block is DataBlockVersionLink)
+                );
+                Assert.Equal(newDataBlockVersion.Id, newDataBlockVersionLink.DataBlockVersionId);
+                Assert.Equal(newDataBlockVersionLink.Id, newDataBlockVersionLink.DataBlockVersionId);
+                Assert.Equal(genericDataBlockVersionLink.Order, newDataBlockVersionLink.Order);
+            }
+        }
+
+        [Fact]
+        public async Task GivenStructureOnlyMode_CopiesContentButDropsDataBlockVersionLinks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            // A standard (non-Generic) section - in StructureOnly mode, unlike WithData, nothing has been saved
+            // yet when this section's own HtmlBlock is copied, so destinationSection.Id is still Guid.Empty at
+            // that point. This proves the new block's ContentSectionId still resolves correctly regardless,
+            // via EF's relationship fixup when it's added to destinationSection.Content.
+            HtmlBlock headlinesHtmlBlock = _dataFixture
+                .DefaultHtmlBlock()
+                .WithBody("Last year's headline")
+                .WithOrder(1)
+                .Generate();
+            headlinesHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            ContentSection headlinesSection = _dataFixture
+                .DefaultContentSection(ContentSectionType.Headlines)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithContentBlocks([headlinesHtmlBlock])
+                .Generate();
+
+            HtmlBlock genericHtmlBlock = _dataFixture.DefaultHtmlBlock().WithBody("Some text").WithOrder(1).Generate();
+            genericHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            DataBlockVersionLink genericDataBlockVersionLink = _dataFixture
+                .DefaultDataVersionBlockVersionLink()
+                .WithDataBlockVersion(templateDataBlockVersion)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithOrder(2)
+                .Generate();
+
+            ContentSection genericSection = _dataFixture
+                .DefaultContentSection(ContentSectionType.Generic)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithHeading("Custom section")
+                .WithOrder(5)
+                .WithContentBlocks([genericHtmlBlock, genericDataBlockVersionLink])
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                context.ContentSections.AddRange(headlinesSection, genericSection);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.StructureOnly,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // StructureOnly must not copy any data blocks at all, not just omit linking them into content.
+                Assert.False(
+                    await context.DataBlockVersions.AnyAsync(dataBlockVersion =>
+                        dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                    )
+                );
+
+                var newHeadlinesSection = await context
+                    .ContentSections.Include(section => section.Content)
+                    .SingleAsync(section =>
+                        section.ReleaseVersionId == newReleaseVersionId && section.Type == ContentSectionType.Headlines
+                    );
+
+                var newHeadlinesHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(newHeadlinesSection.Content));
+                Assert.Equal(string.Empty, newHeadlinesHtmlBlock.Body);
+                Assert.Equal(headlinesHtmlBlock.Order, newHeadlinesHtmlBlock.Order);
+
+                // Proves the ContentSectionId FK resolved correctly via EF's relationship fixup, even though
+                // destinationSection.Id was still Guid.Empty (nothing saved yet) at the point this was assigned.
+                Assert.Equal(newHeadlinesSection.Id, newHeadlinesHtmlBlock.ContentSectionId);
+                Assert.NotEqual(Guid.Empty, newHeadlinesHtmlBlock.ContentSectionId);
+
+                var newGenericSection = await context
+                    .ContentSections.Include(section => section.Content)
+                    .SingleAsync(section =>
+                        section.ReleaseVersionId == newReleaseVersionId && section.Type == ContentSectionType.Generic
+                    );
+
+                Assert.NotEqual(genericSection.Id, newGenericSection.Id);
+                Assert.Equal(genericSection.Heading, newGenericSection.Heading);
+                Assert.Equal(genericSection.Order, newGenericSection.Order);
+
+                // The DataBlockVersionLink is silently dropped - there's no id-map to resolve it against.
+                var newGenericHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(newGenericSection.Content));
+                Assert.Equal(string.Empty, newGenericHtmlBlock.Body);
+                Assert.Equal(genericHtmlBlock.Order, newGenericHtmlBlock.Order);
+                Assert.NotEqual(genericHtmlBlock.Id, newGenericHtmlBlock.Id);
+            }
+        }
+
+        [Fact]
         public async Task GivenReleaseRolloverDisabled_ReturnsForbid()
         {
             Publication publication = _dataFixture.DefaultPublication();

@@ -421,4 +421,61 @@ describe('ReorderFiltersList', () => {
 
     expect(handleSave).toHaveBeenCalledWith(testSubject.id, expectedRequest);
   });
+
+  test('the back link goes back straight away when the order is unchanged', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    const handleBack = jest.fn();
+
+    const { user } = render(
+      <ReorderFiltersList
+        releaseVersionId="release-1"
+        subject={testSubject}
+        onCancel={handleBack}
+        onSave={noop}
+      />,
+    );
+
+    await screen.findByText('Reorder filters for Subject Name');
+
+    await user.click(
+      screen.getByRole('button', { name: 'Back to data files' }),
+    );
+
+    expect(handleBack).toHaveBeenCalledTimes(1);
+    expect(
+      screen.queryByText('You have unsaved changes'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('the back link asks to confirm after the order has changed', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    const handleBack = jest.fn();
+
+    const { user } = render(
+      <ReorderFiltersList
+        releaseVersionId="release-1"
+        subject={testSubject}
+        onCancel={handleBack}
+        onSave={noop}
+      />,
+    );
+
+    await screen.findByText('Reorder filters for Subject Name');
+
+    await user.click(
+      screen.getByRole('button', { name: 'Move Category 2 down' }),
+    );
+    await user.click(
+      screen.getByRole('button', { name: 'Back to data files' }),
+    );
+
+    expect(
+      await screen.findByText('You have unsaved changes'),
+    ).toBeInTheDocument();
+    expect(handleBack).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: 'Discard changes' }));
+
+    await waitFor(() => expect(handleBack).toHaveBeenCalledTimes(1));
+  });
 });

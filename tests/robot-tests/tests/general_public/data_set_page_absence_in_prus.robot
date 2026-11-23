@@ -23,6 +23,13 @@ Validate data set info
     user checks page contains    Latest data
     user checks page contains    ${PUPIL_ABSENCE_PUBLICATION_TITLE}
     user checks page contains    ${PUPIL_ABSENCE_RELEASE_NAME}
+    user checks element is visible    testid:Published-value
+    user checks element is visible    testid:Last updated-value
+
+Validate quick links
+    user checks page contains element    testid:quick-links
+    user checks page contains link    Create your own tables    testid:quick-links
+    user checks page does not contain element    xpath://*[@data-testid="quick-links"]//a[text()="Get email alerts"]
 
 Validate zip contains correct files
     [Documentation]    EES-4147

@@ -1,4 +1,5 @@
 using System.Net.Mime;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Clients.AzureBlobStorage;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Options;
@@ -76,7 +77,7 @@ public class DataSetDocumentCreatorTests
         }
 
         [Fact]
-        public async Task ShouldUploadEachDataSetDocumentAsJsonWithoutMetadata()
+        public async Task ShouldUploadEachDataSetDocumentAsJsonWithFileIdMetadata()
         {
             await GetSut().RefreshReleaseDataSetDocuments(_request);
 
@@ -84,13 +85,13 @@ public class DataSetDocumentCreatorTests
                 containerName: DataSetDocumentsContainerName,
                 blobName: $"{PublicationId}/{ReleaseId}/{DataSetDocument1.FileId}.json",
                 contentType: MediaTypeNames.Application.Json,
-                whereBlob: blob => blob.Contents == DataSetDocument1.ToJson() && blob.Metadata is null
+                whereBlob: blob => blob == new Blob(DataSetDocument1.ToJson(), DataSetDocument1.BuildMetadata())
             );
             _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
                 containerName: DataSetDocumentsContainerName,
                 blobName: $"{PublicationId}/{ReleaseId}/{DataSetDocument2.FileId}.json",
                 contentType: MediaTypeNames.Application.Json,
-                whereBlob: blob => blob.Contents == DataSetDocument2.ToJson() && blob.Metadata is null
+                whereBlob: blob => blob == new Blob(DataSetDocument2.ToJson(), DataSetDocument2.BuildMetadata())
             );
         }
 
@@ -184,13 +185,14 @@ public class DataSetDocumentCreatorTests
                 containerName: DataSetDocumentsContainerName,
                 blobName: $"{PublicationId}/{ReleaseId}/{DataSetDocument1.FileId}.json",
                 contentType: MediaTypeNames.Application.Json,
-                whereBlob: blob => blob.Contents == DataSetDocument1.ToJson() && blob.Metadata is null
+                whereBlob: blob => blob == new Blob(DataSetDocument1.ToJson(), DataSetDocument1.BuildMetadata())
             );
             _azureBlobStorageClientMockBuilder.Assert.BlobWasUploaded(
                 containerName: DataSetDocumentsContainerName,
                 blobName: $"{PublicationId}/{OtherReleaseId}/{OtherReleaseDataSetDocument.FileId}.json",
                 contentType: MediaTypeNames.Application.Json,
-                whereBlob: blob => blob.Contents == OtherReleaseDataSetDocument.ToJson() && blob.Metadata is null
+                whereBlob: blob =>
+                    blob == new Blob(OtherReleaseDataSetDocument.ToJson(), OtherReleaseDataSetDocument.BuildMetadata())
             );
         }
 
