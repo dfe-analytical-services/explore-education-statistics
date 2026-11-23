@@ -49,6 +49,10 @@ prevent infrastructure deploys from overriding application-specific appsettings 
 ''')
 param existingProdAppSettings object = {}
 
+@secure()
+@description('The existing appsettings for the staging slot, fetched by the pipeline before deployment. Used to prevent infrastructure deploys from overriding application-specific appsettings back to their original values.')
+param existingStagingSlotAppSettings object = {}
+
 module appServicePlanModule '../common/components/app-service-plan/app-service-plan.bicep' = {
   name: 'publicSiteAppServicePlanModule'
   params: {
@@ -99,7 +103,6 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     appInsightsName: appInsightsModule.outputs.applicationInsightsName
     detailedErrors: detailedErrors
     autoscaleEnabled: autoscaleAppServices
-    swapSlotEnabled: false
     healthCheckPath: '/health'
     allowedOrigins: allowedOrigins
     alerts: deployAlerts ? {
@@ -113,6 +116,7 @@ module appServiceModule '../common/components/app-service/app-service.bicep' = {
     websitePort: 3000
     applicationAppSettings: {}
     existingProdAppSettings: existingProdAppSettings
+    existingStagingSlotAppSettings: existingStagingSlotAppSettings
     tagValues: tagValues
   }
 }
@@ -127,6 +131,16 @@ module searchIndexDataReaderRoleAssignmentModule '../common/components/search/se
       resourceId('Microsoft.Web/sites', appServiceModule.outputs.appServiceName),
       subscriptionResourceId('Microsoft.Authorization/roleDefinitions', builtInRoleDefinitionIds.SearchIndexDataReader)
     )
+    role: 'Search Index Data Reader'
+  }
+}
+
+// TODO EES-7502 - remove once every environment has moved to the ELZ and the public site uses its user-assigned identity.
+module stagingSlotSearchIndexDataReaderRoleAssignmentModule '../common/components/search/searchServiceRoleAssignment.bicep' = if (!useUserAssignedIdentity) {
+  name: 'publicSiteStagingSlotSearchReaderRoleAssignmentDeploy'
+  params: {
+    searchServiceName: resourceNames.search.service
+    principalIds: [appServiceModule.outputs.stagingSlotSystemIdentityPrincipalId]
     role: 'Search Index Data Reader'
   }
 }

@@ -16,6 +16,8 @@ parameters:
 
 steps:
   - task: AzureCLI@2
+    # Named so that "deployedAt" can be read by later jobs - see SwapAdminIntoMainSlot.
+    name: GetNewAppSettings
     displayName: ${{ parameters.displayNamePrefix }} - Get new application-specific appsettings to deploy
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
@@ -28,6 +30,8 @@ steps:
         # appsetting below - see wait-for-app-service-restart.yml.
         deployedAt=$(date -u +%Y-%m-%dT%H:%M:%SZ)
         echo "##vso[task.setvariable variable=deployedAt]$deployedAt"
+        # Also exposed as an output variable for jobs that act on this deploy later on.
+        echo "##vso[task.setvariable variable=deployedAt;isOutput=true]$deployedAt"
 
         # TODO EES-7502 - consider using bicep snapshot as per usage in
         # infrastructure/common/ci/tasks/get-resource-names.yml to speed up

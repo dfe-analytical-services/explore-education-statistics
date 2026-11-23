@@ -80,6 +80,8 @@ jobs:
         displayName: Swap Admin into main slot
         dependsOn: DeployAdmin
         environment: ${{ parameters.environment }}
+        variables:
+          deployedAt: $[ dependencies.DeployAdmin.outputs['DeployAdmin.GetNewAppSettings.deployedAt'] ]
         strategy:
           runOnce:
             deploy:
@@ -99,3 +101,4 @@ jobs:
                     appName: $(resourceNames.admin.appService)
                     resourceGroupName: $(resourceGroupName)
                     healthCheckPath: /api/health
+                    deployedAt: $(deployedAt)

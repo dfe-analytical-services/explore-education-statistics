@@ -37,3 +37,4 @@ steps:
       appName: ${{ parameters.appName }}
       resourceGroupName: ${{ parameters.resourceGroupName }}
       healthCheckPath: ${{ parameters.healthCheckPath }}
+      deployedAt: ${{ parameters.deployedAt }}
