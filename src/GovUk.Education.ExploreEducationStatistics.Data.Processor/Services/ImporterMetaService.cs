@@ -45,33 +45,25 @@ public class ImporterMetaService : IImporterMetaService
         IStorageDataSetWriter dataSetWriter
     )
     {
-        var dataSet = dataSetWriter.DataSet;
-
         var metaFileReader = new MetaDataFileReader(metaFileCsvHeaders);
         var metaRows = metaFileReader.GetMetaRows(metaFileRows);
         metaRows = IgnoreFiltersUsedForGrouping(metaRows);
 
-        var filtersAndMeta = metaFileReader.ReadFiltersFromCsv(metaRows, dataSet.SubjectId);
-        var indicatorsAndMeta = metaFileReader.ReadIndicatorsFromCsv(metaRows, dataSet.SubjectId);
-
-        // These load every filter and indicator group only to check whether there are any. A possible performance
-        // improvement is to add HasFilters and HasIndicatorGroups to IStorageDataSet.
-        var filtersAlreadyImported = filtersAndMeta.Count > 0 && (await dataSet.ListFilters()).Count > 0;
-
-        var indicatorsAlreadyImported = indicatorsAndMeta.Count > 0 && (await dataSet.ListIndicatorGroups()).Count > 0;
-
-        if (!filtersAlreadyImported || !indicatorsAlreadyImported)
+        if (!await dataSetWriter.HasIndicators())
         {
-            var filters = filtersAndMeta.Select(f => f.Filter).ToList();
-            filters.ForEach(filter => filter.Id = _guidGenerator.NewGuid());
-
-            var indicators = indicatorsAndMeta.Select(i => i.Indicator).ToList();
+            var indicators = metaFileReader
+                .ReadIndicatorsFromCsv(metaRows, dataSetWriter.SubjectId)
+                .Select(i => i.Indicator)
+                .ToList();
             indicators.ForEach(indicator => indicator.Id = _guidGenerator.NewGuid());
 
-            await dataSetWriter.WriteFiltersAndIndicators(filters, indicators);
+            await dataSetWriter.WriteIndicators(indicators);
         }
 
-        return await GetSubjectMeta(metaFileCsvHeaders, metaFileRows, dataSet);
+        var filters = metaFileReader.ReadFiltersFromCsv(metaRows, dataSetWriter.SubjectId);
+        filters.ForEach(filter => filter.Filter.Id = _guidGenerator.NewGuid());
+
+        return new SubjectMeta { Filters = filters, Indicators = await GetIndicators(metaRows, dataSetWriter.DataSet) };
     }
 
     public async Task<SubjectMeta> GetSubjectMeta(

@@ -20,24 +20,25 @@ public interface IStorageDataSetWriter
     IStorageDataSet DataSet { get; }
 
     /// <summary>
-    /// Writes the data set's filters (not their groups and items), and its indicators together with their
-    /// IndicatorGroups.
+    /// Whether <see cref="WriteIndicators" /> has already run, e.g. in an earlier attempt at the import.
     /// </summary>
-    Task WriteFiltersAndIndicators(
-        IReadOnlyList<Filter> filters,
-        IReadOnlyList<Indicator> indicators,
-        CancellationToken cancellationToken = default
-    );
+    Task<bool> HasIndicators(CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Writes filter items together with their FilterGroups, and sets the auto select filter item of each filter in
-    /// <paramref name="autoSelectFilterItemsByFilterId" />, clearing it where the filter has none.
+    /// Writes all of the data set's indicators together with their IndicatorGroups.
     /// </summary>
-    Task WriteFilterItems(
-        IReadOnlyList<FilterItem> filterItems,
-        IReadOnlyDictionary<Guid, FilterItem?> autoSelectFilterItemsByFilterId,
-        CancellationToken cancellationToken = default
-    );
+    Task WriteIndicators(IReadOnlyList<Indicator> indicators, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Whether <see cref="WriteFilters" /> has already run, e.g. in an earlier attempt at the import.
+    /// </summary>
+    Task<bool> HasFilters(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Writes all of the data set's filters together with their FilterGroups, FilterItems and auto select filter
+    /// items.
+    /// </summary>
+    Task WriteFilters(IReadOnlyList<Filter> filters, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Writes those of the given locations that have not been written already.

@@ -21,46 +21,37 @@ public class StatisticsDbDataSetWriter(
 
     public IStorageDataSet DataSet => dataSet;
 
-    public Task WriteFiltersAndIndicators(
-        IReadOnlyList<Filter> filters,
-        IReadOnlyList<Indicator> indicators,
-        CancellationToken cancellationToken = default
-    )
+    public Task<bool> HasIndicators(CancellationToken cancellationToken = default)
+    {
+        return context.IndicatorGroup.AnyAsync(group => group.SubjectId == SubjectId, cancellationToken);
+    }
+
+    public Task WriteIndicators(IReadOnlyList<Indicator> indicators, CancellationToken cancellationToken = default)
     {
         return databaseHelper.DoInTransaction(
             context,
             async ctxDelegate =>
             {
-                await ctxDelegate.Filter.AddRangeAsync(filters, cancellationToken);
+                // We don't add indicator groups explicitly, as they are included in `indicators`
                 await ctxDelegate.Indicator.AddRangeAsync(indicators, cancellationToken);
                 await ctxDelegate.SaveChangesAsync(cancellationToken);
             }
         );
     }
 
-    public Task WriteFilterItems(
-        IReadOnlyList<FilterItem> filterItems,
-        IReadOnlyDictionary<Guid, FilterItem?> autoSelectFilterItemsByFilterId,
-        CancellationToken cancellationToken = default
-    )
+    public Task<bool> HasFilters(CancellationToken cancellationToken = default)
     {
-        var filterIds = autoSelectFilterItemsByFilterId.Keys.ToList();
+        return context.Filter.AnyAsync(filter => filter.SubjectId == SubjectId, cancellationToken);
+    }
 
+    public Task WriteFilters(IReadOnlyList<Filter> filters, CancellationToken cancellationToken = default)
+    {
         return databaseHelper.DoInTransaction(
             context,
             async ctxDelegate =>
             {
-                // We don't add filter groups explicitly, as they are included in `filterItems`
-                await ctxDelegate.FilterItem.AddRangeAsync(filterItems, cancellationToken);
-
-                var filters = ctxDelegate.Filter.Where(f => filterIds.Contains(f.Id)).ToList();
-                foreach (var filter in filters)
-                {
-                    var filterItem = autoSelectFilterItemsByFilterId[filter.Id];
-                    filter.AutoSelectFilterItemId = filterItem?.Id;
-                    filter.AutoSelectFilterItemLabel = filterItem?.Label;
-                }
-
+                // We don't add filter groups and items explicitly, as they are included in `filters`
+                await ctxDelegate.Filter.AddRangeAsync(filters, cancellationToken);
                 await ctxDelegate.SaveChangesAsync(cancellationToken);
             }
         );

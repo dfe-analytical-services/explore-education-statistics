@@ -207,7 +207,21 @@ public class ImporterService : IImporterService
             }
         );
 
-        await dataSetWriter.WriteFilterItems(filterItems, filterIdToAutoSelectFilterItem);
+        if (!await dataSetWriter.HasFilters())
+        {
+            var filtersById = subjectMeta.Filters.ToDictionary(meta => meta.Filter.Id, meta => meta.Filter);
+
+            filterGroups.ForEach(filterGroup => filtersById[filterGroup.FilterId].FilterGroups.Add(filterGroup));
+            filterItems.ForEach(filterItem => filterItem.FilterGroup.FilterItems.Add(filterItem));
+
+            foreach (var (filterId, autoSelectFilterItem) in filterIdToAutoSelectFilterItem)
+            {
+                filtersById[filterId].AutoSelectFilterItemId = autoSelectFilterItem?.Id;
+                filtersById[filterId].AutoSelectFilterItemLabel = autoSelectFilterItem?.Label;
+            }
+
+            await dataSetWriter.WriteFilters(filtersById.Values.ToList());
+        }
 
         await dataSetWriter.WriteLocations(locations);
     }
