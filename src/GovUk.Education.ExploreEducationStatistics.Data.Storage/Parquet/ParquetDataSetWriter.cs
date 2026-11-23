@@ -34,6 +34,67 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         public static string Indicator(Indicator indicator) => $"i_{indicator.Id:N}";
     }
 
+    public bool HasIndicators(Guid subjectId)
+    {
+        return File.Exists(pathResolver.IndicatorsPath(subjectId));
+    }
+
+    public Task WriteIndicators(
+        Guid subjectId,
+        IReadOnlyList<Indicator> indicators,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return WriteTables(
+            subjectId,
+            new Dictionary<string, string> { { IndicatorsTable.TableName, pathResolver.IndicatorsPath(subjectId) } },
+            connection => CreateIndicatorsTable(connection, indicators, cancellationToken),
+            cancellationToken
+        );
+    }
+
+    public bool HasFilters(Guid subjectId)
+    {
+        return File.Exists(pathResolver.FiltersPath(subjectId))
+            && File.Exists(pathResolver.FilterOptionsPath(subjectId));
+    }
+
+    public Task WriteFilters(
+        Guid subjectId,
+        IReadOnlyList<Filter> filters,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return WriteTables(
+            subjectId,
+            new Dictionary<string, string>
+            {
+                { FiltersTable.TableName, pathResolver.FiltersPath(subjectId) },
+                { FilterOptionsTable.TableName, pathResolver.FilterOptionsPath(subjectId) },
+            },
+            connection => CreateFiltersTables(connection, filters, cancellationToken),
+            cancellationToken
+        );
+    }
+
+    public Task WriteLocations(
+        Guid subjectId,
+        IReadOnlyList<Location> locations,
+        CancellationToken cancellationToken = default
+    )
+    {
+        return WriteTables(
+            subjectId,
+            new Dictionary<string, string>
+            {
+                { LocationsTable.TableName, pathResolver.LocationsPath(subjectId) },
+                { LocationOptionsTable.TableName, pathResolver.LocationOptionsPath(subjectId) },
+            },
+            connection => CreateLocationTables(connection, locations, cancellationToken),
+            cancellationToken
+        );
+    }
+
     public async Task StartStaging(
         Guid subjectId,
         IReadOnlyList<Filter> filters,
@@ -142,64 +203,97 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
             .ExecuteScalarAsync<long>(cancellationToken: cancellationToken);
     }
 
-    public async Task<List<Guid>> ListStagedLocationIds(Guid subjectId, CancellationToken cancellationToken = default)
-    {
-        await using var connection = OpenStagingDb(subjectId);
-
-        return (
-            await connection
-                .SqlBuilder($"SELECT DISTINCT {StagingCols.LocationId:raw} FROM {StagingTableName:raw}")
-                .QueryAsync<Guid>(cancellationToken: cancellationToken)
-        ).AsList();
-    }
-
-    public async Task WriteParquetFiles(
+    public async Task WriteTimePeriodsAndData(
         Guid subjectId,
         IReadOnlyList<Filter> filters,
-        IReadOnlyList<IndicatorGroup> indicatorGroups,
+        IReadOnlyList<Indicator> indicators,
         IReadOnlyList<Location> locations,
         CancellationToken cancellationToken = default
     )
     {
-        var indicators = indicatorGroups.SelectMany(group => group.Indicators).ToList();
-
         ValidateColumnNames(filters, indicators);
 
         var tableFiles = new Dictionary<string, string>
         {
             { DataTable.TableName, pathResolver.DataPath(subjectId) },
-            { FilterOptionsTable.TableName, pathResolver.FilterOptionsPath(subjectId) },
-            { FiltersTable.TableName, pathResolver.FiltersPath(subjectId) },
-            { IndicatorsTable.TableName, pathResolver.IndicatorsPath(subjectId) },
-            { LocationOptionsTable.TableName, pathResolver.LocationOptionsPath(subjectId) },
-            { LocationsTable.TableName, pathResolver.LocationsPath(subjectId) },
             { TimePeriodsTable.TableName, pathResolver.TimePeriodsPath(subjectId) },
         };
 
         await using (var connection = OpenStagingDb(subjectId))
         {
             await CreateTimePeriodsTable(connection, cancellationToken);
-            await CreateFiltersTables(connection, filters, cancellationToken);
-            await CreateIndicatorsTable(connection, indicatorGroups, cancellationToken);
-            var levels = await CreateLocationTables(connection, locations, cancellationToken);
-            await CreateDataTable(connection, filters, indicators, levels, cancellationToken);
 
-            foreach (var (table, path) in tableFiles)
-            {
-                await connection
-                    .SqlBuilder($"COPY {table:raw} TO {Literal(TempPath(path)):raw} (FORMAT PARQUET, CODEC ZSTD)")
-                    .ExecuteAsync(cancellationToken: cancellationToken);
-            }
+            await connection
+                .SqlBuilder(
+                    $"""
+                    CREATE OR REPLACE TABLE {FilterOptionsTable.TableName:raw} AS
+                    SELECT * FROM {Literal(pathResolver.FilterOptionsPath(subjectId)):raw}
+                    """
+                )
+                .ExecuteAsync(cancellationToken: cancellationToken);
+
+            var locationOptionIds = await ReadLocationOptionIds(connection, subjectId, cancellationToken);
+            var levels = await CreateLocationLinksTable(connection, locations, locationOptionIds, cancellationToken);
+
+            await CreateDataTable(connection, filters, indicators, levels, cancellationToken);
+            await ExportTables(connection, tableFiles, cancellationToken);
         }
 
-        // Only replace the parquet files once every table has been exported, so that a failure
-        // part way through never leaves a mix of old and new files.
-        foreach (var path in tableFiles.Values)
+        ReplaceFiles(tableFiles.Values);
+
+        logger.LogInformation("Wrote data parquet files for subject {SubjectId}", subjectId);
+    }
+
+    private async Task WriteTables(
+        Guid subjectId,
+        Dictionary<string, string> tableFiles,
+        Func<IDuckDbConnection, Task> createTables,
+        CancellationToken cancellationToken
+    )
+    {
+        Directory.CreateDirectory(pathResolver.DirectoryPath(subjectId));
+
+        await using (var connection = new DuckDbConnection())
+        {
+            connection.Open();
+
+            await createTables(connection);
+            await ExportTables(connection, tableFiles, cancellationToken);
+        }
+
+        ReplaceFiles(tableFiles.Values);
+
+        logger.LogInformation(
+            "Wrote {Tables} parquet files for subject {SubjectId}",
+            tableFiles.Keys.JoinToString(", "),
+            subjectId
+        );
+    }
+
+    private static async Task ExportTables(
+        IDuckDbConnection connection,
+        Dictionary<string, string> tableFiles,
+        CancellationToken cancellationToken
+    )
+    {
+        foreach (var (table, path) in tableFiles)
+        {
+            await connection
+                .SqlBuilder($"COPY {table:raw} TO {Literal(TempPath(path)):raw} (FORMAT PARQUET, CODEC ZSTD)")
+                .ExecuteAsync(cancellationToken: cancellationToken);
+        }
+    }
+
+    /// <summary>
+    /// Only replaces the parquet files once every table has been exported, so that a failure part way through
+    /// never leaves a mix of old and new files.
+    /// </summary>
+    private static void ReplaceFiles(IEnumerable<string> paths)
+    {
+        foreach (var path in paths)
         {
             File.Move(TempPath(path), path, overwrite: true);
         }
-
-        logger.LogInformation("Wrote parquet files for subject {SubjectId}", subjectId);
     }
 
     private static async Task CreateTimePeriodsTable(IDuckDbConnection connection, CancellationToken cancellationToken)
@@ -357,7 +451,7 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
 
     private static async Task CreateIndicatorsTable(
         IDuckDbConnection connection,
-        IReadOnlyList<IndicatorGroup> indicatorGroups,
+        IReadOnlyList<Indicator> indicators,
         CancellationToken cancellationToken
     )
     {
@@ -380,13 +474,9 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
 
         using var appender = connection.CreateAppender(IndicatorsTable.TableName);
 
-        var indicators = indicatorGroups
-            .SelectMany(group => group.Indicators.Select(indicator => (Group: group, Indicator: indicator)))
-            .OrderBy(tuple => tuple.Indicator.Name);
-
         var ordinal = 1;
 
-        foreach (var (group, indicator) in indicators)
+        foreach (var indicator in indicators.OrderBy(indicator => indicator.Name))
         {
             appender
                 .CreateRow()
@@ -396,18 +486,16 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
                 .AppendValue(indicator.Unit.GetEnumLabel())
                 .AppendValue((sbyte?)indicator.DecimalPlaces)
                 .AppendValue(indicator.Id)
-                .AppendValue(group.Id)
-                .AppendValue(group.Label)
+                .AppendValue(indicator.IndicatorGroup.Id)
+                .AppendValue(indicator.IndicatorGroup.Label)
                 .EndRow();
         }
     }
 
     /// <summary>
-    /// Creates the locations table, the Public API's location options table and a table linking each location
-    /// to its location option at each geographic level.
+    /// Creates the locations table and the Public API's location options table.
     /// </summary>
-    /// <returns>The geographic levels that have location options.</returns>
-    private static async Task<List<GeographicLevel>> CreateLocationTables(
+    private static async Task CreateLocationTables(
         IDuckDbConnection connection,
         IReadOnlyList<Location> locations,
         CancellationToken cancellationToken
@@ -456,8 +544,6 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
             .OrderBy(group => group.Key.GetEnumLabel())
             .ToList();
 
-        var levels = optionsByLevel.Select(group => group.Key).ToList();
-
         await connection
             .SqlBuilder(
                 $"""
@@ -476,16 +562,12 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
             )
             .ExecuteAsync(cancellationToken: cancellationToken);
 
-        var optionIds = new Dictionary<LocationOption, int>();
-
         using (var appender = connection.CreateAppender(LocationOptionsTable.TableName))
         {
             var id = 1;
 
             foreach (var option in optionsByLevel.SelectMany(group => group.OrderBy(option => option.Label)))
             {
-                optionIds[option] = id;
-
                 appender
                     .CreateRow()
                     .AppendValue(id)
@@ -502,6 +584,62 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
                 id++;
             }
         }
+    }
+
+    /// <summary>
+    /// Reads the ids of the location options written by <see cref="WriteLocations" />.
+    /// </summary>
+    private async Task<Dictionary<LocationOption, int>> ReadLocationOptionIds(
+        IDuckDbConnection connection,
+        Guid subjectId,
+        CancellationToken cancellationToken
+    )
+    {
+        var rows = await connection
+            .SqlBuilder(
+                $"""
+                SELECT
+                    {LocationOptionsTable.Cols.Id:raw} AS Id,
+                    {LocationOptionsTable.Cols.Label:raw} AS Label,
+                    {LocationOptionsTable.Cols.Level:raw} AS Level,
+                    {LocationOptionsTable.Cols.Code:raw} AS Code,
+                    {LocationOptionsTable.Cols.OldCode:raw} AS OldCode,
+                    {LocationOptionsTable.Cols.Urn:raw} AS Urn,
+                    {LocationOptionsTable.Cols.Ukprn:raw} AS Ukprn
+                FROM {Literal(pathResolver.LocationOptionsPath(subjectId)):raw}
+                """
+            )
+            .QueryAsync<LocationOptionRow>(cancellationToken: cancellationToken);
+
+        return rows.ToDictionary(
+            row => new LocationOption(
+                EnumUtil.GetFromEnumValue<GeographicLevel>(row.Level),
+                row.Label,
+                Code: row.Code,
+                OldCode: row.OldCode,
+                Urn: row.Urn,
+                Ukprn: row.Ukprn
+            ),
+            row => row.Id
+        );
+    }
+
+    /// <summary>
+    /// Creates a table linking each location to its location option at each geographic level.
+    /// </summary>
+    /// <returns>The geographic levels that have location options.</returns>
+    private static async Task<List<GeographicLevel>> CreateLocationLinksTable(
+        IDuckDbConnection connection,
+        IReadOnlyList<Location> locations,
+        Dictionary<LocationOption, int> optionIds,
+        CancellationToken cancellationToken
+    )
+    {
+        var levels = optionIds
+            .Keys.Select(option => option.Level)
+            .Distinct()
+            .OrderBy(level => level.GetEnumLabel())
+            .ToList();
 
         string[] linkColumns =
         [
@@ -673,6 +811,17 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
     }
 
     private static string TempPath(string path) => $"{path}.tmp";
+
+    private class LocationOptionRow
+    {
+        public int Id { get; init; }
+        public string Label { get; init; } = string.Empty;
+        public string Level { get; init; } = string.Empty;
+        public string? Code { get; init; }
+        public string? OldCode { get; init; }
+        public string? Urn { get; init; }
+        public string? Ukprn { get; init; }
+    }
 
     /// <summary>
     /// A location option at a single geographic level, which is equivalent to a Public API location option.

@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 
 /// <summary>
 /// Storage-agnostic methods used to write, or to support the writing of, a single data set's data while it is being
-/// imported. Reads of the imported data set go through <see cref="DataSet" />.
+/// imported. Reads of the data set go through <see cref="DataSet" />.
 ///
 /// All methods are scoped to <see cref="SubjectId" />.
 /// </summary>
@@ -15,8 +15,8 @@ public interface IStorageDataSetWriter
     Guid SubjectId { get; }
 
     /// <summary>
-    /// The data set being written to. Its data may only be readable once <see cref="Complete" /> has run, so reads
-    /// made while importing go through this writer instead.
+    /// The data set being written to. Each part of it can be read once it has been written, e.g. its filters once
+    /// <see cref="WriteFilters" /> has run, and its observations once <see cref="Complete" /> has run.
     /// </summary>
     IStorageDataSet DataSet { get; }
 
@@ -42,13 +42,13 @@ public interface IStorageDataSetWriter
     Task WriteFilters(IReadOnlyList<Filter> filters, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Writes those of the given locations that have not been written already.
+    /// Writes all of the data set's locations, giving an id to any location that doesn't have one.
     /// </summary>
     Task WriteLocations(IReadOnlyCollection<Location> locations, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// The id of the written location matching the given one, which must already have been written by
-    /// <see cref="WriteLocations" />.
+    /// The id of the written location matching the given one. Can be called once <see cref="StartObservations" />
+    /// has run.
     /// </summary>
     Guid GetLocationId(Location location);
 
@@ -78,18 +78,6 @@ public interface IStorageDataSetWriter
     /// The number of observations written.
     /// </summary>
     Task<long> CountObservations(CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// The filters written by <see cref="WriteFilters" />, with their FilterGroups and FilterItems if
-    /// <paramref name="includeItems" /> is true. Once imported, read them from <see cref="DataSet" /> instead.
-    /// </summary>
-    Task<List<Filter>> ListFilters(bool includeItems = false, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// The IndicatorGroups written by <see cref="WriteIndicators" />, with their Indicators. Once
-    /// imported, read them from <see cref="DataSet" /> instead.
-    /// </summary>
-    Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Distinct pairs of filter items from the given parent and child filters that occur together on the same

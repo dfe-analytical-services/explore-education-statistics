@@ -136,18 +136,29 @@ public sealed class ParquetTestDataSet : IDisposable
     public ParquetV1DataSet BuildDataSet() => new(SubjectId, PathResolver);
 
     /// <summary>
-    /// Stages the observations in two batches and writes the parquet files.
+    /// Writes the meta parquet files, stages the observations in two batches and writes the data parquet files.
     /// </summary>
-    public async Task<ParquetV1DataSet> Write()
+    public async Task<ParquetV1DataSet> Write(List<Location>? locations = null)
     {
         var writer = BuildWriter();
 
+        await WriteMeta(writer, locations);
         await writer.StartStaging(SubjectId, Filters, Indicators, resumeFromCsvRow: null);
         await writer.AppendObservations(SubjectId, Filters, Indicators, Observations.Take(3));
         await writer.AppendObservations(SubjectId, Filters, Indicators, Observations.Skip(3));
-        await writer.WriteParquetFiles(SubjectId, Filters, IndicatorGroups, Locations);
+        await writer.WriteTimePeriodsAndData(SubjectId, Filters, Indicators, locations ?? Locations);
 
         return BuildDataSet();
+    }
+
+    /// <summary>
+    /// Writes the indicators, filters and locations parquet files.
+    /// </summary>
+    public async Task WriteMeta(ParquetDataSetWriter writer, List<Location>? locations = null)
+    {
+        await writer.WriteIndicators(SubjectId, Indicators);
+        await writer.WriteFilters(SubjectId, Filters);
+        await writer.WriteLocations(SubjectId, locations ?? Locations);
     }
 
     public void Dispose()

@@ -14,6 +14,6 @@ public interface IImporterMetaService
     Task<SubjectMeta> GetSubjectMeta(
         List<string> metaFileCsvHeaders,
         List<List<string>> metaFileRows,
-        IStorageDataSetWriter dataSetWriter
+        IStorageDataSet dataSet
     );
 }

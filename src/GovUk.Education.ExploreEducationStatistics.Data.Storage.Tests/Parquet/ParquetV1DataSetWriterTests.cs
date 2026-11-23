@@ -1,108 +1,140 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
-using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
-using static Moq.MockBehavior;
-using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Parquet;
 
-public abstract class ParquetV1DataSetWriterTests
+public abstract class ParquetV1DataSetWriterTests : IDisposable
 {
-    private readonly Guid _subjectId = Guid.NewGuid();
-    private readonly string _statisticsDbContextId = Guid.NewGuid().ToString();
-    private readonly Mock<IParquetDataSetWriter> _parquetDataSetWriter = new(Strict);
+    private readonly ParquetTestDataSet _testDataSet = new();
 
-    public class WriteIndicatorsAndFiltersTests : ParquetV1DataSetWriterTests
+    public void Dispose() => _testDataSet.Dispose();
+
+    public class WriteIndicatorsTests : ParquetV1DataSetWriterTests
     {
         [Fact]
-        public async Task WrittenToStatisticsDb()
+        public async Task WrittenToParquetAndReadableFromDataSet()
         {
-            var filter = new Filter
+            var writer = BuildWriter();
+
+            Assert.False(await writer.HasIndicators());
+
+            await writer.WriteIndicators(_testDataSet.Indicators);
+
+            Assert.True(await writer.HasIndicators());
+
+            var indicatorGroups = await writer.DataSet.ListIndicatorGroups();
+
+            Assert.Equal(
+                _testDataSet.IndicatorGroups.Select(group => group.Id).Order(),
+                indicatorGroups.Select(group => group.Id).Order()
+            );
+            Assert.Equal(
+                _testDataSet.Indicators.Select(indicator => indicator.Id).Order(),
+                indicatorGroups.SelectMany(group => group.Indicators).Select(indicator => indicator.Id).Order()
+            );
+        }
+    }
+
+    public class WriteFiltersTests : ParquetV1DataSetWriterTests
+    {
+        [Fact]
+        public async Task WrittenToParquetAndReadableFromDataSet()
+        {
+            var writer = BuildWriter();
+
+            Assert.False(await writer.HasFilters());
+
+            await writer.WriteFilters(_testDataSet.Filters);
+
+            Assert.True(await writer.HasFilters());
+
+            var filters = await writer.DataSet.ListFilters(includeItems: true);
+
+            var schoolType = Assert.Single(filters, filter => filter.Id == _testDataSet.SchoolType.Id);
+            Assert.Equal(_testDataSet.Primary.Id, schoolType.AutoSelectFilterItemId);
+            Assert.Equal(_testDataSet.Primary.Label, schoolType.AutoSelectFilterItemLabel);
+
+            Assert.Equal(
+                _testDataSet
+                    .Filters.SelectMany(filter => filter.FilterGroups)
+                    .SelectMany(group => group.FilterItems)
+                    .Select(item => item.Id)
+                    .Order(),
+                filters
+                    .SelectMany(filter => filter.FilterGroups)
+                    .SelectMany(group => group.FilterItems)
+                    .Select(item => item.Id)
+                    .Order()
+            );
+        }
+    }
+
+    public class WriteLocationsTests : ParquetV1DataSetWriterTests
+    {
+        [Fact]
+        public async Task LocationsWithIds_IdsKept()
+        {
+            var writer = BuildWriter();
+
+            await writer.WriteLocations(_testDataSet.Locations);
+
+            Assert.Equal(
+                _testDataSet.Locations.Select(location => location.Id).Order(),
+                (await writer.DataSet.ListLocations()).Select(location => location.Id).Order()
+            );
+        }
+
+        [Fact]
+        public async Task LocationsWithoutIds_GivenIds()
+        {
+            var location = new Location
             {
-                Id = Guid.NewGuid(),
-                SubjectId = _subjectId,
-                Label = "Filter",
-            };
-            var indicator = new Indicator
-            {
-                Id = Guid.NewGuid(),
-                Label = "Indicator",
-                IndicatorGroup = new IndicatorGroup
-                {
-                    Id = Guid.NewGuid(),
-                    SubjectId = _subjectId,
-                    Label = "Group",
-                },
+                GeographicLevel = GeographicLevel.Country,
+                Country = new Country("E92000001", "England"),
             };
 
             var writer = BuildWriter();
 
-            await writer.WriteIndicators([indicator]);
-            await writer.WriteFilters([filter]);
+            await writer.WriteLocations([location]);
 
-            await using var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId);
-
-            Assert.Equal(filter.Id, Assert.Single(await statisticsDbContext.Filter.ToListAsync()).Id);
-            Assert.Equal(indicator.Id, Assert.Single(await statisticsDbContext.Indicator.ToListAsync()).Id);
+            Assert.NotEqual(Guid.Empty, location.Id);
+            Assert.Equal(location.Id, Assert.Single(await writer.DataSet.ListLocations()).Id);
         }
     }
 
-    public class StartObservationsTests : ParquetV1DataSetWriterTests
+    public class GetLocationIdTests : ParquetV1DataSetWriterTests
     {
         [Fact]
-        public async Task StagingStarted()
+        public async Task ReturnsIdOfWrittenLocationWithSameAttributes()
         {
-            List<Filter> filters = [new() { Id = Guid.NewGuid() }];
-            List<Indicator> indicators = [new() { Id = Guid.NewGuid() }];
+            var writer = BuildWriter();
 
-            _parquetDataSetWriter
-                .Setup(w => w.StartStaging(_subjectId, filters, indicators, 10, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
+            await writer.WriteLocations(_testDataSet.Locations);
+            await writer.StartObservations(_testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: null);
 
-            await BuildWriter().StartObservations(filters, indicators, resumeFromCsvRow: 10);
+            var locationFromCsv = new Location
+            {
+                GeographicLevel = GeographicLevel.Country,
+                Country = new Country("E92000001", "England"),
+            };
 
-            VerifyAllMocks(_parquetDataSetWriter);
+            Assert.Equal(_testDataSet.England.Id, writer.GetLocationId(locationFromCsv));
+        }
+
+        [Fact]
+        public void ObservationsNotStarted_Throws()
+        {
+            Assert.Throws<InvalidOperationException>(() => BuildWriter().GetLocationId(_testDataSet.England));
         }
     }
 
     public class WriteObservationsTests : ParquetV1DataSetWriterTests
     {
-        [Fact]
-        public async Task ObservationsStagedWithFiltersAndIndicators()
-        {
-            List<Filter> filters = [new() { Id = Guid.NewGuid() }];
-            List<Indicator> indicators = [new() { Id = Guid.NewGuid() }];
-            List<Observation> observations = [new() { Id = Guid.NewGuid() }];
-
-            _parquetDataSetWriter
-                .Setup(w => w.StartStaging(_subjectId, filters, indicators, null, It.IsAny<CancellationToken>()))
-                .Returns(Task.CompletedTask);
-            _parquetDataSetWriter
-                .Setup(w =>
-                    w.AppendObservations(_subjectId, filters, indicators, observations, It.IsAny<CancellationToken>())
-                )
-                .Returns(Task.CompletedTask);
-
-            var writer = BuildWriter();
-            await writer.StartObservations(filters, indicators, resumeFromCsvRow: null);
-            await writer.WriteObservations(observations);
-
-            VerifyAllMocks(_parquetDataSetWriter);
-        }
-
         [Fact]
         public async Task ObservationsNotStarted_Throws()
         {
@@ -112,117 +144,43 @@ public abstract class ParquetV1DataSetWriterTests
         }
     }
 
-    public class CountObservationsTests : ParquetV1DataSetWriterTests
-    {
-        [Fact]
-        public async Task StagedObservationsCounted()
-        {
-            _parquetDataSetWriter
-                .Setup(w => w.CountStagedObservations(_subjectId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(3);
-
-            Assert.Equal(3, await BuildWriter().CountObservations());
-        }
-    }
-
     public class CompleteTests : ParquetV1DataSetWriterTests
     {
         [Fact]
-        public async Task ParquetFilesWrittenWithMetaFromStatisticsDb()
+        public async Task ObservationsReadableFromDataSet()
         {
-            var filterItem = new FilterItem { Id = Guid.NewGuid(), Label = "Item" };
-            var filter = new Filter
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = _subjectId,
-                Label = "Filter",
-                FilterGroups =
-                [
-                    new FilterGroup
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "Group",
-                        FilterItems = [filterItem],
-                    },
-                ],
-            };
-            var indicatorGroup = new IndicatorGroup
-            {
-                Id = Guid.NewGuid(),
-                SubjectId = _subjectId,
-                Label = "Group",
-                Indicators = [new Indicator { Id = Guid.NewGuid(), Label = "Indicator" }],
-            };
-            var stagedLocation = new Location
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.Country,
-                Country = new Country("E92000001", "England"),
-            };
-            var otherLocation = new Location
-            {
-                Id = Guid.NewGuid(),
-                GeographicLevel = GeographicLevel.Country,
-                Country = new Country("W92000004", "Wales"),
-            };
+            var writer = BuildWriter();
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
-            {
-                statisticsDbContext.Filter.Add(filter);
-                statisticsDbContext.IndicatorGroup.Add(indicatorGroup);
-                statisticsDbContext.Location.AddRange(stagedLocation, otherLocation);
-                await statisticsDbContext.SaveChangesAsync();
-            }
+            await writer.WriteIndicators(_testDataSet.Indicators);
+            await writer.WriteFilters(_testDataSet.Filters);
+            await writer.WriteLocations(_testDataSet.Locations);
+            await writer.StartObservations(_testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: null);
+            await writer.WriteObservations(_testDataSet.Observations);
 
-            _parquetDataSetWriter
-                .Setup(w => w.ListStagedLocationIds(_subjectId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync([stagedLocation.Id]);
-            _parquetDataSetWriter
-                .Setup(w =>
-                    w.WriteParquetFiles(
-                        _subjectId,
-                        It.Is<IReadOnlyList<Filter>>(filters =>
-                            filters.Single().Id == filter.Id
-                            && filters.Single().FilterGroups.Single().FilterItems.Single().Id == filterItem.Id
-                        ),
-                        It.Is<IReadOnlyList<IndicatorGroup>>(groups =>
-                            groups.Single().Id == indicatorGroup.Id && groups.Single().Indicators.Count == 1
-                        ),
-                        It.Is<IReadOnlyList<Location>>(locations => locations.Single().Id == stagedLocation.Id),
-                        It.IsAny<CancellationToken>()
-                    )
-                )
-                .Returns(Task.CompletedTask);
+            Assert.Equal(_testDataSet.Observations.Count, await writer.CountObservations());
 
-            await BuildWriter().Complete();
+            await writer.Complete();
 
-            VerifyAllMocks(_parquetDataSetWriter);
+            var observations = await writer.DataSet.ListObservations([], [], null);
+
+            Assert.Equal(
+                _testDataSet.Observations.Select(observation => observation.Id).Order(),
+                observations.Select(observation => observation.Id).Order()
+            );
+            Assert.Equal(
+                _testDataSet.Locations.Select(location => location.GeographicLevel).Order(),
+                (await writer.ListGeographicLevels()).Order()
+            );
         }
     }
 
     private ParquetV1DataSetWriter BuildWriter()
     {
-        var dbContextSupplier = new Mock<IDbContextSupplier>(Strict);
-        dbContextSupplier
-            .Setup(s => s.CreateDbContextDelegate<StatisticsDbContext>())
-            .Returns(() => InMemoryStatisticsDbContext(_statisticsDbContextId));
-
-        var resolver = BuildStorageDataSetWriterResolver(
-            InMemoryStatisticsDbContext(_statisticsDbContextId),
-            new InMemoryDatabaseHelper(dbContextSupplier.Object),
-            parquetDataSetWriter: _parquetDataSetWriter.Object
+        return new ParquetV1DataSetWriter(
+            _testDataSet.SubjectId,
+            BuildParquetV1DataSetFactory(_testDataSet.PathResolver),
+            _testDataSet.BuildWriter(),
+            new SequentialGuidGenerator()
         );
-
-        var dataFile = new File
-        {
-            Id = Guid.NewGuid(),
-            RootPath = Guid.NewGuid(),
-            Filename = "data.csv",
-            SubjectId = _subjectId,
-            Type = FileType.Data,
-            DataStorageVersion = DataStorageVersion.ParquetV1,
-        };
-
-        return Assert.IsType<ParquetV1DataSetWriter>(resolver.Resolve(dataFile));
     }
 }

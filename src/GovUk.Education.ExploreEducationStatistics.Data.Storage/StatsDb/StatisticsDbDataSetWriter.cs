@@ -107,16 +107,6 @@ public class StatisticsDbDataSetWriter(
         return context.Observation.LongCountAsync(o => o.SubjectId == SubjectId, cancellationToken);
     }
 
-    public Task<List<Filter>> ListFilters(bool includeItems = false, CancellationToken cancellationToken = default)
-    {
-        return dataSet.ListFilters(includeItems, cancellationToken);
-    }
-
-    public Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default)
-    {
-        return dataSet.ListIndicatorGroups(cancellationToken);
-    }
-
     public async Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
         Guid parentFilterId,
         Guid childFilterId,

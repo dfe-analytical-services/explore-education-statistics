@@ -1873,15 +1873,20 @@ public class ProcessorStage3Tests
     private async Task RunParquetV1Import(DataImport import, IParquetDataSetPathResolver pathResolver)
     {
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             await contentDbContext.DataImports.AddAsync(import);
             await contentDbContext.SaveChangesAsync();
-
-            await statisticsDbContext.Subject.AddAsync(_subject);
-            await statisticsDbContext.Location.AddRangeAsync(_locations);
-            await statisticsDbContext.SaveChangesAsync();
         }
+
+        var parquetDataSetWriter = new ParquetDataSetWriter(pathResolver, Mock.Of<ILogger<ParquetDataSetWriter>>());
+
+        // Stage 2 has written the data set's indicators, filters and locations to parquet files.
+        await parquetDataSetWriter.WriteIndicators(
+            _subject.Id,
+            _subject.IndicatorGroups.SelectMany(group => group.Indicators).ToList()
+        );
+        await parquetDataSetWriter.WriteFilters(_subject.Id, _subject.Filters);
+        await parquetDataSetWriter.WriteLocations(_subject.Id, _locations);
 
         var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
@@ -1922,8 +1927,6 @@ public class ProcessorStage3Tests
 
         var guidGenerator = new SequentialGuidGenerator();
 
-        var parquetDataSetWriter = new ParquetDataSetWriter(pathResolver, Mock.Of<ILogger<ParquetDataSetWriter>>());
-
         var importerService = new ImporterService(
             new AppOptions { RowsPerBatch = 5 }.ToOptionsWrapper(),
             guidGenerator,
@@ -1940,6 +1943,7 @@ public class ProcessorStage3Tests
             importerService,
             new ParquetDataSetService(
                 dbContextSupplier,
+                new StatisticsDbDataSetFactory(Mock.Of<IServiceProvider>(Strict)),
                 new ParquetV1DataSetWriterFactory(Mock.Of<IServiceProvider>(Strict)),
                 Mock.Of<ILogger<ParquetDataSetService>>()
             )

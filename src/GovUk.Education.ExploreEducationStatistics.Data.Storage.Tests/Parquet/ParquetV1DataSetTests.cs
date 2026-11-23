@@ -517,22 +517,7 @@ public abstract class ParquetV1DataSetTests : IDisposable
             _testDataSet.Observations[2].Year = 2021;
             _testDataSet.Observations.RemoveRange(3, 3);
 
-            var writer = _testDataSet.BuildWriter();
-            var subjectId = _testDataSet.SubjectId;
-
-            await writer.StartStaging(subjectId, _testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: null);
-            await writer.AppendObservations(
-                subjectId,
-                _testDataSet.Filters,
-                _testDataSet.Indicators,
-                _testDataSet.Observations
-            );
-            await writer.WriteParquetFiles(
-                subjectId,
-                _testDataSet.Filters,
-                _testDataSet.IndicatorGroups,
-                [_testDataSet.England]
-            );
+            await _testDataSet.Write(locations: [_testDataSet.England]);
 
             var result = await _testDataSet.BuildDataSet().ListTimePeriods();
 

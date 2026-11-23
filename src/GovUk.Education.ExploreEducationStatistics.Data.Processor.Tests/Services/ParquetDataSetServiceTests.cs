@@ -141,10 +141,12 @@ public abstract class ParquetDataSetServiceTests : IDisposable
 
         return new ParquetDataSetService(
             dbContextSupplier,
+            BuildStatisticsDbDataSetFactory(InMemoryStatisticsDbContext(_statisticsDbContextId)),
             BuildParquetV1DataSetWriterFactory(
                 InMemoryStatisticsDbContext(_statisticsDbContextId),
                 new InMemoryDatabaseHelper(dbContextSupplier),
-                writer
+                writer,
+                _testDataSet.PathResolver
             ),
             Mock.Of<ILogger<ParquetDataSetService>>()
         );

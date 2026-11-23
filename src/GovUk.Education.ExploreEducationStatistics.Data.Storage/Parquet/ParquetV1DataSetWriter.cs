@@ -1,5 +1,6 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interfaces;
@@ -8,27 +9,21 @@ using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
 
 /// <summary>
-/// Writes a data set's meta to StatsDB, and stages its observations so that they can be written as parquet files
-/// together with that meta once the import is complete.
+/// Writes a data set's indicators, filters and locations as parquet files as soon as each is known, and stages its
+/// observations so that the time periods and data files can be written once the import is complete.
 /// </summary>
 public class ParquetV1DataSetWriter(
     Guid subjectId,
-    StatisticsDbDataSetWriterFactory statisticsDbDataSetWriterFactory,
     ParquetV1DataSetFactory parquetV1DataSetFactory,
-    IParquetDataSetWriter parquetDataSetWriter
+    IParquetDataSetWriter parquetDataSetWriter,
+    IGuidGenerator guidGenerator
 ) : IStorageDataSetWriter
 {
-    // Keeps the number of query parameters within SQL Server's limit.
-    private const int LocationQueryBatchSize = 1_000;
-
-    private readonly StatisticsDbDataSetWriter _statisticsDbDataSetWriter = statisticsDbDataSetWriterFactory.Create(
-        subjectId
-    );
-
     private readonly ParquetV1DataSet _parquetV1DataSet = parquetV1DataSetFactory.Create(subjectId);
 
     private IReadOnlyList<Filter>? _filters;
     private IReadOnlyList<Indicator>? _indicators;
+    private Dictionary<string, Guid>? _locationIdsByKey;
 
     public Guid SubjectId { get; } = subjectId;
 
@@ -36,35 +31,45 @@ public class ParquetV1DataSetWriter(
 
     public Task<bool> HasIndicators(CancellationToken cancellationToken = default)
     {
-        return _statisticsDbDataSetWriter.HasIndicators(cancellationToken);
+        return Task.FromResult(parquetDataSetWriter.HasIndicators(SubjectId));
     }
 
     public Task WriteIndicators(IReadOnlyList<Indicator> indicators, CancellationToken cancellationToken = default)
     {
-        return _statisticsDbDataSetWriter.WriteIndicators(indicators, cancellationToken);
+        return parquetDataSetWriter.WriteIndicators(SubjectId, indicators, cancellationToken);
     }
 
     public Task<bool> HasFilters(CancellationToken cancellationToken = default)
     {
-        return _statisticsDbDataSetWriter.HasFilters(cancellationToken);
+        return Task.FromResult(parquetDataSetWriter.HasFilters(SubjectId));
     }
 
     public Task WriteFilters(IReadOnlyList<Filter> filters, CancellationToken cancellationToken = default)
     {
-        return _statisticsDbDataSetWriter.WriteFilters(filters, cancellationToken);
+        return parquetDataSetWriter.WriteFilters(SubjectId, filters, cancellationToken);
     }
 
     public Task WriteLocations(IReadOnlyCollection<Location> locations, CancellationToken cancellationToken = default)
     {
-        return _statisticsDbDataSetWriter.WriteLocations(locations, cancellationToken);
+        foreach (var location in locations.Where(location => location.Id == Guid.Empty))
+        {
+            location.Id = guidGenerator.NewGuid();
+        }
+
+        return parquetDataSetWriter.WriteLocations(SubjectId, locations.ToList(), cancellationToken);
     }
 
     public Guid GetLocationId(Location location)
     {
-        return _statisticsDbDataSetWriter.GetLocationId(location);
+        if (_locationIdsByKey is null)
+        {
+            throw new InvalidOperationException($"{nameof(StartObservations)} must be called first");
+        }
+
+        return _locationIdsByKey[ImporterLocationCache.GetLocationCacheKey(location)];
     }
 
-    public Task StartObservations(
+    public async Task StartObservations(
         IReadOnlyList<Filter> filters,
         IReadOnlyList<Indicator> indicators,
         long? resumeFromCsvRow,
@@ -74,7 +79,12 @@ public class ParquetV1DataSetWriter(
         _filters = filters;
         _indicators = indicators;
 
-        return parquetDataSetWriter.StartStaging(SubjectId, filters, indicators, resumeFromCsvRow, cancellationToken);
+        _locationIdsByKey = (await _parquetV1DataSet.ListLocations(cancellationToken: cancellationToken)).ToDictionary(
+            ImporterLocationCache.GetLocationCacheKey,
+            location => location.Id
+        );
+
+        await parquetDataSetWriter.StartStaging(SubjectId, filters, indicators, resumeFromCsvRow, cancellationToken);
     }
 
     public Task WriteObservations(
@@ -101,16 +111,6 @@ public class ParquetV1DataSetWriter(
         return parquetDataSetWriter.CountStagedObservations(SubjectId, cancellationToken);
     }
 
-    public Task<List<Filter>> ListFilters(bool includeItems = false, CancellationToken cancellationToken = default)
-    {
-        return _statisticsDbDataSetWriter.ListFilters(includeItems, cancellationToken);
-    }
-
-    public Task<List<IndicatorGroup>> ListIndicatorGroups(CancellationToken cancellationToken = default)
-    {
-        return _statisticsDbDataSetWriter.ListIndicatorGroups(cancellationToken);
-    }
-
     public Task<List<(Guid ParentFilterItemId, Guid ChildFilterItemId)>> ListFilterItemRelationships(
         Guid parentFilterId,
         Guid childFilterId,
@@ -127,20 +127,13 @@ public class ParquetV1DataSetWriter(
 
     public async Task Complete(CancellationToken cancellationToken = default)
     {
-        var filters = await ListFilters(includeItems: true, cancellationToken);
-        var indicatorGroups = await ListIndicatorGroups(cancellationToken);
-
-        var locationIds = await parquetDataSetWriter.ListStagedLocationIds(SubjectId, cancellationToken);
-        var locations = new List<Location>();
-
-        foreach (var locationIdsBatch in locationIds.Chunk(LocationQueryBatchSize))
-        {
-            locations.AddRange(
-                await _statisticsDbDataSetWriter.DataSet.ListLocations(locationIdsBatch, cancellationToken)
-            );
-        }
-
-        await parquetDataSetWriter.WriteParquetFiles(SubjectId, filters, indicatorGroups, locations, cancellationToken);
+        await parquetDataSetWriter.WriteTimePeriodsAndData(
+            SubjectId,
+            await _parquetV1DataSet.ListFilters(cancellationToken: cancellationToken),
+            await _parquetV1DataSet.ListIndicators(cancellationToken: cancellationToken),
+            await _parquetV1DataSet.ListLocations(cancellationToken: cancellationToken),
+            cancellationToken
+        );
     }
 
     public Task CleanUp(CancellationToken cancellationToken = default)

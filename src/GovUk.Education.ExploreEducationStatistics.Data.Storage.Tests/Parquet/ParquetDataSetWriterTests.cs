@@ -16,7 +16,7 @@ public abstract class ParquetDataSetWriterTests : IDisposable
 
     public void Dispose() => _testDataSet.Dispose();
 
-    public class WriteParquetFilesTests : ParquetDataSetWriterTests
+    public class WriteTests : ParquetDataSetWriterTests
     {
         [Fact]
         public async Task WritesParquetFilesAndKeepsStagingDb()
@@ -38,16 +38,35 @@ public abstract class ParquetDataSetWriterTests : IDisposable
         }
 
         [Fact]
-        public async Task WrittenAgain_ReplacesParquetFiles()
+        public async Task HasIndicatorsAndFilters_TrueOnceWritten()
+        {
+            var writer = _testDataSet.BuildWriter();
+            var subjectId = _testDataSet.SubjectId;
+
+            Assert.False(writer.HasIndicators(subjectId));
+            Assert.False(writer.HasFilters(subjectId));
+
+            await writer.WriteIndicators(subjectId, _testDataSet.Indicators);
+
+            Assert.True(writer.HasIndicators(subjectId));
+            Assert.False(writer.HasFilters(subjectId));
+
+            await writer.WriteFilters(subjectId, _testDataSet.Filters);
+
+            Assert.True(writer.HasFilters(subjectId));
+        }
+
+        [Fact]
+        public async Task TimePeriodsAndDataWrittenAgain_ReplacesParquetFiles()
         {
             await _testDataSet.Write();
 
             await _testDataSet
                 .BuildWriter()
-                .WriteParquetFiles(
+                .WriteTimePeriodsAndData(
                     _testDataSet.SubjectId,
                     _testDataSet.Filters,
-                    _testDataSet.IndicatorGroups,
+                    _testDataSet.Indicators,
                     _testDataSet.Locations
                 );
 
@@ -363,11 +382,12 @@ public abstract class ParquetDataSetWriterTests : IDisposable
         }
 
         [Fact]
-        public async Task StagedObservationLocationNotProvided_Throws()
+        public async Task StagedObservationLocationNotWritten_Throws()
         {
             var writer = _testDataSet.BuildWriter();
             var subjectId = _testDataSet.SubjectId;
 
+            await _testDataSet.WriteMeta(writer, locations: [_testDataSet.England]);
             await writer.StartStaging(subjectId, _testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: null);
             await writer.AppendObservations(
                 subjectId,
@@ -377,10 +397,10 @@ public abstract class ParquetDataSetWriterTests : IDisposable
             );
 
             await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                writer.WriteParquetFiles(
+                writer.WriteTimePeriodsAndData(
                     subjectId,
                     _testDataSet.Filters,
-                    _testDataSet.IndicatorGroups,
+                    _testDataSet.Indicators,
                     [_testDataSet.England]
                 )
             );
@@ -394,7 +414,7 @@ public abstract class ParquetDataSetWriterTests : IDisposable
     public class StagingTests : ParquetDataSetWriterTests
     {
         [Fact]
-        public async Task CountAndListLocationIds_ReturnStagedObservations()
+        public async Task Count_ReturnsStagedObservations()
         {
             var writer = _testDataSet.BuildWriter();
             var subjectId = _testDataSet.SubjectId;
@@ -408,10 +428,6 @@ public abstract class ParquetDataSetWriterTests : IDisposable
             );
 
             Assert.Equal(6, await writer.CountStagedObservations(subjectId));
-            Assert.Equal(
-                _testDataSet.Locations.Select(location => location.Id).Order(),
-                (await writer.ListStagedLocationIds(subjectId)).Order()
-            );
         }
 
         [Fact]

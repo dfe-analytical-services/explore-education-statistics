@@ -7,13 +7,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interf
 /// Writes a data set as a set of parquet files in the Public API's format.
 /// </summary>
 /// <remarks>
-/// Observations are first appended to a staging DuckDB database in the data set's directory, which allows an
-/// import to resume after a restart. <see cref="WriteParquetFiles" /> then builds each table from the staged
-/// observations and the data set's meta and exports them as parquet files. The staging database is kept so that
-/// <see cref="WriteParquetFiles" /> can be run again, until <see cref="DeleteStagingDb" /> removes it.
+/// The indicators, filters and locations files are each written as soon as their data is known. Observations are
+/// appended to a staging DuckDB database in the data set's directory, which allows an import to resume after a
+/// restart. <see cref="WriteTimePeriodsAndData" /> then builds the time periods and data files from the staged
+/// observations and the files already written. The staging database is kept so that
+/// <see cref="WriteTimePeriodsAndData" /> can be run again, until <see cref="DeleteStagingDb" /> removes it.
 /// </remarks>
 public interface IParquetDataSetWriter
 {
+    bool HasIndicators(Guid subjectId);
+
+    /// <summary>
+    /// Writes the indicators file, replacing any written by an earlier attempt.
+    /// </summary>
+    /// <param name="subjectId">The data set's subject id.</param>
+    /// <param name="indicators">All indicators for the data set, including their indicator groups.</param>
+    /// <param name="cancellationToken"></param>
+    Task WriteIndicators(
+        Guid subjectId,
+        IReadOnlyList<Indicator> indicators,
+        CancellationToken cancellationToken = default
+    );
+
+    bool HasFilters(Guid subjectId);
+
+    /// <summary>
+    /// Writes the filters and filter options files, replacing any written by an earlier attempt.
+    /// </summary>
+    /// <param name="subjectId">The data set's subject id.</param>
+    /// <param name="filters">All filters for the data set, including their groups and items.</param>
+    /// <param name="cancellationToken"></param>
+    Task WriteFilters(Guid subjectId, IReadOnlyList<Filter> filters, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Writes the locations and location options files, replacing any written by an earlier attempt.
+    /// </summary>
+    /// <param name="subjectId">The data set's subject id.</param>
+    /// <param name="locations">All locations for the data set.</param>
+    /// <param name="cancellationToken"></param>
+    Task WriteLocations(
+        Guid subjectId,
+        IReadOnlyList<Location> locations,
+        CancellationToken cancellationToken = default
+    );
+
     /// <summary>
     /// Prepares the staging database for the data set's observations.
     /// </summary>
@@ -44,20 +81,19 @@ public interface IParquetDataSetWriter
 
     Task<long> CountStagedObservations(Guid subjectId, CancellationToken cancellationToken = default);
 
-    Task<List<Guid>> ListStagedLocationIds(Guid subjectId, CancellationToken cancellationToken = default);
-
     /// <summary>
-    /// Writes the parquet files from the staged observations, replacing any written by an earlier attempt.
+    /// Writes the time periods and data files from the staged observations and the filter options and location
+    /// options files, replacing any written by an earlier attempt.
     /// </summary>
     /// <param name="subjectId">The data set's subject id.</param>
-    /// <param name="filters">All filters for the data set, including their groups and items.</param>
-    /// <param name="indicatorGroups">All indicator groups for the data set, including their indicators.</param>
-    /// <param name="locations">The locations of the staged observations.</param>
+    /// <param name="filters">All filters for the data set, as written by <see cref="WriteFilters" />.</param>
+    /// <param name="indicators">All indicators for the data set, as written by <see cref="WriteIndicators" />.</param>
+    /// <param name="locations">All locations for the data set, as written by <see cref="WriteLocations" />.</param>
     /// <param name="cancellationToken"></param>
-    Task WriteParquetFiles(
+    Task WriteTimePeriodsAndData(
         Guid subjectId,
         IReadOnlyList<Filter> filters,
-        IReadOnlyList<IndicatorGroup> indicatorGroups,
+        IReadOnlyList<Indicator> indicators,
         IReadOnlyList<Location> locations,
         CancellationToken cancellationToken = default
     );

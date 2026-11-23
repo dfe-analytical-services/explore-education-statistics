@@ -245,7 +245,11 @@ public class ImporterService : IImporterService
         var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
         var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
 
-        var subjectMeta = await _importerMetaService.GetSubjectMeta(metaFileCsvHeaders, metaFileCsvRows, dataSetWriter);
+        var subjectMeta = await _importerMetaService.GetSubjectMeta(
+            metaFileCsvHeaders,
+            metaFileCsvRows,
+            dataSetWriter.DataSet
+        );
 
         var fixedInformationReader = new FixedInformationDataFileReader(csvHeaders);
         var filterAndIndicatorReader = new FilterAndIndicatorValuesReader(csvHeaders, subjectMeta);
