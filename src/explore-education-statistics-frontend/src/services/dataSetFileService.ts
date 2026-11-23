@@ -1,3 +1,4 @@
+import { Organisation } from '@common/services/types/organisation';
 import { PaginatedList } from '@common/services/types/pagination';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { contentApi } from '@common/services/api';
@@ -18,6 +19,8 @@ export interface DataSetFootnote {
   id: string;
   label: string;
 }
+
+export type DataSetFileOrganisation = Pick<Organisation, 'id' | 'title'>;
 
 export interface DataSetFile {
   id: string;
@@ -52,6 +55,7 @@ export interface DataSetFile {
       themeTitle: string;
       title: string;
     };
+    publishingOrganisations: DataSetFileOrganisation[];
     published: Date;
     lastUpdated: string;
     slug: string;
