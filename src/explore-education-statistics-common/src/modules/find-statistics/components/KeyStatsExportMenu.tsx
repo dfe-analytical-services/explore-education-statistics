@@ -34,7 +34,7 @@ export default function KeyStatsExportMenu({
     getClipboardPng,
     // Replace slashes (e.g. 'Academic year 2016/17') with hyphens
     // so they aren't stripped out when the file name is sanitised.
-    `Headlines - ${publicationTitle} - ${releaseTitle.replaceAll('/', '-')}`,
+    `Headlines - ${publicationTitle} - ${releaseTitle}`.replaceAll('/', '-'),
   );
 
   const handleCopyToClipboard = useCallback(async () => {
