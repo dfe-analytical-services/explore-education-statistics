@@ -388,6 +388,9 @@ jobs:
     pool: ees-ubuntu2604-xlarge-v2
     workspace:
       clean: all
+    variables:
+      PnpmStoreDirectory: $(Pipeline.Workspace)/.pnpm-store
+      NextCacheDirectory: $(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/.next/cache
     steps:
       - task: UseNode@1
         displayName: Install Node.js $(NodeVersion)
@@ -408,12 +411,20 @@ jobs:
           targetType: inline
           script: corepack enable
 
+      - task: Cache@2
+        displayName: Cache pnpm store
+        inputs:
+          key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+          path: $(PnpmStoreDirectory)
+          restoreKeys: |
+            pnpm | "$(Agent.OS)"
+
       - task: Bash@3
         displayName: pnpm i
         inputs:
           workingDir: .
           targetType: inline
-          script: pnpm i
+          script: pnpm i --store-dir $(PnpmStoreDirectory)
 
       - task: Bash@3
         displayName: pnpm tsc
@@ -454,11 +465,24 @@ jobs:
               testRunTitle: Release Jest tests
               mergeTestResults: true
 
+      - task: Cache@2
+        displayName: Cache Next.js build
+        inputs:
+          key: 'next | "$(Agent.OS)" | pnpm-lock.yaml | $(Build.SourceVersion)'
+          path: $(NextCacheDirectory)
+          restoreKeys: |
+            next | "$(Agent.OS)" | pnpm-lock.yaml
+            next | "$(Agent.OS)"
+
+      # This build output is what gets packaged into the Public frontend Docker image below.
+      # Type checking is skipped as "pnpm tsc" has already checked the frontend above.
       - task: Bash@3
         displayName: pnpm run build
         inputs:
           targetType: inline
           script: pnpm --filter=explore-education-statistics-frontend run build
+        env:
+          TYPE_CHECK_DISABLE: true
 
       - task: Docker@2
         displayName: Build Public frontend Docker image
@@ -470,7 +494,6 @@ jobs:
           Dockerfile: docker/public-frontend/Dockerfile
           buildContext: $(System.DefaultWorkingDirectory)
           tags: $(Build.BuildNumber)
-          arguments: --build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)
         env:
           DOCKER_BUILDKIT: 1
 

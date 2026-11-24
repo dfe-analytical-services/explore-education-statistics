@@ -2,6 +2,10 @@
 const withBundleAnalyzer = require('@next/bundle-analyzer');
 const path = require('path');
 
+// Allows type checking to be skipped during builds where it has already been done separately,
+// e.g. the pipeline, which runs `pnpm tsc` before building.
+const typeCheckDisabled = process.env.TYPE_CHECK_DISABLE === 'true';
+
 /**
  * @type {import('next').NextConfig}
  */
@@ -9,6 +13,9 @@ const path = require('path');
 const nextConfig = {
   compress: false,
   reactStrictMode: true,
+  typescript: {
+    ignoreBuildErrors: typeCheckDisabled,
+  },
   env: {
     BUILD_NUMBER: process.env.BUILD_BUILDNUMBER ?? '',
   },
@@ -38,23 +45,25 @@ const nextConfig = {
     const { dev, isServer } = options;
 
     if (isServer) {
-      const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
+      if (!typeCheckDisabled) {
+        const ForkTsCheckerPlugin = require('fork-ts-checker-webpack-plugin');
 
-      config.plugins.push(
-        new ForkTsCheckerPlugin({
-          typescript: {
-            configFile: path.resolve(__dirname, 'tsconfig.json'),
-          },
-          issue: {
-            // Next generates types into `.next/types` (build) and
-            // `.next/dev/types` (dev), and both are in tsconfig's `include`.
-            // Leftover generated files from a previous build can reference
-            // routes that no longer exist, so don't report issues in them.
-            // `pnpm tsc` and `next build` check freshly generated types.
-            exclude: [{ file: '**/.next/**' }],
-          },
-        }),
-      );
+        config.plugins.push(
+          new ForkTsCheckerPlugin({
+            typescript: {
+              configFile: path.resolve(__dirname, 'tsconfig.json'),
+            },
+            issue: {
+              // Next generates types into `.next/types` (build) and
+              // `.next/dev/types` (dev), and both are in tsconfig's `include`.
+              // Leftover generated files from a previous build can reference
+              // routes that no longer exist, so don't report issues in them.
+              // `pnpm tsc` and `next build` check freshly generated types.
+              exclude: [{ file: '**/.next/**' }],
+            },
+          }),
+        );
+      }
 
       config.externals = [...config.externals, 'react', 'react-dom'];
     }
