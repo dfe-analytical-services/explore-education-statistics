@@ -47,17 +47,14 @@ steps:
           cliCommand=functionapp
         fi
 
+        subscriptionId=$(az account show --query id --output tsv)
+
         # Fetches appsettings for a single app / slot combination, writing the result (as flat
         # {name: value} JSON) to $outFile. Leave $slotName empty to target production.
         fetch_appsettings() {
           local appName=$1
           local slotName=$2
           local outFile=$3
-
-          local slotArgs=()
-          if [ -n "$slotName" ]; then
-            slotArgs=(--slot "$slotName")
-          fi
 
           # Check whether or not the target App or slot exists yet.
           local exists
@@ -80,18 +77,18 @@ steps:
           fi
 
           # If the App exists, we should be able to get its appsettings without issue. If we run
-          # into any errors, they will not be caught here and so will fail the task (see the
-          # exit-status handling below). This prevents us from risking applying empty appsettings
-          # against a running App or slot.
-          local rawAppSettings
-          rawAppSettings=$(az $cliCommand config appsettings list \
-            --name "$appName" \
-            --resource-group ${{ parameters.resourceGroupName }} \
-            "${slotArgs[@]}")
+          # into any errors, they will be dealth with in the exit-status handling below. This prevents
+          # us from risking applying empty appsettings against a running App or slot.
+          local siteResourceId="/subscriptions/$subscriptionId/resourceGroups/${{ parameters.resourceGroupName }}/providers/Microsoft.Web/sites/$appName"
+          if [ -n "$slotName" ]; then
+            siteResourceId="$siteResourceId/slots/$slotName"
+          fi
 
-          # Convert the CLI's [{name, value, slotSetting}] array into a flat {name: value} object,
-          # which is the shape the Bicep template's appsettings params expect.
-          echo "$rawAppSettings" | jq -c 'map({key: .name, value: .value}) | from_entries' > "$outFile"
+          az rest \
+            --method post \
+            --url "$siteResourceId/config/appsettings/list?api-version=2025-03-01" \
+            --query properties \
+            | jq -c '. // {}' > "$outFile"
         }
 
         tmpDir=$(mktemp -d)
