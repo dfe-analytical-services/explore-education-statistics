@@ -43,6 +43,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import {
   dehydrate,
   keepPreviousData,
+  noop,
   QueryClient,
   useQuery,
 } from '@tanstack/react-query';
@@ -826,19 +827,21 @@ export const getServerSideProps: GetServerSideProps = async ({
   const queryClient = new QueryClient();
 
   await Promise.all([
-    // Prefetch both searches so the result count can be shown on each tab.
-    queryClient.prefetchQuery(
-      azurePublicationQueries.listStatisticalReleases(publicationsQuery),
-    ),
-    queryClient.prefetchQuery(azureDataSetQueries.list(dataSetsQuery)),
+    // Fetch both searches so the result count can be shown on each tab.
+    queryClient
+      .query(azurePublicationQueries.listStatisticalReleases(publicationsQuery))
+      .catch(noop),
+    queryClient.query(azureDataSetQueries.list(dataSetsQuery)).catch(noop),
     isPublicationsSearch
-      ? queryClient.prefetchQuery(themeQueries.list())
-      : queryClient.prefetchQuery(
-          publicationQueries.getPublicationTree({
-            filter: 'DataCatalogue',
-          }),
-        ),
-    queryClient.prefetchQuery(organisationQueries.list()),
+      ? queryClient.query(themeQueries.list()).catch(noop)
+      : queryClient
+          .query(
+            publicationQueries.getPublicationTree({
+              filter: 'DataCatalogue',
+            }),
+          )
+          .catch(noop),
+    queryClient.query(organisationQueries.list()).catch(noop),
   ]);
 
   return {
