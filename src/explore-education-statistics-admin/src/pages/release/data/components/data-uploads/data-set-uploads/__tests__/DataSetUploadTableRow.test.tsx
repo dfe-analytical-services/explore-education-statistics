@@ -612,8 +612,15 @@ describe('DataSetUploadTableRow', () => {
     expect(fileDetailsTabPanel).toBeInTheDocument();
 
     expect(
-      within(fileDetailsTabPanel).getAllByText('Screening').length,
-    ).toEqual(1);
+      within(within(fileDetailsTabPanel).getByTestId('Status')).getByText(
+        'Screening',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(
+        within(fileDetailsTabPanel).getByTestId('API compatible'),
+      ).getByText('Screening'),
+    ).toBeInTheDocument();
 
     expect(screen.queryByText('Continue import')).not.toBeInTheDocument();
 
