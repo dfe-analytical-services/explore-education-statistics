@@ -90,7 +90,6 @@ const SearchDataPage: NextPage = () => {
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     staleTime: 60000,
-    enabled: !isPublicationsSearch,
   });
 
   const {
@@ -103,7 +102,6 @@ const SearchDataPage: NextPage = () => {
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     staleTime: 60000,
-    enabled: isPublicationsSearch,
   });
 
   const { data: organisations = [] } = useQuery({
@@ -129,10 +127,24 @@ const SearchDataPage: NextPage = () => {
     publicationsData ?? {};
 
   const {
-    page,
-    totalPages,
-    totalResults = 0,
-  } = (isPublicationsSearch ? publicationsPaging : dataSetsPaging) ?? {};
+    page: pagePublications,
+    totalPages: totalPagesPublications,
+    totalResults: totalResultsPublications = 0,
+  } = publicationsPaging ?? {};
+
+  const {
+    page: pageDataSets,
+    totalPages: totalPagesDataSets,
+    totalResults: totalResultsDataSets = 0,
+  } = dataSetsPaging ?? {};
+
+  const page = isPublicationsSearch ? pagePublications : pageDataSets;
+  const totalPages = isPublicationsSearch
+    ? totalPagesPublications
+    : totalPagesDataSets;
+  const totalResults = isPublicationsSearch
+    ? totalResultsPublications
+    : totalResultsDataSets;
 
   const {
     dataSetType,
@@ -476,6 +488,7 @@ const SearchDataPage: NextPage = () => {
                   className={styles.navItemLink}
                 >
                   Statistical releases
+                  {publicationsPaging && ` (${totalResultsPublications})`}
                 </Link>
               </li>
               <li>
@@ -489,7 +502,7 @@ const SearchDataPage: NextPage = () => {
                   aria-current={!isPublicationsSearch ? 'page' : undefined}
                   className={styles.navItemLink}
                 >
-                  Data
+                  Data sets{dataSetsPaging && ` (${totalResultsDataSets})`}
                 </Link>
               </li>
             </ul>
@@ -787,11 +800,11 @@ export const getServerSideProps: GetServerSideProps = async ({
   const queryClient = new QueryClient();
 
   await Promise.all([
-    isPublicationsSearch
-      ? queryClient.prefetchQuery(
-          azurePublicationQueries.listStatisticalReleases(query),
-        )
-      : queryClient.prefetchQuery(azureDataSetQueries.list(query)),
+    // Prefetch both searches so the result count can be shown on each tab.
+    queryClient.prefetchQuery(
+      azurePublicationQueries.listStatisticalReleases(query),
+    ),
+    queryClient.prefetchQuery(azureDataSetQueries.list(query)),
     isPublicationsSearch
       ? queryClient.prefetchQuery(themeQueries.list())
       : queryClient.prefetchQuery(
