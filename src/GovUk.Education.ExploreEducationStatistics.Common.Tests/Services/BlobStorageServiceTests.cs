@@ -1094,8 +1094,21 @@ public class BlobStorageServiceTests
 
         var blobServiceClient = MockBlobServiceClient(sourceBlobContainerClient, destinationBlobContainerClient);
 
+        var blobSasService = new Mock<IBlobSasService>(Strict);
+        blobSasService
+            .Setup(s =>
+                s.CreateBlobReadSasUri(
+                    blobServiceClient.Object,
+                    sourceBlobClient.Object,
+                    TimeSpan.FromHours(1),
+                    CancellationToken.None
+                )
+            )
+            .ReturnsAsync(sourceUri);
+
         var service = SetupTestBlobStorageService(
             blobServiceClient: blobServiceClient.Object,
+            blobSasService: blobSasService.Object,
             storageInstanceCreationUtil: StorageInstanceCreationUtilThatCreates()
         );
 
@@ -1109,7 +1122,7 @@ public class BlobStorageServiceTests
         Assert.True(moved);
         sourceBlobContainerClient.VerifyCreateIfNotExistsAsync();
         destinationBlobContainerClient.VerifyCreateIfNotExistsAsync();
-        MockUtils.VerifyAllMocks(lease);
+        MockUtils.VerifyAllMocks(lease, blobSasService);
         sourceBlobClient.Verify(
             client =>
                 client.DeleteAsync(
