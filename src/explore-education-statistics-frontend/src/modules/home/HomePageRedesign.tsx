@@ -5,6 +5,8 @@ import {
   DfeOpeningHours,
   DfeTelephoneLine,
 } from '@common/modules/find-statistics/components/ContactUsSection';
+import logger from '@common/services/logger';
+import { PublicationListSummary } from '@common/services/publicationService';
 import CookieBanner from '@frontend/components/CookieBanner';
 import Link from '@frontend/components/Link';
 import PageFeedback from '@frontend/components/PageFeedback';
@@ -12,13 +14,19 @@ import PageFooter from '@frontend/components/PageFooter';
 import PageMeta from '@frontend/components/PageMeta';
 import HomePageHeader from '@frontend/modules/home/components/HomePageHeader';
 import HomePageMasthead from '@frontend/modules/home/components/HomePageMasthead';
-import HomeReleaseLink from '@frontend/modules/home/components/HomeReleaseLink';
-import { latestReleases } from '@frontend/modules/home/data/prototypeHomeReleasesData';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
-import React from 'react';
 import HomePageNav from '@frontend/modules/home/components/HomePageNav';
+import HomeReleaseLink from '@frontend/modules/home/components/HomeReleaseLink';
+import createStatisticalReleasesListRequest from '@frontend/modules/search-data/utils/createStatisticalReleasesListRequest';
+import azurePublicationService from '@frontend/services/azurePublicationService';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import { GetServerSideProps } from 'next';
+import React from 'react';
 
-const HomePageRedesign = () => {
+interface Props {
+  latestReleases: PublicationListSummary[] | null;
+}
+
+const HomePageRedesign = ({ latestReleases }: Props) => {
   const logLinkClick = (label: string) =>
     logEvent({
       category: 'Homepage',
@@ -77,16 +85,19 @@ const HomePageRedesign = () => {
               Latest releases
             </h2>
 
-            <ol className="govuk-grid-row govuk-list">
-              {latestReleases.map(release => (
-                <li
-                  className="govuk-grid-column-one-third"
-                  key={`${release.publicationSlug}-${release.releaseSlug}`}
-                >
-                  <HomeReleaseLink release={release} onClick={logLinkClick} />
-                </li>
-              ))}
-            </ol>
+            {latestReleases === null && (
+              <p>Could not load the latest releases.</p>
+            )}
+            {latestReleases?.length === 0 && <p>No releases found.</p>}
+            {!!latestReleases?.length && (
+              <ol className="govuk-grid-row govuk-list">
+                {latestReleases.map(release => (
+                  <li className="govuk-grid-column-one-third" key={release.id}>
+                    <HomeReleaseLink release={release} onClick={logLinkClick} />
+                  </li>
+                ))}
+              </ol>
+            )}
             <Link
               to="/search-releases"
               onClick={() => logLinkClick('Find statistics')}
@@ -290,6 +301,27 @@ const HomePageRedesign = () => {
       <PageFooter width="wide" />
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  try {
+    const { results } = await azurePublicationService.listStatisticalReleases({
+      ...createStatisticalReleasesListRequest({
+        releaseType: [
+          'OfficialStatistics',
+          'AccreditedOfficialStatistics',
+          'OfficialStatisticsInDevelopment',
+        ],
+        sortBy: 'newest',
+      }),
+      latestReleases: true,
+    });
+
+    return { props: { latestReleases: results.slice(0, 3) } };
+  } catch (error) {
+    logger.error(error);
+    return { props: { latestReleases: null } };
+  }
 };
 
 export default HomePageRedesign;
