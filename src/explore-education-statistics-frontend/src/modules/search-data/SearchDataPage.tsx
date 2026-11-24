@@ -1,11 +1,12 @@
-import getPublicEnv from '@frontend/utils/publicEnv';
 import BackToTopLink from '@common/components/BackToTopLink';
 import ButtonText from '@common/components/ButtonText';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
+import useCopySuccess from '@common/hooks/useCopySuccess';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import {
   ReleaseType,
@@ -25,8 +26,10 @@ import { SortOption } from '@frontend/components/SortControls';
 import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
 import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
+import DataSetsGuidanceModal from '@frontend/modules/search-data/components/DataSetsGuidanceModal';
 import SearchDataFilters from '@frontend/modules/search-data/components/SearchDataFilters';
 import SearchDataSearchForm from '@frontend/modules/search-data/components/SearchDataSearchForm';
+import StatisticalReleasesGuidanceModal from '@frontend/modules/search-data/components/StatisticalReleasesGuidanceModal';
 import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
 import { getParamsFromQuery } from '@frontend/modules/search-data/utils/createDataSetListRequest';
 import {
@@ -40,6 +43,7 @@ import publicationQueries from '@frontend/queries/publicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
 import { DataSetType } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
+import getPublicEnv from '@frontend/utils/publicEnv';
 import {
   dehydrate,
   keepPreviousData,
@@ -54,8 +58,6 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
 import { useState } from 'react';
-import DataSetsGuidanceModal from './components/DataSetsGuidanceModal';
-import StatisticalReleasesGuidanceModal from './components/StatisticalReleasesGuidanceModal';
 
 const defaultPageTitle = 'Explore our education statistics';
 
@@ -96,6 +98,8 @@ const SearchDataPage: NextPage = () => {
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
+  const [isLinkCopied, showLinkCopied] = useCopySuccess();
+
   const currentRoute = router.pathname as RoutePath;
   const isPublicationsSearch = currentRoute.includes('search-releases');
 
@@ -299,6 +303,11 @@ const SearchDataPage: NextPage = () => {
         shallow: true,
       },
     );
+  };
+
+  const handleCopyLink = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    showLinkCopied();
   };
 
   const handleSortBy = async (nextSortBy: PublicationSortOption) => {
@@ -714,6 +723,17 @@ const SearchDataPage: NextPage = () => {
                 </ButtonText>
               </div>
             )}
+
+            <InsetText className="govuk-!-width-full govuk-!-margin-top-3 govuk-!-margin-bottom-1">
+              Bookmark this page or{' '}
+              <ButtonText onClick={handleCopyLink}>
+                copy the link to the current page
+              </ButtonText>{' '}
+              to come back to these results.
+              <ScreenReaderMessage
+                message={isLinkCopied ? 'Link copied to the clipboard' : ''}
+              />
+            </InsetText>
           </div>
 
           <LoadingSpinner

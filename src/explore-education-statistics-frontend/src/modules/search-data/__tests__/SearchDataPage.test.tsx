@@ -244,6 +244,52 @@ describe('SearchDataPage', () => {
     });
   });
 
+  describe('copy link to current page', () => {
+    afterEach(() => {
+      window.history.replaceState({}, '', '/');
+    });
+
+    test('renders the bookmark text and copy link button', async () => {
+      render(<SearchDataPage />);
+
+      expect(
+        await screen.findByText(/Bookmark this page or/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/to come back to these results/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', {
+          name: 'copy the link to the current page',
+        }),
+      ).toBeInTheDocument();
+    });
+
+    test('copies the current page URL to the clipboard and announces it', async () => {
+      window.history.replaceState(
+        {},
+        '',
+        '/search-data?search=pupils&themeId=theme-1&page=2',
+      );
+
+      const { user } = render(<SearchDataPage />);
+
+      await user.click(
+        await screen.findByRole('button', {
+          name: 'copy the link to the current page',
+        }),
+      );
+
+      expect(await window.navigator.clipboard.readText()).toBe(
+        'http://localhost/search-data?search=pupils&themeId=theme-1&page=2',
+      );
+
+      expect(
+        await screen.findByText('Link copied to the clipboard'),
+      ).toBeInTheDocument();
+    });
+  });
+
   describe('filtering', () => {
     test('renders default sorted by text and no filtered string', async () => {
       render(<SearchDataPage />);
