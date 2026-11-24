@@ -1,5 +1,7 @@
+using System.IO.Compression;
 using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests;
 using GovUk.Education.ExploreEducationStatistics.Common.IntegrationTests.FunctionApp;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -294,6 +296,79 @@ public abstract class ImportDataFunctionTests(ImportDataFunctionTestsFixture fix
                         EnumUtil.GetFromEnumLabel<TimeIdentifier>(actualTimePeriod.Identifier)
                     );
                     Assert.Equal(expectedTimePeriod.Period, TimePeriodFormatter.FormatFromCsv(actualTimePeriod.Period));
+                }
+            );
+        }
+
+        [Fact]
+        public async Task DuckDbDataTable_LocationOptionsWithSameCodeAndLabelAcrossLevels_NoDuplicateRows()
+        {
+            var (dataSetVersion, instanceId) = await CommonTestDataUtils.CreateDataSetInitialVersion(
+                fixture.GetPublicDataDbContext(),
+                Stage.PreviousStage()
+            );
+
+            // The ward and parliamentary constituency options share the same code and
+            // label ('z' / 'Unknown'). Each row must only be matched to the option for
+            // its own geographic level, otherwise rows are duplicated.
+            const string csvData = """
+                time_period,time_identifier,geographic_level,country_code,country_name,pcon_code,pcon_name,ward_code,ward_name,school_type,headcount
+                2025,Academic year,Ward,E92000001,England,z,Unknown,z,Unknown,Primary,10
+                2025,Academic year,Ward,E92000001,England,E14001063,Barnsley North,z,Unknown,Primary,20
+                2025,Academic year,Ward,E92000001,England,E14001063,Barnsley North,E05000979,Central,Primary,30
+                """;
+
+            const string csvMetadata = """
+                col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column,filter_default
+                headcount,Indicator,Headcount,,,,,,
+                school_type,Filter,School type,,,,,,
+                """;
+
+            var pathResolver = fixture.GetDataSetVersionPathResolver();
+            Directory.CreateDirectory(pathResolver.DirectoryPath(dataSetVersion));
+
+            await using (var fileStream = File.Create(pathResolver.CsvDataPath(dataSetVersion)))
+            await using (var gzipStream = new GZipStream(fileStream, CompressionMode.Compress))
+            await using (var writer = new StreamWriter(gzipStream))
+            {
+                await writer.WriteAsync(csvData);
+            }
+
+            await File.WriteAllTextAsync(pathResolver.CsvMetadataPath(dataSetVersion), csvMetadata);
+
+            await fixture.ImportMetadataFunction.ImportMetadata(instanceId, CancellationToken.None);
+            await fixture.ImportDataFunction.ImportData(instanceId, CancellationToken.None);
+
+            await using var duckDbConnection = GetDuckDbConnection(dataSetVersion);
+
+            var rows = (
+                await duckDbConnection
+                    .SqlBuilder(
+                        $"""
+                        SELECT
+                            {DataTable.Ref().LocationId(GeographicLevel.ParliamentaryConstituency):raw} AS pcon_id,
+                            {DataTable.Ref().LocationId(GeographicLevel.Ward):raw} AS ward_id
+                        FROM '{DataTable.TableName:raw}'
+                        """
+                    )
+                    .QueryAsync<(int PconId, int WardId)>()
+            ).AsList();
+
+            Assert.Equal(3, rows.Count);
+
+            var options = (
+                await duckDbConnection
+                    .SqlBuilder($"SELECT * FROM '{LocationOptionsTable.TableName:raw}'")
+                    .QueryAsync<ParquetLocationOption>()
+            ).ToDictionary(o => o.Id);
+
+            // Every row's location ids must reference options of the matching level.
+            Assert.All(
+                rows,
+                row =>
+                {
+                    Assert.Equal(GeographicLevel.ParliamentaryConstituency.GetEnumValue(), options[row.PconId].Level);
+                    Assert.Equal(GeographicLevel.Ward.GetEnumValue(), options[row.WardId].Level);
                 }
             );
         }
