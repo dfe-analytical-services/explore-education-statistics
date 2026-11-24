@@ -15,9 +15,15 @@ const pngOptions: Partial<HTML2CanvasOptions> = {
 
 interface Props {
   containerRef: RefObject<HTMLElement | null>;
+  publicationTitle: string;
+  releaseTitle: string;
 }
 
-export default function KeyStatsExportMenu({ containerRef }: Props) {
+export default function KeyStatsExportMenu({
+  containerRef,
+  publicationTitle,
+  releaseTitle,
+}: Props) {
   const [getClipboardPng] = useCurrentPng({
     options: pngOptions,
     ref: containerRef,
@@ -26,7 +32,7 @@ export default function KeyStatsExportMenu({ containerRef }: Props) {
 
   const handlePngDownload = usePngDownload(
     getClipboardPng,
-    'Key Statistics Summary',
+    `Headlines - ${publicationTitle} - ${releaseTitle}`,
   );
 
   const handleCopyToClipboard = useCallback(async () => {
