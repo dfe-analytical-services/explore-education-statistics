@@ -59,14 +59,14 @@ describe('KeyStatsExportMenu', () => {
     ).toBeInTheDocument();
   });
 
-  test('downloads the PNG with the publication and release titles in the file name', async () => {
+  test('downloads the PNG with the publication and release titles in the file name, replacing slashes with hyphens', async () => {
     const ref = createRef<HTMLDivElement>();
 
     const { user } = render(
       <KeyStatsExportMenu
         containerRef={ref}
         publicationTitle="Publication title"
-        releaseTitle="Release title"
+        releaseTitle="Academic year 2016/17"
       />,
     );
 
@@ -81,7 +81,7 @@ describe('KeyStatsExportMenu', () => {
       expect(downloadFile).toHaveBeenCalledWith({
         file: 'data:image/png;base64,test',
         extension: 'png',
-        fileName: 'Headlines - Publication title - Release title',
+        fileName: 'Headlines - Publication title - Academic year 2016-17',
       });
     });
   });
