@@ -30,7 +30,7 @@ jobs:
                 environment: ${{ parameters.environment }}
 
             - download: MainBuild
-              displayName: Download Admin artifact
+              displayName: Admin - downloading artifact
               artifact: admin
 
             - template: ../tasks/get-new-appsettings.yml
@@ -42,7 +42,7 @@ jobs:
                 bicepConfigDeployName: $(bicepConfigDeployName)
 
             # Database migrations run as part of Admin's startup, so by the time the staging
-            # slot (or production, on the direct path) reports healthy here, they've already
+            # slot (or main slot, on the direct path) reports healthy here, they've already
             # run successfully. This job intentionally stops right after that health check -
             # see SwapAdminIntoMainSlot below - so that services waiting on Admin (via
             # deployAdminFirst) can start as soon as migrations are done, without also waiting

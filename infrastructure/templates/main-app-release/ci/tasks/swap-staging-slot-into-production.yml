@@ -17,7 +17,7 @@ parameters:
 
 steps:
   - task: AzureCLI@2
-    displayName: ${{ parameters.displayNamePrefix }} - swapping staging slot into production.
+    displayName: ${{ parameters.displayNamePrefix }} - swapping staging slot into main slot
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash

@@ -33,7 +33,7 @@ steps:
       appSettingsJson: ${{ parameters.appSettingsJson }}
 
   - task: AzureCLI@2
-    displayName: ${{ parameters.displayNamePrefix }} - Deploy
+    displayName: ${{ parameters.displayNamePrefix }} - deploying code
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash
@@ -79,5 +79,5 @@ steps:
       - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
         parameters:
           serviceConnection: ${{ parameters.serviceConnection }}
-          displayName: ${{ parameters.displayNamePrefix }} - Checking app is healthy after deploy
+          displayName: ${{ parameters.displayNamePrefix }} - checking app is healthy after deploy
           endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
