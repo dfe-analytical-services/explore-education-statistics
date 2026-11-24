@@ -1,5 +1,6 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators.ErrorDetails;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -320,6 +321,57 @@ internal class DataSetVersionMappingService(
                 )
             )
         );
+
+        if (locationMappingPlan.Levels.TryGetValue(GeographicLevel.School, out var schoolMappings))
+        {
+            AutoMapSchoolsByUrn(schoolMappings);
+        }
+    }
+
+    /// <summary>
+    /// Fallback for schools that weren't matched exactly on name, URN and LAEstab.
+    /// A school can change its name or LAEstab whilst keeping the same URN, so we
+    /// auto-map on URN alone where there's exactly one unmapped source option and
+    /// exactly one candidate in total with that URN, which isn't already claimed.
+    /// If the target has several variants of the URN (even if one is already
+    /// exactly matched), the choice is ambiguous and left for the user to map manually.
+    /// </summary>
+    private static void AutoMapSchoolsByUrn(LocationLevelMappings schoolMappings)
+    {
+        var claimedCandidateKeys = schoolMappings
+            .Mappings.Values.Where(mapping => mapping.Type == MappingType.AutoMapped)
+            .Select(mapping => mapping.CandidateKey!)
+            .ToHashSet();
+
+        // Group all candidates (claimed or not) so that the uniqueness check
+        // considers every variant of a URN in the target.
+        var candidateKeysByUrn = schoolMappings
+            .Candidates.Where(candidate => !string.IsNullOrEmpty(candidate.Value.Urn))
+            .GroupBy(candidate => candidate.Value.Urn!)
+            .ToDictionary(group => group.Key, group => group.Select(candidate => candidate.Key).ToList());
+
+        var unmappedSourcesByUrn = schoolMappings
+            .Mappings.Values.Where(mapping =>
+                mapping.Type == MappingType.AutoNone && !string.IsNullOrEmpty(mapping.Source.Urn)
+            )
+            .GroupBy(mapping => mapping.Source.Urn!);
+
+        foreach (var sources in unmappedSourcesByUrn)
+        {
+            if (
+                sources.Count() != 1
+                || !candidateKeysByUrn.TryGetValue(sources.Key, out var candidateKeys)
+                || candidateKeys.Count != 1
+                || claimedCandidateKeys.Contains(candidateKeys.Single())
+            )
+            {
+                continue;
+            }
+
+            var mapping = sources.Single();
+            mapping.CandidateKey = candidateKeys.Single();
+            mapping.Type = MappingType.AutoMapped;
+        }
     }
 
     private static void AutoMapFilters(FilterMappingPlan filterMappingPlan)

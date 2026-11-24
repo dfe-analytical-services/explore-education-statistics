@@ -1232,6 +1232,242 @@ public abstract class ProcessNextDataSetVersionMappingsFunctionsTests(
         }
     }
 
+    public class ApplyAutoMappingsSchoolUrnTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
+        : ApplyAutoMappingsTests(fixture)
+    {
+        [Fact]
+        public async Task Complete_SchoolNameChangedWithSameUrn_MinorUpdate()
+        {
+            var updatedMapping = await ApplyLocationAutoMappings(
+                sources: new() { ["source-key"] = School("Some RC School", urn: "112388", laEstab: "9094204") },
+                candidates: new()
+                {
+                    ["candidate-key"] = School("Some Roman Catholic School", urn: "112388", laEstab: "9094204"),
+                }
+            );
+
+            AssertMapping(updatedMapping, "source-key", MappingType.AutoMapped, "candidate-key");
+            Assert.True(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
+        }
+
+        [Fact]
+        public async Task Complete_SchoolLaEstabChangedWithSameUrn_MinorUpdate()
+        {
+            var updatedMapping = await ApplyLocationAutoMappings(
+                sources: new() { ["source-key"] = School("Millom School", urn: "112388", laEstab: "9094204") },
+                candidates: new() { ["candidate-key"] = School("Millom School", urn: "112388", laEstab: "9424204") }
+            );
+
+            AssertMapping(updatedMapping, "source-key", MappingType.AutoMapped, "candidate-key");
+            Assert.True(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
+        }
+
+        [Fact]
+        public async Task Complete_SchoolNameAndLaEstabChangedWithSameUrn_MinorUpdate()
+        {
+            var updatedMapping = await ApplyLocationAutoMappings(
+                sources: new() { ["source-key"] = School("Millom School", urn: "112388", laEstab: "9094204") },
+                candidates: new() { ["candidate-key"] = School("Millom Academy", urn: "112388", laEstab: "9424204") }
+            );
+
+            AssertMapping(updatedMapping, "source-key", MappingType.AutoMapped, "candidate-key");
+            Assert.True(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
+        }
+
+        [Fact]
+        public async Task Complete_ExactMatchTakesPrecedenceOverUrnMatch()
+        {
+            var updatedMapping = await ApplyLocationAutoMappings(
+                sources: new() { ["exact-key"] = School("Millom School", urn: "112388", laEstab: "9094204") },
+                candidates: new()
+                {
+                    ["exact-key"] = School("Millom School", urn: "112388", laEstab: "9094204"),
+                    // New variant of the same school - left as a new location option.
+                    ["variant-key"] = School("Millom Academy", urn: "112388", laEstab: "9424204"),
+                }
+            );
+
+            AssertMapping(updatedMapping, "exact-key", MappingType.AutoMapped, "exact-key");
+            Assert.True(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "1.1.0");
+        }
+
+        [Fact]
+        public async Task Incomplete_UrnMatchDoesNotClaimCandidateAlreadyExactMatched_MajorUpdate()
+        {
+            var updatedMapping = await ApplyLocationAutoMappings(
+                sources: new()
+                {
+                    ["exact-key"] = School("Millom School", urn: "112388", laEstab: "9094204"),
+                    ["old-variant-key"] = School("Millom Old School", urn: "112388", laEstab: "9094204"),
+                },
+                candidates: new() { ["exact-key"] = School("Millom School", urn: "112388", laEstab: "9094204") }
+            );
+
+            AssertMapping(updatedMapping, "exact-key", MappingType.AutoMapped, "exact-key");
+            AssertMapping(updatedMapping, "old-variant-key", MappingType.AutoNone, null);
+            Assert.False(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Incomplete_UnmatchedVariantNotMappedWhenTargetHasMultipleVariantsOfUrn_MajorUpdate()
+        {
+            // Old version has variants A and B, new version has A and C, all with the same URN.
+            // A is exactly matched. C is the only unclaimed candidate, but the target has more than
+            // one variant of the URN, so B must be left for the publisher to map.
+            var updatedMapping = await ApplyLocationAutoMappings(
+                sources: new()
+                {
+                    ["a-key"] = School("Millom School", urn: "112388", laEstab: "9094204"),
+                    ["b-key"] = School("Millom Old School", urn: "112388", laEstab: "9094204"),
+                },
+                candidates: new()
+                {
+                    ["a-key"] = School("Millom School", urn: "112388", laEstab: "9094204"),
+                    ["c-key"] = School("Millom Academy", urn: "112388", laEstab: "9424204"),
+                }
+            );
+
+            AssertMapping(updatedMapping, "a-key", MappingType.AutoMapped, "a-key");
+            AssertMapping(updatedMapping, "b-key", MappingType.AutoNone, null);
+            Assert.False(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Incomplete_MultipleCandidatesWithSameUrn_MajorUpdate()
+        {
+            var updatedMapping = await ApplyLocationAutoMappings(
+                sources: new() { ["source-key"] = School("Millom School", urn: "112388", laEstab: "9094204") },
+                candidates: new()
+                {
+                    ["candidate-1-key"] = School("Millom Academy", urn: "112388", laEstab: "9424204"),
+                    ["candidate-2-key"] = School("Millom Primary", urn: "112388", laEstab: "9424205"),
+                }
+            );
+
+            AssertMapping(updatedMapping, "source-key", MappingType.AutoNone, null);
+            Assert.False(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Incomplete_MultipleUnmappedSourcesWithSameUrn_MajorUpdate()
+        {
+            var updatedMapping = await ApplyLocationAutoMappings(
+                sources: new()
+                {
+                    ["source-1-key"] = School("Millom School", urn: "112388", laEstab: "9094204"),
+                    ["source-2-key"] = School("Millom Old School", urn: "112388", laEstab: "9094204"),
+                },
+                candidates: new() { ["candidate-key"] = School("Millom Academy", urn: "112388", laEstab: "9424204") }
+            );
+
+            AssertMapping(updatedMapping, "source-1-key", MappingType.AutoNone, null);
+            AssertMapping(updatedMapping, "source-2-key", MappingType.AutoNone, null);
+            Assert.False(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Incomplete_DifferentUrn_MajorUpdate()
+        {
+            var updatedMapping = await ApplyLocationAutoMappings(
+                sources: new() { ["source-key"] = School("Millom School", urn: "112388", laEstab: "9094204") },
+                candidates: new() { ["candidate-key"] = School("Millom School", urn: "999999", laEstab: "9094204") }
+            );
+
+            AssertMapping(updatedMapping, "source-key", MappingType.AutoNone, null);
+            Assert.False(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        [Fact]
+        public async Task Incomplete_UrnFallbackNotAppliedToOtherLevels_MajorUpdate()
+        {
+            var updatedMapping = await ApplyLocationAutoMappings(
+                level: GeographicLevel.LocalAuthority,
+                sources: new() { ["source-key"] = School("Millom School", urn: "112388", laEstab: "9094204") },
+                candidates: new() { ["candidate-key"] = School("Millom Academy", urn: "112388", laEstab: "9094204") }
+            );
+
+            AssertMapping(
+                updatedMapping,
+                "source-key",
+                MappingType.AutoNone,
+                null,
+                level: GeographicLevel.LocalAuthority
+            );
+            Assert.False(updatedMapping.LocationMappingsComplete);
+            await AssertCorrectDataSetVersionNumbers(updatedMapping, "2.0.0");
+        }
+
+        private MappableLocationOption School(string label, string urn, string laEstab) =>
+            DataFixture
+                .DefaultMappableLocationOption()
+                .WithLabel(label)
+                .WithCodes(code: null, oldCode: null, urn: urn, laEstab: laEstab, ukprn: null);
+
+        private async Task<DataSetVersionMapping> ApplyLocationAutoMappings(
+            Dictionary<string, MappableLocationOption> sources,
+            Dictionary<string, MappableLocationOption> candidates,
+            GeographicLevel level = GeographicLevel.School
+        )
+        {
+            var (instanceId, originalVersion, nextVersion) = await CreateNextDataSetVersionAndDataFiles(
+                Stage.PreviousStage()
+            );
+
+            DataSetVersionMapping mapping = DataFixture
+                .DefaultDataSetVersionMapping()
+                .WithSourceDataSetVersionId(originalVersion.Id)
+                .WithTargetDataSetVersionId(nextVersion.Id)
+                .WithLocationMappingPlan(
+                    DataFixture
+                        .DefaultLocationMappingPlan()
+                        .AddLevel(
+                            level: level,
+                            mappings: new LocationLevelMappings
+                            {
+                                Mappings = sources.ToDictionary(
+                                    source => source.Key,
+                                    source =>
+                                        (LocationOptionMapping)
+                                            DataFixture
+                                                .DefaultLocationOptionMapping()
+                                                .WithSource(source.Value)
+                                                .WithNoMapping()
+                                ),
+                                Candidates = candidates,
+                            }
+                        )
+                );
+
+            await fixture.GetPublicDataDbContext().AddTestData(context => context.DataSetVersionMappings.Add(mapping));
+
+            await ApplyAutoMappings(instanceId);
+
+            return await GetDataSetVersionMapping(nextVersion);
+        }
+
+        private static void AssertMapping(
+            DataSetVersionMapping mapping,
+            string sourceKey,
+            MappingType expectedType,
+            string? expectedCandidateKey,
+            GeographicLevel level = GeographicLevel.School
+        )
+        {
+            var optionMapping = mapping.GetLocationOptionMapping(level, sourceKey);
+            Assert.Equal(expectedType, optionMapping.Type);
+            Assert.Equal(expectedCandidateKey, optionMapping.CandidateKey);
+        }
+    }
+
     public class ApplyAutoMappingsFiltersTests(ProcessNextDataSetVersionMappingsFunctionsTestsFixture fixture)
         : ApplyAutoMappingsTests(fixture)
     {
