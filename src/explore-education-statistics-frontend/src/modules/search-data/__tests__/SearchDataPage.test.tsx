@@ -1,5 +1,5 @@
 import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import SearchDataPage from '@frontend/modules/search-data/SearchDataPage';
 import _publicationService, {
@@ -126,8 +126,13 @@ describe('SearchDataPage', () => {
       const links = within(nav).getAllByRole('link');
 
       expect(links).toHaveLength(2);
-      expect(links[0]).toHaveTextContent('Statistical releases');
-      expect(links[1]).toHaveTextContent('Data');
+
+      await waitFor(() => {
+        expect(links[0]).toHaveTextContent('Statistical releases (2)');
+      });
+      await waitFor(() => {
+        expect(links[1]).toHaveTextContent('Data sets (2)');
+      });
       expect(links[1]).toHaveAttribute('aria-current', 'page');
     });
 
