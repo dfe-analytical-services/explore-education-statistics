@@ -159,20 +159,12 @@ describe('prefetchSsrDataBlocks', () => {
       .mockResolvedValueOnce(testTableData('1000'))
       .mockRejectedValueOnce(error);
 
-    // React Query logs failed queries itself outside of production.
-    const consoleError = jest.spyOn(console, 'error').mockImplementation(noop);
+    const state = await prefetchSsrDataBlocks({
+      homeContent: testHomeContent({ keyStatistics }),
+      releaseVersionId,
+    });
 
-    try {
-      const state = await prefetchSsrDataBlocks({
-        homeContent: testHomeContent({ keyStatistics }),
-        releaseVersionId,
-      });
-
-      expect(getQueryKeys(state)).toEqual([keyStatKey('data-block-1')]);
-      expect(consoleError).toHaveBeenCalledWith(error);
-    } finally {
-      consoleError.mockRestore();
-    }
+    expect(getQueryKeys(state)).toEqual([keyStatKey('data-block-1')]);
   });
 
   test('stops waiting after the timeout, and does not return pending key stats', async () => {

@@ -25,7 +25,7 @@ import { screen, waitFor, within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import {
   dehydrate,
-  Hydrate,
+  HydrationBoundary,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
@@ -653,7 +653,6 @@ describe('DataBlockTabs', () => {
 
     function createQueryClient(tableData?: TableDataResponse) {
       const queryClient = new QueryClient({
-        logger: { log: noop, warn: noop, error: noop },
         defaultOptions: { queries: { retry: false } },
       });
 
@@ -681,7 +680,7 @@ describe('DataBlockTabs', () => {
       const container = document.createElement('div');
       container.innerHTML = renderToString(
         <QueryClientProvider client={queryClient}>
-          <Hydrate state={state}>{ui}</Hydrate>
+          <HydrationBoundary state={state}>{ui}</HydrationBoundary>
         </QueryClientProvider>,
       );
       document.body.appendChild(container);
@@ -695,7 +694,7 @@ describe('DataBlockTabs', () => {
         onRecoverableError,
         wrapper: ({ children }) => (
           <QueryClientProvider client={client}>
-            <Hydrate state={state}>{children}</Hydrate>
+            <HydrationBoundary state={state}>{children}</HydrationBoundary>
           </QueryClientProvider>
         ),
       });

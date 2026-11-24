@@ -4,6 +4,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import React, { useEffect, useState } from 'react';
 import dataSetFileQueries from '@frontend/queries/dataSetFileQueries';
 import {
+  keepPreviousData,
   QueryClient,
   dehydrate,
   useQuery,
@@ -102,7 +103,7 @@ const DataCataloguePage: NextPage<Props> = ({ showTypeFilter }) => {
     isLoading,
   } = useQuery({
     ...dataSetFileQueries.list(createDataSetFileListRequest(router.query)),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     staleTime: 60000,
   });
 
