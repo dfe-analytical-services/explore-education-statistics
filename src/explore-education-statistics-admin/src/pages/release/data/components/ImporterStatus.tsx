@@ -10,7 +10,7 @@ import ProgressBar from '@common/components/ProgressBar';
 import Tag, { TagProps } from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const getImportStatusLabel = (
   statusCode: ImportStatusCode,
@@ -94,7 +94,7 @@ const ImporterStatus = ({
   releaseVersionId,
   onStatusChange,
 }: ImporterStatusProps) => {
-  const { data } = useQuery({
+  const { data, dataUpdatedAt, isFetchedAfterMount } = useQuery({
     ...releaseDataFileQueries.importStatus(releaseVersionId, dataFile.id),
     enabled: dataFile.status !== 'COMPLETE',
     // Poll every 5 seconds until the import reaches a status it can't move on from.
@@ -105,12 +105,21 @@ const ImporterStatus = ({
         : 5000,
   });
 
+  // Read the latest props from a ref so that a new callback or data file
+  // reference from the parent doesn't re-trigger the effect below.
+  const latestProps = useRef({ dataFile, onStatusChange });
+  latestProps.current = { dataFile, onStatusChange };
+
+  // Notify the parent once per fetch. Data that was already in the cache
+  // when this mounted is ignored, as it may be stale.
   useEffect(() => {
-    if (!data) return;
-    if (data.status !== dataFile.status) {
-      onStatusChange?.(dataFile, data);
+    if (!data || !isFetchedAfterMount) return;
+    const { dataFile: currentDataFile, onStatusChange: notify } =
+      latestProps.current;
+    if (data.status !== currentDataFile.status) {
+      notify?.(currentDataFile, data);
     }
-  }, [data, dataFile, onStatusChange]);
+  }, [data, dataUpdatedAt, isFetchedAfterMount]);
 
   const currentStatus: StatusState = data ?? {
     status: dataFile.status,
