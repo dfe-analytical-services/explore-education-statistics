@@ -453,6 +453,9 @@ jobs:
   - template: azure-pipelines-frontend-checks-job.yml
     parameters:
       jobName: AdminChecks
+      # One of the quicker jobs, so it runs on a large agent, leaving the xlarge agents free for the
+      # slower ones.
+      pool: ees-ubuntu2604-large-v2
       includeFormattingAndLinting: ${{ parameters.IncludeFormattingAndLinting }}
       includeTests: ${{ parameters.IncludeTests }}
       typeCheckScript: pnpm --filter=explore-education-statistics-admin tsc
@@ -469,6 +472,9 @@ jobs:
   - template: azure-pipelines-frontend-checks-job.yml
     parameters:
       jobName: PublicSiteChecks
+      # One of the quicker jobs, so it runs on a large agent, leaving the xlarge agents free for the
+      # slower ones.
+      pool: ees-ubuntu2604-large-v2
       includeFormattingAndLinting: ${{ parameters.IncludeFormattingAndLinting }}
       includeTests: ${{ parameters.IncludeTests }}
       typeCheckScript: pnpm --filter=explore-education-statistics-frontend tsc
@@ -485,6 +491,9 @@ jobs:
   - template: azure-pipelines-frontend-checks-job.yml
     parameters:
       jobName: CommonChecks
+      # One of the quicker jobs, so it runs on a large agent, leaving the xlarge agents free for the
+      # slower ones.
+      pool: ees-ubuntu2604-large-v2
       includeFormattingAndLinting: ${{ parameters.IncludeFormattingAndLinting }}
       includeTests: ${{ parameters.IncludeTests }}
       typeCheckScript: pnpm --filter=explore-education-statistics-common tsc
