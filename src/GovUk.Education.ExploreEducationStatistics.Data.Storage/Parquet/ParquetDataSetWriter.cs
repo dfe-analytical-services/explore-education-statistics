@@ -287,6 +287,11 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
     /// <summary>
     /// Only replaces the parquet files once every table has been exported, so that a failure part way through
     /// never leaves a mix of old and new files.
+    ///
+    /// Each table is exported to a temp path first and moved into place here, so a file only ever appears at its
+    /// real path once it is complete. HasIndicators and HasFilters rely on this: if the processor restarts part way
+    /// through an import, stage 2 is run again and skips any tables whose files exist. Exporting straight to the real
+    /// path could leave a half-written file there, which would then be taken as already written.
     /// </summary>
     private static void ReplaceFiles(IEnumerable<string> paths)
     {
