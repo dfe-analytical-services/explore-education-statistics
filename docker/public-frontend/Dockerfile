@@ -8,7 +8,7 @@ RUN corepack enable
 
 WORKDIR /app
 
-# The public site is built by the pipeline before this image is built (see the "Frontend" job in
+# The public site is built by the pipeline before this image is built (see the "PublicSiteBuild" job in
 # azure-pipelines-main.yml), so this image only packages that build output along with production
 # dependencies, rather than building it a second time.
 COPY package.json .

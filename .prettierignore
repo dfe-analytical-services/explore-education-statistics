@@ -6,6 +6,8 @@ build/
 dist/
 coverage/
 node_modules/
+# Third-party packages, e.g. Ruby gems installed by the API docs.
+vendor/
 *.min.css
 *.min.js
 # Artifacts can leak between jobs on self-hosted runners

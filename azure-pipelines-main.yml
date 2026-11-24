@@ -72,6 +72,10 @@ jobs:
     workspace:
       clean: all
     steps:
+      - checkout: self
+        fetchDepth: 1
+        fetchTags: false
+
       - task: NuGetAuthenticate@1
         inputs:
           nuGetServiceConnections: $(NuGetServiceConnectionName)
@@ -119,11 +123,17 @@ jobs:
               /scripts/public-api-openapi-diff.sh
 
   - ${{ if eq(parameters.IncludeTests, true) }}:
-      - job: BackendTest
+      - job: BackendTests
         pool: ees-ubuntu2604-xlarge-v2
         workspace:
           clean: all
+        variables:
+          BackendTestResultsDirectory: $(Agent.TempDirectory)/BackendTestResults
         steps:
+          - checkout: self
+            fetchDepth: 1
+            fetchTags: false
+
           - task: NuGetAuthenticate@1
             inputs:
               nuGetServiceConnections: $(NuGetServiceConnectionName)
@@ -134,19 +144,65 @@ jobs:
               version: $(DotNetVersion)
               performMultiLevelLookup: true
 
-          - task: DotNetCoreCLI@2
+          # Rather than running "dotnet test" once per test project in turn, the test projects in the
+          # main solution are run together via a solution filter, so that they're built once and run
+          # in parallel. Admin's tests are excluded, as AdminBackendTests runs them. Projects that
+          # aren't in the main solution will have their own pipelines run their tests instead of this
+          # one.
+          - task: Bash@3
             displayName: Test
             inputs:
-              command: test
-              projects: |
-                **/GovUk.*[Tt]ests/*.csproj
-                !**/GovUk.Education.ExploreEducationStatistics.Admin.Tests/*csproj
-              arguments: --configuration $(BuildConfiguration)
+              targetType: inline
+              workingDirectory: src
+              script: |
+                set -e
 
+                solution=GovUk.Education.ExploreEducationStatistics.sln
+
+                # Read the main solution's test projects, apart from Admin's, into the "testProjects"
+                # array, one project path per element ("-t" strips each line's trailing newline).
+                mapfile -t testProjects < <(dotnet sln "$solution" list \
+                  | grep -E '[Tt]ests\.csproj$' \
+                  | grep -v '/GovUk\.Education\.ExploreEducationStatistics\.Admin\.Tests\.csproj$')
+
+                jq -n --arg solution "$solution" \
+                  '{solution: {path: $solution, projects: $ARGS.positional}}' \
+                  --args "${testProjects[@]}" > BackendTests.slnf
+
+                echo "Running ${#testProjects[@]} test projects together:"
+                printf '  %s\n' "${testProjects[@]}"
+
+                dotnet test BackendTests.slnf \
+                  --configuration $(BuildConfiguration) \
+                  --logger trx \
+                  --results-directory "$(BackendTestResultsDirectory)"
+
+          - task: PublishTestResults@2
+            displayName: Publish backend test results
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: VSTest
+              testResultsFiles: '*.trx'
+              searchFolder: $(BackendTestResultsDirectory)
+              testRunTitle: Backend tests
+              mergeTestResults: true
+
+  # Only packages the apps when they'll be deployed, or when BackendTests isn't running and this is
+  # the only check that they compile. Otherwise, BackendTests' builds of the test projects already
+  # compile every app packaged here.
+  #
+  # This runs on a self-hosted xlarge agent rather than a Microsoft-hosted one, as packaging the apps
+  # is CPU-bound and was the slowest job in the pipeline on the latter's 2 vCPUs.
   - job: BackendPublish
-    pool:
-      vmImage: ubuntu-22.04
+    pool: ees-ubuntu2604-xlarge-v2
+    workspace:
+      clean: all
+    condition: or(eq(variables.IsBranchDeployable, true), eq('${{ parameters.IncludeTests }}', 'false'))
     steps:
+      - checkout: self
+        fetchDepth: 1
+        fetchTags: false
+
       - task: NuGetAuthenticate@1
         inputs:
           nuGetServiceConnections: $(NuGetServiceConnectionName)
@@ -301,29 +357,20 @@ jobs:
           artifactName: processor
           targetPath: $(Build.ArtifactStagingDirectory)/processor
 
-  - job: Admin
+  # Admin is built and packaged alongside its checks (AdminChecks, CommonChecks and
+  # AdminBackendTests) rather than after them, so that packaging doesn't add to the length of the
+  # run. A failure in any of them still fails the run, which prevents the release pipeline from
+  # deploying it.
+  - job: AdminBuild
     pool: ees-ubuntu2604-xlarge-v2
     workspace:
       clean: all
     steps:
-      - task: UseNode@1
-        displayName: Install Node.js $(NodeVersion)
-        inputs:
-          version: $(NodeVersion)
+      - checkout: self
+        fetchDepth: 1
+        fetchTags: false
 
-      - task: Bash@3
-        displayName: Install Corepack
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: npm i -g corepack@latest
-
-      - task: Bash@3
-        displayName: corepack enable
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: corepack enable
+      - template: azure-pipelines-install-node-dependencies.yml
 
       - task: NuGetAuthenticate@1
         inputs:
@@ -335,25 +382,14 @@ jobs:
           version: $(DotNetVersion)
           performMultiLevelLookup: true
 
+      # Only needed when nothing else compiles Admin's .NET code - otherwise "Package Admin app" below
+      # compiles it on deployable branches, and AdminBackendTests does when tests are running.
       - task: DotNetCoreCLI@2
         displayName: Build
+        condition: and(succeeded(), ne(variables.IsBranchDeployable, true), eq('${{ parameters.IncludeTests }}', 'false'))
         inputs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: --configuration $(BuildConfiguration)
-
-      - ${{ if eq(parameters.IncludeTests, true) }}:
-          - task: DotNetCoreCLI@2
-            displayName: Test
-            inputs:
-              command: test
-              projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
-              arguments: --configuration $(BuildConfiguration) --collect "Code coverage"
-
-      - task: Bash@3
-        displayName: pnpm i
-        inputs:
-          targetType: inline
-          script: pnpm i
 
       - task: Bash@3
         displayName: pnpm run build
@@ -378,104 +414,118 @@ jobs:
           zipAfterPublish: True
 
       - task: PublishPipelineArtifact@1
-        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         displayName: Publish Admin artifact
+        condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
         inputs:
           artifactName: admin
           targetPath: $(Build.ArtifactStagingDirectory)/admin
 
-  - job: Frontend
+  - ${{ if eq(parameters.IncludeTests, true) }}:
+      - job: AdminBackendTests
+        pool: ees-ubuntu2604-xlarge-v2
+        workspace:
+          clean: all
+        steps:
+          - checkout: self
+            fetchDepth: 1
+            fetchTags: false
+
+          - task: NuGetAuthenticate@1
+            inputs:
+              nuGetServiceConnections: $(NuGetServiceConnectionName)
+
+          - task: UseDotNet@2
+            displayName: Install .NET $(DotNetVersion)
+            inputs:
+              version: $(DotNetVersion)
+              performMultiLevelLookup: true
+
+          - task: DotNetCoreCLI@2
+            displayName: Test
+            inputs:
+              command: test
+              projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
+              arguments: --configuration $(BuildConfiguration) --collect "Code coverage"
+
+  # The frontend checks are split into one job per area of the pnpm monorepo, running in parallel
+  # with the Admin and public site builds. CommonChecks covers the common workspace along with
+  # everything else outside of Admin and the public site.
+  - template: azure-pipelines-frontend-checks-job.yml
+    parameters:
+      jobName: AdminChecks
+      includeFormattingAndLinting: ${{ parameters.IncludeFormattingAndLinting }}
+      includeTests: ${{ parameters.IncludeTests }}
+      typeCheckScript: pnpm --filter=explore-education-statistics-admin tsc
+      lintScript: >-
+        pnpm exec eslint --ext .ts,.tsx,.js,.jsx src/explore-education-statistics-admin &&
+        pnpm exec stylelint "src/explore-education-statistics-admin/**/*.{scss,css}"
+      formatCheckScript: >-
+        pnpm exec prettier --list-different
+        "src/explore-education-statistics-admin/**/*.{js,jsx,ts,tsx,css,scss,html}"
+      testScript: pnpm --filter=explore-education-statistics-admin test:ci
+      testResultsFiles: explore-education-statistics-admin/junit-*.xml
+      testRunTitle: Admin Jest tests
+
+  - template: azure-pipelines-frontend-checks-job.yml
+    parameters:
+      jobName: PublicSiteChecks
+      includeFormattingAndLinting: ${{ parameters.IncludeFormattingAndLinting }}
+      includeTests: ${{ parameters.IncludeTests }}
+      typeCheckScript: pnpm --filter=explore-education-statistics-frontend tsc
+      lintScript: >-
+        pnpm exec eslint --ext .ts,.tsx,.js,.jsx src/explore-education-statistics-frontend &&
+        pnpm exec stylelint "src/explore-education-statistics-frontend/**/*.{scss,css}"
+      formatCheckScript: >-
+        pnpm exec prettier --list-different
+        "src/explore-education-statistics-frontend/**/*.{js,jsx,ts,tsx,css,scss,html}"
+      testScript: pnpm --filter=explore-education-statistics-frontend test:ci
+      testResultsFiles: explore-education-statistics-frontend/junit-*.xml
+      testRunTitle: Public site Jest tests
+
+  - template: azure-pipelines-frontend-checks-job.yml
+    parameters:
+      jobName: CommonChecks
+      includeFormattingAndLinting: ${{ parameters.IncludeFormattingAndLinting }}
+      includeTests: ${{ parameters.IncludeTests }}
+      typeCheckScript: pnpm --filter=explore-education-statistics-common tsc
+      lintScript: >-
+        pnpm exec eslint --ext .ts,.tsx,.js,.jsx .
+        --ignore-pattern "src/explore-education-statistics-admin/"
+        --ignore-pattern "src/explore-education-statistics-frontend/" &&
+        pnpm exec stylelint "src/**/*.{scss,css}"
+        --ignore-pattern "src/explore-education-statistics-admin/**"
+        --ignore-pattern "src/explore-education-statistics-frontend/**"
+      formatCheckScript: >-
+        pnpm exec prettier --list-different "**/*.{js,jsx,ts,tsx,css,scss,html}"
+        "!src/explore-education-statistics-admin/**"
+        "!src/explore-education-statistics-frontend/**"
+      testScript: pnpm --filter=explore-education-statistics-common test:ci
+      testResultsFiles: explore-education-statistics-common/junit-*.xml
+      testRunTitle: Common Jest tests
+
+  - job: PublicSiteBuild
     pool: ees-ubuntu2604-xlarge-v2
     workspace:
       clean: all
     variables:
-      PnpmStoreDirectory: $(Pipeline.Workspace)/.pnpm-store
-      NextCacheDirectory: $(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend/.next/cache
+      PublicSiteDirectory: $(System.DefaultWorkingDirectory)/src/explore-education-statistics-frontend
     steps:
-      - task: UseNode@1
-        displayName: Install Node.js $(NodeVersion)
-        inputs:
-          version: $(NodeVersion)
+      - checkout: self
+        fetchDepth: 1
+        fetchTags: false
 
-      - task: Bash@3
-        displayName: Install Corepack
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: npm i -g corepack@latest
-
-      - task: Bash@3
-        displayName: corepack enable
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: corepack enable
-
-      - task: Cache@2
-        displayName: Cache pnpm store
-        inputs:
-          key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
-          path: $(PnpmStoreDirectory)
-          restoreKeys: |
-            pnpm | "$(Agent.OS)"
-
-      - task: Bash@3
-        displayName: pnpm i
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm i --store-dir $(PnpmStoreDirectory)
-
-      - task: Bash@3
-        displayName: pnpm tsc
-        inputs:
-          workingDir: .
-          targetType: inline
-          script: pnpm tsc
-
-      - ${{ if eq(parameters.IncludeFormattingAndLinting, true) }}:
-          - task: Bash@3
-            displayName: pnpm lint
-            inputs:
-              workingDir: .
-              targetType: inline
-              script: pnpm lint
-
-          - task: Bash@3
-            displayName: pnpm format:check
-            inputs:
-              workingDir: .
-              targetType: inline
-              script: pnpm format:check
-
-      - ${{ if eq(parameters.IncludeTests, true) }}:
-          - task: Bash@3
-            displayName: pnpm test:ci
-            inputs:
-              workingDir: .
-              targetType: inline
-              script: pnpm test:ci
-
-          - task: PublishTestResults@2
-            displayName: Publish frontend test results
-            inputs:
-              testResultsFormat: JUnit
-              testResultsFiles: explore-education-statistics-*/junit-*.xml
-              searchFolder: ./src
-              testRunTitle: Release Jest tests
-              mergeTestResults: true
+      - template: azure-pipelines-install-node-dependencies.yml
 
       - task: Cache@2
         displayName: Cache Next.js build
         inputs:
           key: 'next | "$(Agent.OS)" | pnpm-lock.yaml | $(Build.SourceVersion)'
-          path: $(NextCacheDirectory)
+          path: $(PublicSiteDirectory)/.next/cache
           restoreKeys: |
             next | "$(Agent.OS)" | pnpm-lock.yaml
             next | "$(Agent.OS)"
 
-      # This build output is what gets packaged into the Public frontend Docker image below.
-      # Type checking is skipped as "pnpm tsc" has already checked the frontend above.
+      # Type checking is skipped here, as the PublicSiteChecks job covers it.
       - task: Bash@3
         displayName: pnpm run build
         inputs:
@@ -484,6 +534,7 @@ jobs:
         env:
           TYPE_CHECK_DISABLE: true
 
+      # The image packages the build output above, rather than building the site again.
       - task: Docker@2
         displayName: Build Public frontend Docker image
         condition: and(succeeded(), eq(variables.IsBranchDeployable, true))
@@ -514,6 +565,10 @@ jobs:
     variables:
       WorkingDirectory: src/explore-education-statistics-api-docs
     steps:
+      - checkout: self
+        fetchDepth: 1
+        fetchTags: false
+
       - task: UseNode@1
         displayName: Install Node.js $(NodeVersion)
         inputs:
@@ -570,6 +625,10 @@ jobs:
     workspace:
       clean: all
     steps:
+      - checkout: self
+        fetchDepth: 1
+        fetchTags: false
+
       - task: CopyFiles@2
         displayName: Copy Pipfiles to tests
         inputs:

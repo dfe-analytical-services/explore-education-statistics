@@ -25,6 +25,8 @@ export default defineConfig([
     "**/dist/",
     "**/coverage/",
     "**/node_modules/",
+    // Third-party packages, e.g. Ruby gems installed by the API docs.
+    "**/vendor/",
     "**/*.min.js",
     "**/wwwroot/",
     "src/GovUk.Education.ExploreEducationStatistics.*/",

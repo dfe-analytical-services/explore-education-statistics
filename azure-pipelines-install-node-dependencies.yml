@@ -1,0 +1,41 @@
+# Installs Node.js and pnpm, and the dependencies of the pnpm workspace. The pnpm store is cached
+# between runs, keyed on the lockfile, so that unchanged dependencies needn't be downloaded again.
+parameters:
+  - name: pnpmStoreDirectory
+    type: string
+    default: $(Pipeline.Workspace)/.pnpm-store
+
+steps:
+  - task: UseNode@1
+    displayName: Install Node.js $(NodeVersion)
+    inputs:
+      version: $(NodeVersion)
+
+  - task: Bash@3
+    displayName: Install Corepack
+    inputs:
+      workingDir: .
+      targetType: inline
+      script: npm i -g corepack@latest
+
+  - task: Bash@3
+    displayName: corepack enable
+    inputs:
+      workingDir: .
+      targetType: inline
+      script: corepack enable
+
+  - task: Cache@2
+    displayName: Cache pnpm store
+    inputs:
+      key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+      path: ${{ parameters.pnpmStoreDirectory }}
+      restoreKeys: |
+        pnpm | "$(Agent.OS)"
+
+  - task: Bash@3
+    displayName: pnpm i
+    inputs:
+      workingDir: .
+      targetType: inline
+      script: pnpm i --store-dir ${{ parameters.pnpmStoreDirectory }}
