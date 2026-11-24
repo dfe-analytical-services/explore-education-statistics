@@ -51,6 +51,7 @@ import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
+import { ParsedUrlQuery } from 'querystring';
 import { useState } from 'react';
 import DataSetsGuidanceModal from './components/DataSetsGuidanceModal';
 import StatisticalReleasesGuidanceModal from './components/StatisticalReleasesGuidanceModal';
@@ -72,6 +73,23 @@ export interface SearchDataPageQuery {
   themeId?: string | string[];
 }
 
+/**
+ * Both searches run so each tab can show its result count, but only the
+ * active tab's search is paged. The inactive tab's search drops `page` so
+ * paging through one tab doesn't refetch the other, and it matches the
+ * query that tab is opened with (the tab links also drop `page`).
+ */
+function getSearchQueries(
+  query: ParsedUrlQuery,
+  isPublicationsSearch: boolean,
+): { publicationsQuery: ParsedUrlQuery; dataSetsQuery: ParsedUrlQuery } {
+  const unpagedQuery = omit(query, 'page');
+
+  return isPublicationsSearch
+    ? { publicationsQuery: query, dataSetsQuery: unpagedQuery }
+    : { publicationsQuery: unpagedQuery, dataSetsQuery: query };
+}
+
 const SearchDataPage: NextPage = () => {
   const router = useRouter();
   const { isMedia: isMobileMedia } = useMobileMedia();
@@ -80,13 +98,18 @@ const SearchDataPage: NextPage = () => {
   const currentRoute = router.pathname as RoutePath;
   const isPublicationsSearch = currentRoute.includes('search-releases');
 
+  const { publicationsQuery, dataSetsQuery } = getSearchQueries(
+    router.query,
+    isPublicationsSearch,
+  );
+
   const {
     data: dataSetsData,
     isError: isDataSetsError,
     isFetching: isDataSetsFetching,
     isLoading: isDataSetsLoading,
   } = useQuery({
-    ...azureDataSetQueries.list(router.query),
+    ...azureDataSetQueries.list(dataSetsQuery),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     staleTime: 60000,
@@ -98,7 +121,7 @@ const SearchDataPage: NextPage = () => {
     isFetching: isPublicationsFetching,
     isLoading: isPublicationsLoading,
   } = useQuery({
-    ...azurePublicationQueries.listStatisticalReleases(router.query),
+    ...azurePublicationQueries.listStatisticalReleases(publicationsQuery),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     staleTime: 60000,
@@ -478,9 +501,7 @@ const SearchDataPage: NextPage = () => {
                 <Link
                   to={{
                     pathname: '/search-releases',
-                    query: {
-                      ...router.query,
-                    },
+                    query: omit(router.query, 'page'),
                   }}
                   shallow
                   unvisited
@@ -495,7 +516,7 @@ const SearchDataPage: NextPage = () => {
                 <Link
                   to={{
                     pathname: '/search-data',
-                    query: { ...router.query },
+                    query: omit(router.query, 'page'),
                   }}
                   shallow
                   unvisited
@@ -797,14 +818,19 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const isPublicationsSearch = resolvedUrl.startsWith('/search-releases');
 
+  const { publicationsQuery, dataSetsQuery } = getSearchQueries(
+    query,
+    isPublicationsSearch,
+  );
+
   const queryClient = new QueryClient();
 
   await Promise.all([
     // Prefetch both searches so the result count can be shown on each tab.
     queryClient.prefetchQuery(
-      azurePublicationQueries.listStatisticalReleases(query),
+      azurePublicationQueries.listStatisticalReleases(publicationsQuery),
     ),
-    queryClient.prefetchQuery(azureDataSetQueries.list(query)),
+    queryClient.prefetchQuery(azureDataSetQueries.list(dataSetsQuery)),
     isPublicationsSearch
       ? queryClient.prefetchQuery(themeQueries.list())
       : queryClient.prefetchQuery(
