@@ -15,9 +15,15 @@ const pngOptions: Partial<HTML2CanvasOptions> = {
 
 interface Props {
   containerRef: RefObject<HTMLElement | null>;
+  publicationTitle: string;
+  releaseTitle: string;
 }
 
-export default function KeyStatsExportMenu({ containerRef }: Props) {
+export default function KeyStatsExportMenu({
+  containerRef,
+  publicationTitle,
+  releaseTitle,
+}: Props) {
   const [getClipboardPng] = useCurrentPng({
     options: pngOptions,
     ref: containerRef,
@@ -26,7 +32,9 @@ export default function KeyStatsExportMenu({ containerRef }: Props) {
 
   const handlePngDownload = usePngDownload(
     getClipboardPng,
-    'Key Statistics Summary',
+    // Replace slashes (e.g. 'Academic year 2016/17') with hyphens
+    // so they aren't stripped out when the file name is sanitised.
+    `Headlines - ${publicationTitle} - ${releaseTitle}`.replaceAll('/', '-'),
   );
 
   const handleCopyToClipboard = useCallback(async () => {

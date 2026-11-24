@@ -154,15 +154,18 @@ Validate Release Home tab - Headline facts and figures
     ...    Number of unauthorised absences as a percentage of the overall school population.
 
 Download headlines as PNG
-    Remove File    ${DOWNLOAD_DIR}/Key Statistics Summary.png
+    # The '/' in the release title is replaced with '-' in the file name.
+    ${headlines_png}=    Set Variable
+    ...    ${DOWNLOAD_DIR}/Headlines - ${PUPIL_ABSENCE_PUBLICATION_TITLE} - Academic year 2016-17.png
+    Remove File    ${headlines_png}
 
     user opens details dropdown    Export options    id:releaseHeadlines-summary
     user clicks button    Download headlines as PNG    id:releaseHeadlines-summary
 
     Wait Until Keyword Succeeds    10    1    File Should Exist
-    ...    ${DOWNLOAD_DIR}/Key Statistics Summary.png
+    ...    ${headlines_png}
 
-    ${file_size}=    Get File Size    ${DOWNLOAD_DIR}/Key Statistics Summary.png
+    ${file_size}=    Get File Size    ${headlines_png}
     Should Be True    ${file_size} > 0
 
 Validate Headlines facts and figures -- Charts tab
