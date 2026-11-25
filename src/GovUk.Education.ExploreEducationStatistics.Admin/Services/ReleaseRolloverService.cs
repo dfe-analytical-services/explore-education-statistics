@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -26,6 +27,7 @@ public class ReleaseRolloverService(
     IOptions<AppOptions> appOptions,
     ContentDbContext context,
     StatisticsDbContext statisticsDbContext,
+    IFootnoteRepository footnoteRepository,
     IUserService userService,
     IReleaseVersionService releaseVersionService,
     IGuidGenerator guidGenerator,
@@ -105,7 +107,10 @@ public class ReleaseRolloverService(
                                 templateReleaseVersionId: sourceReleaseVersion.Id,
                                 newReleaseVersionId: newReleaseVersion.Id
                             );
-                            // M1.8 copies footnotes.
+                            await CopyFootnotes(
+                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                                newReleaseVersionId: newReleaseVersion.Id
+                            );
                             break;
                         case RolloverMode.StructureOnly:
                             CopyContent(
@@ -329,8 +334,6 @@ public class ReleaseRolloverService(
         }
     }
 
-    // Only ever called from WithData - a FeaturedTable without a copied DataBlockVersion to repoint at would be
-    // meaningless, and StructureOnly never produces a dataBlockVersionMap.
     private async Task CopyFeaturedTables(
         Guid templateReleaseVersionId,
         Guid newReleaseVersionId,
@@ -365,7 +368,6 @@ public class ReleaseRolloverService(
         context.FeaturedTables.AddRange(newFeaturedTables);
     }
 
-    // Only ever called from WithData - see CopyFeaturedTables.
     private async Task CopyKeyStatisticDataBlocks(
         Guid templateReleaseVersionId,
         Guid newReleaseVersionId,
@@ -479,4 +481,35 @@ public class ReleaseRolloverService(
             PublicApiDataSetVersion = templateReleaseFile.PublicApiDataSetVersion,
             PublicApiCompatible = templateReleaseFile.PublicApiCompatible,
         };
+
+    private async Task<Dictionary<Guid, Guid>> CopyFootnotes(Guid templateReleaseVersionId, Guid newReleaseVersionId)
+    {
+        var templateFootnotes = await footnoteRepository.GetFootnotes(templateReleaseVersionId);
+
+        var newFootnoteIdToTemplateFootnoteId = new Dictionary<Guid, Guid>();
+
+        foreach (var templateFootnote in templateFootnotes)
+        {
+            var newFootnote = await footnoteRepository.CreateFootnote(
+                releaseVersionId: newReleaseVersionId,
+                content: templateFootnote.Content,
+                filterIds: templateFootnote.Filters.Select(filterFootnote => filterFootnote.FilterId).ToHashSet(),
+                filterGroupIds: templateFootnote
+                    .FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId)
+                    .ToHashSet(),
+                filterItemIds: templateFootnote
+                    .FilterItems.Select(filterItemFootnote => filterItemFootnote.FilterItemId)
+                    .ToHashSet(),
+                indicatorIds: templateFootnote
+                    .Indicators.Select(indicatorFootnote => indicatorFootnote.IndicatorId)
+                    .ToHashSet(),
+                subjectIds: templateFootnote.Subjects.Select(subjectFootnote => subjectFootnote.SubjectId).ToHashSet(),
+                order: templateFootnote.Order
+            );
+
+            newFootnoteIdToTemplateFootnoteId[newFootnote.Id] = templateFootnote.Id;
+        }
+
+        return newFootnoteIdToTemplateFootnoteId;
+    }
 }
