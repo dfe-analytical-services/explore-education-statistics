@@ -190,7 +190,7 @@ export default function DataBlockTabs({ lazy, ...props }: DataBlockTabsProps) {
   const queryClient = useQueryClient();
 
   // `useState` here to check whether the data has been prefetched during SSR on first render.
-  // `<Hydrate>` adds server-fetched data to the client's cache before this first render.
+  // `<HydrationBoundary>` adds server-fetched data to the client's cache before this first render.
   const [hasTableData] = useState(
     () =>
       queryClient.getQueryData(

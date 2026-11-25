@@ -8,7 +8,7 @@ export default function sanitiseFileName(
   fileName: string,
   extension?: FileExtension,
 ) {
-  const name = fileName.replace(/[|*?"/<>:]/g, '').trim();
+  const name = fileName.replace(/[|*?"/\\<>:]/g, '').trim();
 
   if (extension) {
     const hasExtension =

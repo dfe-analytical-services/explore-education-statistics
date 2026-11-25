@@ -5,6 +5,9 @@ import { ContainerAppResourceConfig, SearchServiceConfig } from '../../types.bic
 @description('Specifies common resource naming variables.')
 param resourceNames ResourceNames
 
+@description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this app.')
+param adminUsesUserAssignedIdentity bool = false
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -61,8 +64,17 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
   name: 'default'
 }
 
-var adminAppClientId = adminAppServiceIdentity.properties.clientId
-var adminAppPrincipalId = adminAppServiceIdentity.properties.principalId
+// TODO EES-7502 - only look up Admin's user-assigned identity once every environment has moved to the ELZ.
+resource adminUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (adminUsesUserAssignedIdentity) {
+  name: resourceNames.admin.identity
+}
+
+var adminAppClientId = adminUsesUserAssignedIdentity
+  ? adminUserAssignedIdentity!.properties.clientId
+  : adminAppServiceIdentity.properties.clientId
+var adminAppPrincipalId = adminUsesUserAssignedIdentity
+  ? adminUserAssignedIdentity!.properties.principalId
+  : adminAppServiceIdentity.properties.principalId
 
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: resourceNames.keyVault.keyVault

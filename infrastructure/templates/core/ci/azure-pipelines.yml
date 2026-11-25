@@ -1,3 +1,5 @@
+# In a new environment, run the pipelines in the order in infrastructure/README.md. This is steps 1 and 6.
+
 trigger:
   branches:
     include:

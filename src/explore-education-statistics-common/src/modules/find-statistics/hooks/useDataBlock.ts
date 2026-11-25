@@ -7,7 +7,11 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import tableBuilderQueries from '@common/queries/tableBuilderQueries';
 import { DataBlock } from '@common/services/types/blocks';
 import logger from '@common/services/logger';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 
 interface Options {
@@ -57,7 +61,7 @@ export default function useDataBlock({
     ),
     enabled: isMapChart,
     staleTime: Infinity,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   const onBoundaryLevelChange = useCallback(

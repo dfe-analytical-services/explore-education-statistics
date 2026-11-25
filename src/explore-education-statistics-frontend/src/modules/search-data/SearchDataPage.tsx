@@ -40,7 +40,12 @@ import publicationQueries from '@frontend/queries/publicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
 import { DataSetType } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
+import {
+  dehydrate,
+  keepPreviousData,
+  QueryClient,
+  useQuery,
+} from '@tanstack/react-query';
 import classNames from 'classnames';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
@@ -82,7 +87,7 @@ const SearchDataPage: NextPage = () => {
     isLoading: isDataSetsLoading,
   } = useQuery({
     ...azureDataSetQueries.list(router.query),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     staleTime: 60000,
     enabled: !isPublicationsSearch,
@@ -95,7 +100,7 @@ const SearchDataPage: NextPage = () => {
     isLoading: isPublicationsLoading,
   } = useQuery({
     ...azurePublicationQueries.listStatisticalReleases(router.query),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     staleTime: 60000,
     enabled: isPublicationsSearch,

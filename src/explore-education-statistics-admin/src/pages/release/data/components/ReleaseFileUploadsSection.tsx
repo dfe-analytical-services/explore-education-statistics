@@ -66,7 +66,9 @@ export default function ReleaseFileUploadsSection({
         listFilesQuery.queryKey,
         (existingFiles = []) => [...existingFiles, newFile],
       );
-      await queryClient.invalidateQueries(listFilesQuery.queryKey);
+      await queryClient.invalidateQueries({
+        queryKey: listFilesQuery.queryKey,
+      });
     },
     [listFilesQuery.queryKey, queryClient, releaseVersionId],
   );
@@ -90,7 +92,9 @@ export default function ReleaseFileUploadsSection({
         files.filter(file => file !== deleteFile),
       );
 
-      await queryClient.invalidateQueries(listFilesQuery.queryKey);
+      await queryClient.invalidateQueries({
+        queryKey: listFilesQuery.queryKey,
+      });
     } catch (err) {
       logger.error(err);
       setFileDeleting(deleteFile, false);

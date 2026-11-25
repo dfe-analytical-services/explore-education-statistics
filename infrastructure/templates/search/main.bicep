@@ -17,6 +17,17 @@ param elz bool = false
 @description('SKU of the Search service\'s storage account and the Function App storage accounts, which sets their redundancy. Legacy accounts can\'t be converted to zone-redundant by a deploy, so only the param files in "parameters/elz" set a zone-redundant SKU.')
 param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
+@description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps, for them to use instead of system-assigned ones. Only the param files in "parameters/elz" turn this on.')
+param deployAppIdentities bool = false
+
+// TODO EES-7502 - remove the Key Vault alternative once every environment has moved to the ELZ.
+@description('Whether the Search Docs Function App connects to the search storage account with its managed identity, given a keyless connection string, rather than with a connection string from Key Vault, which then isn\'t stored. Only the param files in "parameters/elz" turn this on.')
+param identityBasedStorageConnections bool = false
+
+// TODO EES-7502 - remove, leaving shared key access off, once every environment has moved to the ELZ.
+@description('Whether the search storage account accepts its account keys. In ELZ everything connects to it with managed identities, so the param files in "parameters/elz" turn this off.')
+param storageSharedKeyAccessEnabled bool = true
+
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
   CostCentre: string
@@ -82,6 +93,18 @@ var resourceNames = getResourceNamesForEnvironment({
   elz: elz
 })
 
+module appIdentitiesModule '../common/components/managed-identity/user-assigned-identities.bicep' = if (deployAppIdentities) {
+  name: 'appIdentitiesModuleDeploy'
+  params: {
+    identityNames: [
+      resourceNames.nlSearch.identity
+      resourceNames.searchDocs.identity
+    ]
+    location: location
+    tagValues: tagValues
+  }
+}
+
 module monitoringModule 'application/monitoring.bicep' = {
   name: 'monitoringModuleDeploy'
   params: {
@@ -94,6 +117,7 @@ module monitoringModule 'application/monitoring.bicep' = {
 module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = {
   name: 'nlSearchFunctionAppApplicationModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     storageAccountSku: storageAccountSku
     resourceNames: resourceNames
     dataApiUrl: dataApiUrl
@@ -106,11 +130,15 @@ module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = {
     applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
   name: 'searchDocsFunctionAppApplicationModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     storageAccountSku: storageAccountSku
     resourceNames: resourceNames
     contentApiUrl: contentApiUrl
@@ -131,12 +159,16 @@ module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
     releaseIndexerName: searchServiceReleaseIndexerName
     searchServiceName: searchServiceModule.outputs.searchServiceName
     searchStorageAccountName: searchServiceModule.outputs.searchStorageAccountName
-    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.searchStorageAccountConnectionStringSecretName
+    searchStorageAccountConnectionStringSecretName: searchServiceModule.outputs.?searchStorageAccountConnectionStringSecretName
+    identityBasedStorageConnection: identityBasedStorageConnections
     releaseDocumentsContainerName: searchServiceModule.outputs.searchStorageDocumentContainers.releaseDocuments
     storageFirewallRules: maintenanceIpRanges
     applicationInsightsConnectionString: monitoringModule.outputs.applicationInsightsConnectionString
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctionEventSubscriptions.bicep' = {
@@ -158,6 +190,8 @@ module searchServiceModule 'application/searchService.bicep' = {
     searchServiceIpRules: [] // No restrictions applied as the resource is intended to be publicly accessible.
     semanticRankerAvailability: searchServiceSemanticRankerAvailability
     storageIpRules: maintenanceIpRanges
+    storeStorageAccountConnectionString: !identityBasedStorageConnections
+    storageSharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     logAnalyticsWorkspaceId: monitoringModule.outputs.logAnalyticsWorkspaceId
     tagValues: tagValues
   }

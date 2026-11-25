@@ -19,6 +19,18 @@ param operatingSystem 'Windows' | 'Linux'
 @description('SKU of the Function App\'s storage account, which sets its redundancy.')
 param storageAccountSku StorageAccountSku
 
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
+
+@description('Whether to create a content share for the Function App, which is used to store its code in Consumption and Elastic plans.')
+param deployContentShare bool = true
+
+@description('Whether to store the storage account\'s connection string in Key Vault, for the apps that connect to it with a connection string rather than a managed identity.')
+param storeStorageAccountConnectionString bool = true
+
+@description('Whether the storage account accepts its account keys, for the apps that connect to it with a connection string rather than a managed identity.')
+param storageAccountSharedKeyAccessEnabled bool = true
+
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -83,11 +95,16 @@ resource adminSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' exis
 module functionAppModule '../common/components/function-app/function-app.bicep' = {
   name: 'importerFunctionAppModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.importer.identity : ''
     functionAppName: resourceNames.importer.functionApp
     appServicePlanName: resourceNames.importer.appServicePlan
     storageAccountName: resourceNames.importer.storageAccount
     storageAccountSku: storageAccountSku
-    storageAccountConnectionStringSecretName: resourceNames.keyVault.secrets.importerStorageAccountConnectionString
+    deployContentShare: deployContentShare
+    storageAccountSharedKeyAccessEnabled: storageAccountSharedKeyAccessEnabled
+    storageAccountConnectionStringSecretName: storeStorageAccountConnectionString
+      ? resourceNames.keyVault.secrets.importerStorageAccountConnectionString
+      : null
     keyVaultName: resourceNames.keyVault.keyVault
     keyVaultRoles: {
       secretsUser: true
@@ -139,5 +156,32 @@ module functionAppModule '../common/components/function-app/function-app.bicep' 
     appSettings: []
     existingAppSettings: existingAppSettings
     tagValues: tagValues
+  }
+}
+
+// When the release apps use their user-assigned identities, grant them here their roles on the storage accounts that
+// the Importer uses.
+// TODO EES-7502 - make these grants unconditional once every environment has moved to the ELZ.
+resource adminIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.admin.identity
+}
+
+// Allow the Importer to read and write files in the core storage account.
+module coreStorageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'importerCoreStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.storageAccounts.core
+    principalIds: [functionAppModule.outputs.functionAppIdentityPrincipalId]
+    role: 'Storage Blob Data Contributor'
+  }
+}
+
+// Allow Admin to send messages to the Importer's queues.
+module adminStorageAccountRoleAssignmentModule '../common/components/storageAccountRoleAssignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'importerAdminStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: functionAppModule.outputs.storageAccountName
+    principalIds: [adminIdentity!.properties.principalId]
+    role: 'Storage Queue Data Contributor'
   }
 }

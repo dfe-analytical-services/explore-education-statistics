@@ -1,9 +1,11 @@
 import _releaseDataFileService, {
   DataSetUpload,
 } from '@admin/services/releaseDataFileService';
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import render from '@common-test/render';
 import { Dictionary } from '@common/types';
-import React from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import React, { ReactNode } from 'react';
 import { screen, waitFor, within } from '@testing-library/dom';
 import DataSetUploadTableRow from '@admin/pages/release/data/components/data-uploads/data-set-uploads/DataSetUploadTableRow';
 
@@ -612,8 +614,15 @@ describe('DataSetUploadTableRow', () => {
     expect(fileDetailsTabPanel).toBeInTheDocument();
 
     expect(
-      within(fileDetailsTabPanel).getAllByText('Screening').length,
-    ).toEqual(1);
+      within(within(fileDetailsTabPanel).getByTestId('Status')).getByText(
+        'Screening',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(
+        within(fileDetailsTabPanel).getByTestId('API compatible'),
+      ).getByText('Screening'),
+    ).toBeInTheDocument();
 
     expect(screen.queryByText('Continue import')).not.toBeInTheDocument();
 
@@ -745,6 +754,93 @@ describe('DataSetUploadTableRow', () => {
     await waitFor(() =>
       expect(rowBaseProps.onRefreshUploads).toHaveBeenCalled(),
     );
+  });
+
+  test('does not refresh the uploads again when the parent passes a new callback', async () => {
+    releaseDataFileService.getDataFileScreeningStatus.mockResolvedValue({
+      percentageComplete: 100,
+      stage: 'screening',
+      status: 'PendingImport',
+      completed: true,
+    });
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    const wrapper = ({ children }: { children?: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+
+    const { rerender } = render(
+      <table>
+        <tbody>
+          <DataSetUploadTableRow
+            {...rowBaseProps}
+            dataSetUpload={fileUploads.screening}
+          />
+        </tbody>
+      </table>,
+      { wrapper },
+    );
+
+    await waitFor(() =>
+      expect(rowBaseProps.onRefreshUploads).toHaveBeenCalledTimes(1),
+    );
+
+    const nextOnRefreshUploads = jest.fn();
+    rerender(
+      <table>
+        <tbody>
+          <DataSetUploadTableRow
+            {...rowBaseProps}
+            dataSetUpload={fileUploads.screening}
+            onRefreshUploads={nextOnRefreshUploads}
+          />
+        </tbody>
+      </table>,
+    );
+
+    expect(await screen.findByText('Pending import')).toBeInTheDocument();
+    expect(rowBaseProps.onRefreshUploads).toHaveBeenCalledTimes(1);
+    expect(nextOnRefreshUploads).not.toHaveBeenCalled();
+  });
+
+  test('does not refresh the uploads with stale cached screening status on mount', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    queryClient.setQueryData(
+      releaseDataFileQueries.screeningStatus(
+        rowBaseProps.releaseVersionId,
+        fileUploads.pass.id,
+      ).queryKey,
+      {
+        percentageComplete: 100,
+        stage: 'screening',
+        status: 'FailedScreening',
+        completed: true,
+      },
+    );
+    const wrapper = ({ children }: { children?: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+
+    render(
+      <table>
+        <tbody>
+          <DataSetUploadTableRow
+            {...rowBaseProps}
+            dataSetUpload={fileUploads.pass}
+          />
+        </tbody>
+      </table>,
+      { wrapper },
+    );
+
+    expect(await screen.findByText('pass')).toBeInTheDocument();
+    expect(
+      releaseDataFileService.getDataFileScreeningStatus,
+    ).not.toHaveBeenCalled();
+    expect(rowBaseProps.onRefreshUploads).not.toHaveBeenCalled();
   });
 
   test('does not poll for screening status when it is already terminal', async () => {

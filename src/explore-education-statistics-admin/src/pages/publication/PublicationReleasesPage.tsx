@@ -28,12 +28,15 @@ const PublicationReleasesPage = () => {
       label: releaseDetailsFormValues.label,
     });
 
-    queryClient.invalidateQueries(
-      publicationQueries.listUnpublishedReleaseVersions(publicationId).queryKey,
-    );
-    queryClient.invalidateQueries(
-      publicationQueries.listPublishedReleaseVersions(publicationId).queryKey,
-    );
+    queryClient.invalidateQueries({
+      queryKey:
+        publicationQueries.listUnpublishedReleaseVersions(publicationId)
+          .queryKey,
+    });
+    queryClient.invalidateQueries({
+      queryKey:
+        publicationQueries.listPublishedReleaseVersions(publicationId).queryKey,
+    });
   };
 
   const showBackToTopLink = itemsCount > 10;

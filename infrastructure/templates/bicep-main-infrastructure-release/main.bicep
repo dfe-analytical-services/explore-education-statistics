@@ -65,6 +65,21 @@ param notifierStorageAccountSku StorageAccountSku = 'Standard_LRS'
 @description('SKU of the Publisher Function App\'s storage account, which holds the release publishing statuses.')
 param publisherStorageAccountSku StorageAccountSku = 'Standard_GZRS'
 
+@description('Whether to deploy a user-assigned managed identity for each of this pipeline\'s apps, for them to use instead of system-assigned ones. Only the param files in "parameters/elz" turn this on.')
+param deployAppIdentities bool = false
+
+// TODO EES-7502 - remove, leaving the content shares off, once every environment has moved to the ELZ.
+@description('Whether the Importer, Notifier and Publisher Function Apps get a content share. They run on Dedicated plans, which don\'t need one. Removing an existing app\'s content share would move its content, so only the param files in "parameters/elz" turn this off, for the new environments.')
+param functionAppContentShares bool = true
+
+// TODO EES-7502 - remove, leaving the connection strings unstored, once every environment has moved to the ELZ.
+@description('Whether to store the Importer\'s, Notifier\'s and Publisher\'s storage account connection strings in Key Vault. The apps read them in legacy. In ELZ they connect with their managed identities instead, so the param files in "parameters/elz" turn this off.')
+param storeStorageAccountConnectionStrings bool = true
+
+// TODO EES-7502 - remove, leaving shared key access off, once every environment has moved to the ELZ.
+@description('Whether the Importer\'s, Notifier\'s and Publisher\'s storage accounts accept their account keys. In ELZ everything connects to them with managed identities, so the param files in "parameters/elz" turn this off.')
+param storageSharedKeyAccessEnabled bool = true
+
 // Pipeline-supplied tags, plus those that vary by environment and deployment.
 var tagValues = union(tags, {
   Environment: environmentConfig.environmentName!
@@ -233,9 +248,29 @@ resource dataProtectionKey 'Microsoft.KeyVault/vaults/keys@2023-07-01' = {
   }
 }
 
+module appIdentitiesModule '../common/components/managed-identity/user-assigned-identities.bicep' = if (deployAppIdentities) {
+  name: 'appIdentitiesModuleDeploy'
+  params: {
+    identityNames: [
+      resourceNames.admin.identity
+      resourceNames.contentApi.identity
+      resourceNames.dataApi.identity
+      resourceNames.publicSite.identity
+      resourceNames.importer.identity
+      resourceNames.notifier.identity
+      resourceNames.publisher.identity
+    ]
+    tagValues: tagValues
+  }
+}
+
 module importerModuleDeploy '../importer/main.bicep' = {
   name: 'importerModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
+    deployContentShare: functionAppContentShares
+    storeStorageAccountConnectionString: storeStorageAccountConnectionStrings
+    storageAccountSharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: importerStorageAccountSku
@@ -250,11 +285,18 @@ module importerModuleDeploy '../importer/main.bicep' = {
     existingAppSettings: importerProdAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module notifierModuleDeploy '../notifier/main.bicep' = {
   name: 'notifierModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
+    deployContentShare: functionAppContentShares
+    storeStorageAccountConnectionString: storeStorageAccountConnectionStrings
+    storageAccountSharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: notifierStorageAccountSku
@@ -271,11 +313,18 @@ module notifierModuleDeploy '../notifier/main.bicep' = {
     http5xxAlert: http5xxAlerts.?notifier
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module publisherModuleDeploy '../publisher/main.bicep' = {
   name: 'publisherModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
+    deployContentShare: functionAppContentShares
+    storeStorageAccountConnectionString: storeStorageAccountConnectionStrings
+    storageAccountSharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     resourceNames: resourceNames
     operatingSystem: appOperatingSystem
     storageAccountSku: publisherStorageAccountSku
@@ -292,6 +341,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
     tagValues: tagValues
   }
   dependsOn: [
+    appIdentitiesModule
     // Publisher is dependent on Notifier's storage account being available
     // in order to reference its connection string secret in Key Vault.
     notifierModuleDeploy
@@ -301,6 +351,7 @@ module publisherModuleDeploy '../publisher/main.bicep' = {
 module adminModuleDeploy '../admin/main.bicep' = {
   name: 'adminModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     zoneRedundant: zoneRedundantAppServicePlans
     operatingSystem: appOperatingSystem
@@ -320,6 +371,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
     tagValues: tagValues
   }
   dependsOn: [
+    appIdentitiesModule
     // Admin is dependent on Importer's storage account being available
     // in order to reference its connection string secret in Key Vault.
     importerModuleDeploy
@@ -329,6 +381,7 @@ module adminModuleDeploy '../admin/main.bicep' = {
 module contentApiModuleDeploy '../content-api/main.bicep' = {
   name: 'contentApiModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     zoneRedundant: zoneRedundantAppServicePlans
     operatingSystem: appOperatingSystem
@@ -348,11 +401,15 @@ module contentApiModuleDeploy '../content-api/main.bicep' = {
     existingStagingSlotAppSettings: contentApiStagingSlotAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module dataApiModuleDeploy '../data-api/main.bicep' = {
   name: 'dataApiModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     zoneRedundant: zoneRedundantAppServicePlans
     operatingSystem: appOperatingSystem
@@ -371,11 +428,15 @@ module dataApiModuleDeploy '../data-api/main.bicep' = {
     existingStagingSlotAppSettings: dataApiStagingSlotAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }
 
 module publicSiteModuleDeploy '../public-site/main.bicep' = {
   name: 'publicSiteModuleDeploy'
   params: {
+    useUserAssignedIdentity: deployAppIdentities
     resourceNames: resourceNames
     zoneRedundant: zoneRedundantAppServicePlans
     appServiceSku: publicSiteConfig.appServiceSku!
@@ -390,4 +451,7 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     existingProdAppSettings: publicSiteProdAppSettings
     tagValues: tagValues
   }
+  dependsOn: [
+    appIdentitiesModule
+  ]
 }

@@ -7,3 +7,12 @@ param elz = true
 
 // Zone-redundant storage.
 param storageAccountSku = 'Standard_ZRS'
+
+// Deploy a user-assigned managed identity for each of this pipeline's apps.
+param deployAppIdentities = true
+
+// Search Docs connects to the search storage account with its managed identity, so its connection string isn't stored.
+param identityBasedStorageConnections = true
+
+// Everything connects to the search storage account with managed identities, so it doesn't accept account keys.
+param storageSharedKeyAccessEnabled = false
