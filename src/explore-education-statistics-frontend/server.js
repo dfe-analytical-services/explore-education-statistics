@@ -5,7 +5,6 @@ const appInsights = require('applicationinsights');
 const express = require('express');
 const basicAuth = require('express-basic-auth');
 const helmet = require('helmet');
-const referrerPolicy = require('referrer-policy');
 
 const seoRedirects = require('./redirects');
 
@@ -78,7 +77,7 @@ async function startServer() {
   const server = express();
 
   server.head('/health', (req, res) => {
-    return res.status(200);
+    return res.sendStatus(200);
   });
 
   server.get('/health', (req, res) => {
@@ -154,6 +153,9 @@ async function startServer() {
   server.use(
     helmet({
       contentSecurityPolicy: {
+        // Helmet 5+ merges its own default directives into ours unless this
+        // is disabled. Keep the policy to exactly what is defined below.
+        useDefaults: false,
         directives: {
           defaultSrc: ["'self'"],
           scriptSrc: cspScriptSrc,
@@ -178,9 +180,9 @@ async function startServer() {
           childSrc: ["'self'"],
         },
       },
+      referrerPolicy: { policy: 'no-referrer-when-downgrade' },
     }),
   );
-  server.use(referrerPolicy({ policy: 'no-referrer-when-downgrade' }));
 
   if (process.env.BASIC_AUTH === 'true') {
     server.use(
@@ -205,8 +207,10 @@ async function startServer() {
     server.use(conditionalBasicAuth);
   }
 
-  server.get('*', (req, res) => handleRequest(req, res));
-  server.post('*', (req, res) => handleRequest(req, res));
+  // Express 5 requires named wildcards. The braces make the wildcard
+  // optional, so this also matches the root path (/).
+  server.get('/{*splat}', (req, res) => handleRequest(req, res));
+  server.post('/{*splat}', (req, res) => handleRequest(req, res));
 
   server.listen(port, err => {
     if (err) {
