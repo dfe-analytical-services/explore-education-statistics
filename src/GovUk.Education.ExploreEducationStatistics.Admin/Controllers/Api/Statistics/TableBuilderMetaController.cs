@@ -86,11 +86,13 @@ public class TableBuilderMetaController(
             .HandleFailuresOrOk();
     }
 
+    // Checked here rather than in SubjectMetaService, which is shared with the Data API and can't reference Admin
+    // security policies.
     private Task<Either<ActionResult, ReleaseVersion>> CheckCanUpdateReleaseVersion(Guid releaseVersionId)
     {
         return contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId)
-            .OnSuccess(releaseVersion => userService.CheckCanUpdateReleaseVersion(releaseVersion));
+            .OnSuccess(userService.CheckCanUpdateReleaseVersion);
     }
 }
