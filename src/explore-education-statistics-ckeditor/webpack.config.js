@@ -8,6 +8,30 @@ const webpack = require('webpack');
 const { bundler, styles } = require('@ckeditor/ckeditor5-dev-utils');
 const TerserWebpackPlugin = require('terser-webpack-plugin');
 
+/**
+ * pnpm can install the same version of a CKEditor package more than once
+ * (one copy per peer dependency variant, e.g. of `supports-color`), which
+ * leads to CKEditor being bundled twice and failing at runtime with
+ * `ckeditor-duplicated-modules`. Resolve every `@ckeditor/ckeditor5-*`
+ * package from the `ckeditor5` package's own location so that only a single
+ * copy of each is bundled.
+ */
+function getCKEditorAliases() {
+  const ckeditor5Dir = path.dirname(require.resolve('ckeditor5/package.json'));
+  const { dependencies } = require('ckeditor5/package.json');
+
+  return Object.fromEntries(
+    Object.keys(dependencies)
+      .filter(name => name.startsWith('@ckeditor/ckeditor5-'))
+      .map(name => [
+        name,
+        path.dirname(
+          require.resolve(`${name}/package.json`, { paths: [ckeditor5Dir] }),
+        ),
+      ]),
+  );
+}
+
 module.exports = {
   devtool: 'source-map',
   performance: { hints: false },
@@ -22,6 +46,10 @@ module.exports = {
     filename: 'ckeditor.js',
     libraryTarget: 'umd',
     libraryExport: 'default',
+  },
+
+  resolve: {
+    alias: getCKEditorAliases(),
   },
 
   optimization: {
