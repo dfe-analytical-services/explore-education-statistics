@@ -1,4 +1,4 @@
-using Azure.Storage.Blobs;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Processor.Options;
@@ -91,11 +91,15 @@ public class HealthCheckFunctions(
         try
         {
             var connectionString = appOptions.Value.PrivateStorageConnectionString;
-            var blobClient = new BlobServiceClient(connectionString);
-            var response = await blobClient.GetAccountInfoAsync();
-            return response.HasValue
-                ? HealthCheckSummary.Healthy()
-                : HealthCheckSummary.Unhealthy("Could not retrieve Core Storage account info");
+            var blobClient = StorageClientFactory.CreateBlobServiceClient(connectionString);
+
+            // Test blob storage connection by retrieving a minimal list of blob containers.
+            await foreach (var _ in blobClient.GetBlobContainersAsync().AsPages(pageSizeHint: 1))
+            {
+                break;
+            }
+
+            return HealthCheckSummary.Healthy();
         }
         catch (Exception e)
         {

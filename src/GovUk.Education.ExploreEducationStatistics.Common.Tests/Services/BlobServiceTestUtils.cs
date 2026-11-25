@@ -64,6 +64,8 @@ public static class BlobServiceTestUtils
 
         foreach (var blobClient in blobClients)
         {
+            blobClient.SetupGet(client => client.BlobContainerName).Returns(containerName);
+
             blobContainerClient
                 .Setup(client => client.GetBlobClient(blobClient.Object.Name))
                 .Returns(blobClient.Object);

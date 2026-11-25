@@ -50,7 +50,7 @@ const publicationQueries = createQueryKeys('publication', {
           publicationId,
           {
             versionsType: ReleaseVersionsType.LatestPublished,
-            page: pageParam,
+            page: typeof pageParam === 'number' ? pageParam : 1,
             pageSize,
             includePermissions,
           },

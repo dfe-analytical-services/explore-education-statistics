@@ -8,7 +8,7 @@ import {
 import { IpRange } from '../common/types.bicep'
 import { StorageAccountConfig, StorageAccountSku } from '../common/components/storage/types.bicep'
 import { getResourceNamesForEnvironment } from '../common/resource-names.bicep'
-import { publicDataDbConnectionString } from '../common/functions.bicep'
+import { keylessStorageConnectionString, publicDataDbConnectionString } from '../common/functions.bicep'
 
 @description('Environment : Subscription name e.g. s101d01. Used as a prefix for created resources.')
 param subscription string = ''
@@ -86,6 +86,16 @@ param storageAccountSku StorageAccountSku = 'Standard_LRS'
 
 @description('Whether to spread the Container App Environment across availability zones.')
 param containerAppEnvironmentZoneRedundant bool = false
+
+@description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this pipeline\'s apps. Only the param files in "parameters/elz" turn this on.')
+param adminUsesUserAssignedIdentity bool = false
+
+@description('Whether the Data Processor connects to storage accounts with its managed identity, rather than with connection strings.')
+param dataProcessorIdentityBasedStorageConnections bool = false
+
+// TODO EES-7502 - remove, leaving shared key access off, once every environment has moved to the ELZ.
+@description('Whether the Data Processor\'s management storage account accepts its account keys. In ELZ the Data Processor connects to it with its managed identity, so the param files in "parameters/elz" turn this off.')
+param dataProcessorManagementStorageSharedKeyAccessEnabled bool = true
 
 @description('Tagging : Used for tagging resources created by this infrastructure pipeline.')
 param resourceTags {
@@ -277,6 +287,7 @@ module apiAppIdentityModule 'application/public-api/publicApiAppIdentity.bicep' 
 module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployContainerApp) {
   name: 'publicApiAppApplicationModuleDeploy'
   params: {
+    adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
     location: location
     resourceNames: resourceNames
     apiAppRegistrationClientId: keyVault.getSecret('ees-public-api-app-registration-client-id')
@@ -315,6 +326,9 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
 module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = if (deployDataProcessor) {
   name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
+    identityBasedStorageConnections: dataProcessorIdentityBasedStorageConnections
+    managementStorageSharedKeyAccessEnabled: dataProcessorManagementStorageSharedKeyAccessEnabled
+    adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
     storageAccountSku: storageAccountSku
     location: location
     resourceNames: resourceNames
@@ -360,6 +374,13 @@ output dataProcessorPsqlConnectionString string = publicDataDbConnectionString(
   resourceNames.databases.postgreSqlFlexibleServer,
   resourceNames.publicApi.processor.identity
 )
+
+// The Data Processor's core storage connection: keyless, so that it connects with its managed identity, or else a Key
+// Vault reference.
+// TODO EES-7502 - remove the Key Vault alternative once every environment has moved to the ELZ.
+output dataProcessorPrivateStorageConnectionString string = dataProcessorIdentityBasedStorageConnections
+  ? keylessStorageConnectionString(resourceNames.storageAccounts.core)
+  : '@Microsoft.KeyVault(VaultName=${resourceNames.keyVault.keyVault}; SecretName=${resourceNames.keyVault.secrets.coreStorageAccountConnectionString})'
 
 output dataProcessorFunctionAppManagedIdentityClientId string = deployDataProcessor
   ? dataProcessorModule!.outputs.managedIdentityClientId

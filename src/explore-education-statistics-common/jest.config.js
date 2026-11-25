@@ -15,7 +15,8 @@ const config = {
   transform: {
     '^.+\\.(t|j)sx?$': '@swc/jest',
     '^.+\\.css$': '<rootDir>/test/cssTransform.js',
-    '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)': '<rootDir>/test/fileTransform.js',
+    '^(?!.*\\.(js|jsx|cjs|ts|tsx|css|json)$)':
+      '<rootDir>/test/fileTransform.js',
   },
   transformIgnorePatterns: [
     '[/\\\\]node_modules[/\\\\](?!react-leaflet)[/\\\\]',

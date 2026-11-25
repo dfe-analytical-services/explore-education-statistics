@@ -62,8 +62,8 @@ export default function ReleaseApiDataSetDetailsPage() {
     refetch,
   } = useQuery({
     ...apiDataSetQueries.get(dataSetId),
-    refetchInterval: data => {
-      return data?.draftVersion?.status === 'Processing' ||
+    refetchInterval: query => {
+      return query.state.data?.draftVersion?.status === 'Processing' ||
         finalisingStatus === 'finalising'
         ? 3000
         : false;

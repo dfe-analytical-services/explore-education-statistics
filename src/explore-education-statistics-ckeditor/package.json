@@ -20,7 +20,7 @@
     "style-loader": "^3.3.4",
     "terser-webpack-plugin": "^5.6.1",
     "webpack": "^5.105.1",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^7.3.1"
   },
   "scripts": {
     "build": "webpack --mode production",

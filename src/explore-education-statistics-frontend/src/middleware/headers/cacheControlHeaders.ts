@@ -39,7 +39,21 @@ export default async function cacheControlHeaders(
 
   // For all other requests, responses are cached for a small period of time.
   // Note that in development mode, Next will overwrite these headers
-  const generalResponseCacheControlValue = `public, max-age=0, s-maxage=${getDefaultMaxAgeSeconds()}, stale-while-revalidate=30`;
+  // Note that stale-while-revalidate is also honoured by browsers (not just shared caches such as
+  // the CDN), so a browser may serve a stale response for this many seconds after max-age expires.
+  // This can be disabled by setting it to 0 (e.g. when running a production build locally).
+  const staleWhileRevalidateSeconds = getStaleWhileRevalidateSeconds();
+
+  const generalResponseCacheControlValue = [
+    'public',
+    'max-age=0',
+    `s-maxage=${getDefaultMaxAgeSeconds()}`,
+    staleWhileRevalidateSeconds > 0
+      ? `stale-while-revalidate=${staleWhileRevalidateSeconds}`
+      : undefined,
+  ]
+    .filter(Boolean)
+    .join(', ');
 
   res.headers.set('Cache-Control', generalResponseCacheControlValue);
   return res;
@@ -48,4 +62,15 @@ export default async function cacheControlHeaders(
 function getDefaultMaxAgeSeconds() {
   const maxAge = Number(process.env.DEFAULT_CACHE_MAX_AGE_SECONDS);
   return maxAge > 0 ? maxAge : 30;
+}
+
+function getStaleWhileRevalidateSeconds() {
+  const value = process.env.DEFAULT_CACHE_STALE_WHILE_REVALIDATE_SECONDS;
+
+  if (!value) {
+    return 30;
+  }
+
+  const seconds = Number(value);
+  return Number.isInteger(seconds) && seconds >= 0 ? seconds : 30;
 }

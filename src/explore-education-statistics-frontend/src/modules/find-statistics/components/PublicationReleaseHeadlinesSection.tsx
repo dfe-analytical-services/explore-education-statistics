@@ -17,11 +17,15 @@ const PublicationReleaseHeadlinesSection = ({
   headlinesSection,
   keyStatisticsSecondarySection,
   keyStatistics,
+  publicationTitle,
+  releaseTitle,
   releaseVersionId,
 }: Pick<
   ReleaseVersionHomeContent,
   'headlinesSection' | 'keyStatistics' | 'keyStatisticsSecondarySection'
 > & {
+  publicationTitle: string;
+  releaseTitle: string;
   releaseVersionId: string;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -31,7 +35,11 @@ const PublicationReleaseHeadlinesSection = ({
 
   const summaryTab = (
     <>
-      <KeyStatsExportMenu containerRef={containerRef} />
+      <KeyStatsExportMenu
+        containerRef={containerRef}
+        publicationTitle={publicationTitle}
+        releaseTitle={releaseTitle}
+      />
       <div ref={containerRef}>
         <KeyStatContainer>
           {keyStatistics?.map(keyStat => {

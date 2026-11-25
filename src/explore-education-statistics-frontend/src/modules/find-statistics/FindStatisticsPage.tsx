@@ -23,7 +23,12 @@ import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/p
 import azurePublicationQueries from '@frontend/queries/azurePublicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
+import {
+  dehydrate,
+  keepPreviousData,
+  QueryClient,
+  useQuery,
+} from '@tanstack/react-query';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
@@ -54,7 +59,7 @@ const FindStatisticsPage: NextPage = () => {
     isLoading,
   } = useQuery({
     ...azurePublicationQueries.list(router.query),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     staleTime: 60000,
   });
 

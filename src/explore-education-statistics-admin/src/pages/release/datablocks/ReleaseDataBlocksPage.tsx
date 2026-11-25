@@ -88,9 +88,13 @@ const ReleaseDataBlocksPage = () => {
           table => table.dataBlockVersionId !== deletedDataBlockVersionId,
         ),
       );
-      await queryClient.invalidateQueries([
-        listDataBlocksQuery.queryKey,
-        listFeaturedTablesQuery.queryKey,
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: listDataBlocksQuery.queryKey,
+        }),
+        queryClient.invalidateQueries({
+          queryKey: listFeaturedTablesQuery.queryKey,
+        }),
       ]);
     },
     [
@@ -108,7 +112,9 @@ const ReleaseDataBlocksPage = () => {
         releaseVersionId,
         reorderedTables?.map(table => table.id) ?? [],
       );
-      await queryClient.invalidateQueries(listFeaturedTablesQuery.queryKey);
+      await queryClient.invalidateQueries({
+        queryKey: listFeaturedTablesQuery.queryKey,
+      });
     },
     [listFeaturedTablesQuery, queryClient, releaseVersionId],
   );

@@ -15,6 +15,7 @@ const sockPort = process.env.WDS_SOCKET_PORT;
 module.exports = (proxy, allowedHost) => {
   const disableFirewall =
     !proxy || process.env.DANGEROUSLY_DISABLE_HOST_CHECK === 'true';
+  const httpsConfig = getHttpsConfig();
 
   return {
     // WebpackDevServer 2.4.3 introduced a security fix that prevents remote
@@ -88,7 +89,14 @@ module.exports = (proxy, allowedHost) => {
       // remove last slash so user can land on `/test` instead of `/test/`
       publicPath: paths.publicUrlOrPath.slice(0, -1),
     },
-    https: getHttpsConfig(),
+    // `getHttpsConfig` returns `false`, `true` (use a self-signed
+    // certificate) or `{ cert, key }` (use the provided certificate).
+    server: httpsConfig
+      ? {
+          type: 'https',
+          options: typeof httpsConfig === 'object' ? httpsConfig : undefined,
+        }
+      : 'http',
     host,
     historyApiFallback: {
       // Paths with dots should still use the history fallback.
@@ -96,30 +104,40 @@ module.exports = (proxy, allowedHost) => {
       disableDotRule: true,
       index: paths.publicUrlOrPath,
     },
-    // `proxy` is run between `before` and `after` `webpack-dev-server` hooks
-    proxy,
-    onBeforeSetupMiddleware(devServer) {
+    // webpack-dev-server v5 requires `proxy` to be an array, so only
+    // include it when a proxy has been configured.
+    ...(proxy && { proxy }),
+    setupMiddlewares(middlewares, devServer) {
       // Keep `evalSourceMapMiddleware`
       // middlewares before `redirectServedPath` otherwise will not have any effect
-      // This lets us fetch source contents from webpack for the error overlay
-      devServer.app.use(evalSourceMapMiddleware(devServer));
-      devServer.app.use(errorOverlayMiddleware());
+      // This lets us fetch source contents from webpack for the error overlay.
+      // `evalSourceMapMiddleware` reads `server._stats`, which was renamed to
+      // `stats` in webpack-dev-server v5, so expose it under the old name.
+      middlewares.unshift(
+        evalSourceMapMiddleware({
+          get _stats() {
+            return devServer.stats;
+          },
+        }),
+        errorOverlayMiddleware(),
+      );
 
       if (fs.existsSync(paths.proxySetup)) {
         // This registers user provided middleware for proxy reasons
         require(paths.proxySetup)(devServer.app);
       }
-    },
-    onAfterSetupMiddleware(devServer) {
+
       // Redirect to `PUBLIC_URL` or `homepage` from `package.json` if url not match
-      devServer.app.use(redirectServedPath(paths.publicUrlOrPath));
+      middlewares.push(redirectServedPath(paths.publicUrlOrPath));
 
       // This service worker file is effectively a 'no-op' that will reset any
       // previous service worker registered for the same host:port combination.
       // We do this in development to avoid hitting the production cache if
       // it used the same host and port.
       // https://github.com/facebook/create-react-app/issues/2272#issuecomment-302832432
-      devServer.app.use(noopServiceWorkerMiddleware(paths.publicUrlOrPath));
+      middlewares.push(noopServiceWorkerMiddleware(paths.publicUrlOrPath));
+
+      return middlewares;
     },
   };
 };
