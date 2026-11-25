@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -72,6 +73,7 @@ public class ReleaseRolloverServicePermissionTests
         return new ReleaseRolloverService(
             appOptions: new AppOptions { EnableReleaseRollover = true }.ToOptionsWrapper(),
             context: context ?? Mock.Of<ContentDbContext>(),
+            statisticsDbContext: Mock.Of<StatisticsDbContext>(),
             userService: userService,
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             guidGenerator: new SequentialGuidGenerator(),

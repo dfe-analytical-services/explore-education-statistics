@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -24,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReleaseRolloverService(
     IOptions<AppOptions> appOptions,
     ContentDbContext context,
+    StatisticsDbContext statisticsDbContext,
     IUserService userService,
     IReleaseVersionService releaseVersionService,
     IGuidGenerator guidGenerator,
@@ -99,7 +101,11 @@ public class ReleaseRolloverService(
                                 newReleaseVersionId: newReleaseVersion.Id,
                                 dataBlockVersionMap: dataBlockVersionsByTemplateId
                             );
-                            // M1.7-M1.8 copy data files and footnotes, using dataBlockVersionsByTemplateId.
+                            await CopyDataFilesAndSubjects(
+                                templateReleaseVersionId: sourceReleaseVersion.Id,
+                                newReleaseVersionId: newReleaseVersion.Id
+                            );
+                            // M1.8 copies footnotes.
                             break;
                         case RolloverMode.StructureOnly:
                             CopyContent(
@@ -392,4 +398,85 @@ public class ReleaseRolloverService(
 
         context.KeyStatisticsDataBlock.AddRange(newKeyStatisticDataBlocks);
     }
+
+    private async Task CopyDataFilesAndSubjects(Guid templateReleaseVersionId, Guid newReleaseVersionId)
+    {
+        var templateDataReleaseFiles = await context
+            .ReleaseFiles.Include(releaseFile => releaseFile.File)
+            .Where(releaseFile =>
+                releaseFile.ReleaseVersionId == templateReleaseVersionId
+                && releaseFile.File.Type == FileType.Data
+                // Excludes a file that's itself still mid-replacement - shouldn't occur for a published
+                // source release, but mirrors the established "not a replacement" filter used elsewhere
+                // (e.g. DataSetCandidateService) rather than assuming it can never happen.
+                && releaseFile.File.ReplacingId == null
+            )
+            .ToListAsync();
+
+        var templateMetadataReleaseFilesBySubjectId = await context
+            .ReleaseFiles.Include(releaseFile => releaseFile.File)
+            .Where(releaseFile =>
+                releaseFile.ReleaseVersionId == templateReleaseVersionId
+                && releaseFile.File.Type == FileType.Metadata
+                && releaseFile.File.ReplacingId == null
+            )
+            .ToDictionaryAsync(releaseFile => releaseFile.File.SubjectId!.Value);
+
+        foreach (var templateDataReleaseFile in templateDataReleaseFiles)
+        {
+            var templateMetadataReleaseFile = templateMetadataReleaseFilesBySubjectId[
+                templateDataReleaseFile.File.SubjectId!.Value
+            ];
+
+            context.ReleaseFiles.Add(BuildNewReleaseFile(templateDataReleaseFile, newReleaseVersionId));
+            context.ReleaseFiles.Add(BuildNewReleaseFile(templateMetadataReleaseFile, newReleaseVersionId));
+        }
+
+        var templateStatsReleaseVersion = await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(
+            releaseVersion => releaseVersion.Id == templateReleaseVersionId
+        );
+
+        // A release doesn't have to have any stats uploaded.
+        if (templateStatsReleaseVersion is null)
+        {
+            return;
+        }
+
+        statisticsDbContext.ReleaseVersion.Add(
+            new Data.Model.ReleaseVersion
+            {
+                Id = newReleaseVersionId,
+                PublicationId = templateStatsReleaseVersion.PublicationId,
+            }
+        );
+
+        statisticsDbContext.ReleaseSubject.AddRange(
+            templateDataReleaseFiles.Select(templateDataReleaseFile => new Data.Model.ReleaseSubject
+            {
+                ReleaseVersionId = newReleaseVersionId,
+                SubjectId = templateDataReleaseFile.File.SubjectId!.Value,
+            })
+        );
+
+        await statisticsDbContext.SaveChangesAsync();
+    }
+
+    private ReleaseFile BuildNewReleaseFile(ReleaseFile templateReleaseFile, Guid newReleaseVersionId) =>
+        new()
+        {
+            Id = guidGenerator.NewGuid(),
+            ReleaseVersionId = newReleaseVersionId,
+            // Points at the exact same underlying File as the template - nothing is re-uploaded.
+            FileId = templateReleaseFile.FileId,
+            Name = templateReleaseFile.Name,
+            Summary = templateReleaseFile.Summary,
+            Order = templateReleaseFile.Order,
+            FilterSequence = templateReleaseFile.FilterSequence,
+            IndicatorSequence = templateReleaseFile.IndicatorSequence,
+            PairedIndicators = templateReleaseFile.PairedIndicators,
+            Published = templateReleaseFile.Published,
+            PublicApiDataSetId = templateReleaseFile.PublicApiDataSetId,
+            PublicApiDataSetVersion = templateReleaseFile.PublicApiDataSetVersion,
+            PublicApiCompatible = templateReleaseFile.PublicApiCompatible,
+        };
 }
