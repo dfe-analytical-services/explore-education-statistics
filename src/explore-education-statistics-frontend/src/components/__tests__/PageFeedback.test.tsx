@@ -1,5 +1,6 @@
 import PageFeedback from '@frontend/components/PageFeedback';
-import { render, screen, waitFor } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import _feedbackService from '@frontend/services/pageFeedbackService';
@@ -25,7 +26,7 @@ describe('Feedback', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText('Help us improve Explore education statistics'),
+      screen.getByText('Help us improve explore education statistics'),
     ).not.toBeVisible();
 
     expect(

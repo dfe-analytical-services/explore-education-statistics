@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import React from 'react';
 import Link from '@frontend/components/Link';
 
@@ -6,6 +7,8 @@ interface VerificationErrorMessageProps {
 }
 
 const VerificationErrorMessage = ({ slug }: VerificationErrorMessageProps) => {
+  const { contactEmail } = useTenant();
+
   return (
     <div className="govuk-panel__body">
       <p>
@@ -15,11 +18,8 @@ const VerificationErrorMessage = ({ slug }: VerificationErrorMessageProps) => {
       </p>
       <p>
         If this issue persists, please contact{' '}
-        <a href="mailto:explore.statistics@education.gov.uk">
-          explore.statistics@education.gov.uk
-        </a>{' '}
-        for support with details of the publication you are trying to subscribe
-        to.
+        <a href={`mailto:${contactEmail}`}>{contactEmail}</a> for support with
+        details of the publication you are trying to subscribe to.
       </p>
     </div>
   );

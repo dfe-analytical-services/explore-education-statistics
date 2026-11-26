@@ -1,5 +1,6 @@
 import { RelatedInformationItem } from '@common/services/publicationService';
-import { render, screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
 import ReleaseHelpPage from '../ReleaseHelpPage';
 import {

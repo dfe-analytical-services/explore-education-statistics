@@ -1,9 +1,12 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import { ReleaseTypeSectionProps } from '@common/modules/release/components/ReleaseTypeSection';
 import React from 'react';
 
 export default function AdHocStatisticsSection({
   showHeading = true,
 }: ReleaseTypeSectionProps) {
+  const { officialStatisticsStandardsUrl } = useTenant();
+
   return (
     <>
       {showHeading && <h3>Ad hoc official statistics</h3>}
@@ -22,19 +25,21 @@ export default function AdHocStatisticsSection({
 
         <li>well explained and readily accessible</li>
       </ul>
-      <p>
-        Find out more about the standards we follow to produce these statistics
-        through our{' '}
-        <a
-          href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
-          rel="noopener noreferrer nofollow"
-          target="_blank"
-        >
-          Standards for official statistics published by DfE guidance (opens in
-          new tab)
-        </a>
-        .
-      </p>
+      {officialStatisticsStandardsUrl && (
+        <p>
+          Find out more about the standards we follow to produce these
+          statistics through our{' '}
+          <a
+            href={officialStatisticsStandardsUrl}
+            rel="noopener noreferrer nofollow"
+            target="_blank"
+          >
+            Standards for official statistics published by DfE guidance (opens
+            in new tab)
+          </a>
+          .
+        </p>
+      )}
     </>
   );
 }

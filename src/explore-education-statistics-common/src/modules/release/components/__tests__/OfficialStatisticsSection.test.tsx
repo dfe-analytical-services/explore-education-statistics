@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen } from '@testing-library/react';
 import OfficialStatisticsSection from '@common/modules/release/components/OfficialStatisticsSection';
 
 describe('OfficialStatisticsSection', () => {

@@ -2,7 +2,7 @@ import {
   TenantContextProvider,
   useTenant,
 } from '@common/contexts/TenantContext';
-import { eesTenant } from '@common/tenants/eesTenant';
+import eesTenant from '@common/tenants/eesTenant';
 import { Tenant } from '@common/tenants/types';
 import { renderHook } from '@testing-library/react';
 import React, { FC, ReactNode } from 'react';
@@ -18,16 +18,22 @@ describe('useTenant', () => {
   });
 
   test('returns the tenant supplied by the provider', () => {
-    const egsTenant = { ...eesTenant, key: 'egs' } as Tenant;
+    const testTenant: Tenant = {
+      ...eesTenant,
+      service: {
+        nameStartSentence: 'Test tenant',
+        nameMidSentence: 'test tenant',
+      },
+    };
 
     const wrapper: FC<{ children: ReactNode }> = ({ children }) => (
-      <TenantContextProvider tenant={egsTenant}>
+      <TenantContextProvider tenant={testTenant}>
         {children}
       </TenantContextProvider>
     );
 
     const { result } = renderHook(() => useTenant(), { wrapper });
 
-    expect(result.current).toBe(egsTenant);
+    expect(result.current).toBe(testTenant);
   });
 });

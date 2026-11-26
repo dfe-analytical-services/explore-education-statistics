@@ -1,5 +1,6 @@
 import React from 'react';
-import { Matcher, render, screen } from '@testing-library/react';
+import render from '@common-test/render';
+import { Matcher, screen } from '@testing-library/react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import testContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';
 import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';

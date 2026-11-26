@@ -1,4 +1,4 @@
-import { eesTenant } from '@common/tenants/eesTenant';
+import eesTenant from '@common/tenants/eesTenant';
 import { Tenant, TenantKey } from '@common/tenants/types';
 
 export const defaultTenantKey: TenantKey = 'ees';

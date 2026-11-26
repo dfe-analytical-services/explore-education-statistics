@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import Button from '@common/components/Button';
 import { Dictionary } from '@common/types';
 import Panel from '@common/components/Panel';
@@ -21,6 +22,7 @@ interface Props {
 }
 
 const ConfirmUnsubscriptionPage: NextPage<Props> = ({ dataSet, token }) => {
+  const { contactEmail } = useTenant();
   const [submitted, toggleSubmitted] = useToggle(false);
   const [unsubscribeError, setUnsubscribeError] = useState<string>();
 
@@ -58,11 +60,8 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({ dataSet, token }) => {
             </p>
             <p>
               If this issue persists, please contact{' '}
-              <a href="mailto:explore.statistics@education.gov.uk">
-                explore.statistics@education.gov.uk
-              </a>{' '}
-              for support with details of the data set you are trying to
-              subscribe to.
+              <a href={`mailto:${contactEmail}`}>{contactEmail}</a> for support
+              with details of the data set you are trying to subscribe to.
             </p>
           </>
         );
@@ -74,11 +73,8 @@ const ConfirmUnsubscriptionPage: NextPage<Props> = ({ dataSet, token }) => {
             <p>There has been a problem, please try again.</p>
             <p>
               If this issue persists, please contact{' '}
-              <a href="mailto:explore.statistics@education.gov.uk">
-                explore.statistics@education.gov.uk
-              </a>{' '}
-              for support with details of the data set you are trying to
-              subscribe to.
+              <a href={`mailto:${contactEmail}`}>{contactEmail}</a> for support
+              with details of the data set you are trying to subscribe to.
             </p>
           </>
         );

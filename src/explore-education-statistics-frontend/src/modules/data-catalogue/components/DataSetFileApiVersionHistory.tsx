@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
@@ -24,6 +25,9 @@ export default function DataSetFileApiVersionHistory({
   apiDataSetId,
   currentVersion,
 }: Props) {
+  const {
+    service: { nameStartSentence },
+  } = useTenant();
   const router = useRouter();
 
   const { data, isLoading } = useQuery({
@@ -70,7 +74,7 @@ export default function DataSetFileApiVersionHistory({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Versioning - Explore education statistics API
+            Versioning - {nameStartSentence} API
           </Link>
           .
         </p>

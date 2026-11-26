@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
@@ -25,6 +26,9 @@ interface Props {
 }
 
 function CookiesPage({ cookies }: Props) {
+  const {
+    service: { nameMidSentence },
+  } = useTenant();
   const { back } = useRouter();
 
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } =
@@ -34,7 +38,7 @@ function CookiesPage({ cookies }: Props) {
 
   return (
     <Page
-      title="Cookies on Explore education statistics"
+      title={`Cookies on ${nameMidSentence}`}
       pageMeta={{ title: 'Cookies' }}
       breadcrumbLabel="Cookies"
     >
@@ -157,7 +161,7 @@ function CookiesPage({ cookies }: Props) {
           ) : (
             <p>
               <Link to="/cookies/details">
-                Find out more about cookies on Explore education statistics
+                Find out more about cookies on {nameMidSentence}
               </Link>
             </p>
           )}

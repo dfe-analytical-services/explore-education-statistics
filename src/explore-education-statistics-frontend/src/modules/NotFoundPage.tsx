@@ -1,8 +1,13 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
 
 const NotFoundPage = () => {
+  const {
+    service: { nameMidSentence },
+  } = useTenant();
+
   return (
     <Page title="Page not found">
       <p>If you typed the web address, check it's correct.</p>
@@ -13,10 +18,8 @@ const NotFoundPage = () => {
       <p>
         If the web address is correct or you clicked a link or button and ended
         up on this page,{' '}
-        <Link to="/contact-us">
-          contact our Explore education statistics team
-        </Link>{' '}
-        if you need any help or support.
+        <Link to="/contact-us">contact our {nameMidSentence} team</Link> if you
+        need any help or support.
       </p>
     </Page>
   );

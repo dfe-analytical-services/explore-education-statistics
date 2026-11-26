@@ -1,4 +1,5 @@
-import { render, screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Filters from '@frontend/modules/search-data/components/SearchDataFilters';

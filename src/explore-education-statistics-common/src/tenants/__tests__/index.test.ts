@@ -1,4 +1,4 @@
-import { eesTenant } from '@common/tenants/eesTenant';
+import eesTenant from '@common/tenants/eesTenant';
 import { getTenant, isTenantKey } from '@common/tenants/index';
 
 describe('tenants', () => {

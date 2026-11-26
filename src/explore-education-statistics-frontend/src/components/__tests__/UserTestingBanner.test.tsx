@@ -1,7 +1,8 @@
 import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import * as _useCookies from '@frontend/hooks/useCookies';
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 jest.mock('@frontend/hooks/useCookies');

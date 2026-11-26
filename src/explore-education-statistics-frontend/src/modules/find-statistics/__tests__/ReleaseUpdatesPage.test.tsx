@@ -1,6 +1,7 @@
 import { ReleaseUpdate } from '@common/services/releaseUpdatesService';
 import { PaginatedList } from '@common/services/types/pagination';
-import { render, screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
 import ReleaseUpdatesPage from '../ReleaseUpdatesPage';
 import { testReleaseVersionSummary } from './__data__/testReleaseData';

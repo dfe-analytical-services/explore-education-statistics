@@ -1,11 +1,16 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import Page from '@frontend/components/Page';
 import React from 'react';
 import Link from '@frontend/components/Link';
 
 function AcccessibilityStatementPage() {
+  const {
+    service: { nameMidSentence },
+  } = useTenant();
+
   return (
     <Page
-      title="Accessibility statement for Explore education statistics"
+      title={`Accessibility statement for ${nameMidSentence}`}
       breadcrumbLabel="Accessibility statement"
     >
       <div className="govuk-grid-row">

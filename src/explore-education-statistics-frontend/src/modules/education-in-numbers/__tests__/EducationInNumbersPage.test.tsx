@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import EducationInNumbersPage from '@frontend/modules/education-in-numbers/EducationInNumbersPage';
 import {
   EinNavItem,

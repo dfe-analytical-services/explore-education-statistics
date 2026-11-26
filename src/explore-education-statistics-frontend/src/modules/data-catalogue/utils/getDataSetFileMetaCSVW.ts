@@ -1,5 +1,6 @@
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 import { ScriptMetaItem } from '@frontend/components/PageMetaItem';
+import getCurrentTenant from '@frontend/utils/getCurrentTenant';
 import { DataSetFile } from '@frontend/services/dataSetFileService';
 
 interface Props {
@@ -13,6 +14,7 @@ export default function getDataSetFileMetaCSVW({
   dataSetFile,
 }: Props): ScriptMetaItem {
   const { file, release, summary, title, id } = dataSetFile;
+  const { service, organisation } = getCurrentTenant();
 
   const dataSetFileMeta = {
     '@context': ['https://schema.org', { csvw: 'https://www.w3.org/ns/csvw' }],
@@ -23,7 +25,7 @@ export default function getDataSetFileMetaCSVW({
       summary.length < 50
         ? `${
             summary.length ? `${summary} - ` : ''
-          }Explore Education Statistics data set ${title} from ${
+          }${service.nameMidSentence} data set ${title} from ${
             release.publication.title
           }`
         : sanitizeHtml(summary, { allowedTags: [] }),
@@ -34,18 +36,17 @@ export default function getDataSetFileMetaCSVW({
       'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ ',
     includedInDataCatalog: {
       '@type': 'DataCatalog',
-      name: 'Explore education statistics datasets',
-      description:
-        'A http://GOV.UK  Department for Education repository for education statistics',
+      name: `${service.nameStartSentence} datasets`,
+      description: `A http://GOV.UK  ${organisation.name} repository for education statistics`,
       url: 'https://explore-education-statistics.service.gov.uk/data-catalogue ',
     },
     creator: [
       {
         '@type': 'Organization',
-        name: 'Department for Education',
+        name: organisation.name,
         description:
           'The Department for Education is responsible for children’s services and education, including early years, schools, higher and further education policy, apprenticeships and wider skills in England.',
-        url: 'https://www.gov.uk/government/organisations/department-for-education ',
+        url: organisation.url,
         sameAs: 'https://ror.org/0320bge18 ',
       },
       //   {
@@ -57,10 +58,10 @@ export default function getDataSetFileMetaCSVW({
     ],
     publisher: {
       '@type': 'Organization',
-      name: 'Department for Education',
+      name: organisation.name,
       description:
         'The Department for Education is responsible for children’s services and education, including early years, schools, higher and further education policy, apprenticeships and wider skills in England.',
-      url: 'https://www.gov.uk/government/organisations/department-for-education ',
+      url: organisation.url,
       sameAs: 'https://ror.org/0320bge18 ',
     },
     temporalCoverage: `${file.meta.timePeriodRange.from}/${file.meta.timePeriodRange.to}`,
