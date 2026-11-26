@@ -173,5 +173,19 @@ public class ReleaseDocumentRemoverTests
             // Assert
             _azureBlobStorageClientMockBuilder.Assert.AllBlobsWereDeleted(releaseDocumentsContainerName);
         }
+
+        [Fact]
+        public async Task ShouldReturnNamesOfRemovedBlobs()
+        {
+            // Arrange
+            _azureBlobStorageClientMockBuilder.WhereContainerHasBlobs("blob-1", "blob-2");
+            var sut = GetSut();
+
+            // Act
+            var response = await sut.RemoveAllReleaseDocuments();
+
+            // Assert
+            Assert.Equal(["blob-1", "blob-2"], response.RemovedBlobNames);
+        }
     }
 }

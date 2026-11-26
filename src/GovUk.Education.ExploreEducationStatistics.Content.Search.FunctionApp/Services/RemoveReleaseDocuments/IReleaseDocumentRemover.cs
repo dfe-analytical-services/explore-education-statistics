@@ -12,5 +12,8 @@ public interface IReleaseDocumentRemover
         CancellationToken cancellationToken = default
     );
 
-    Task RemoveAllReleaseDocuments(CancellationToken cancellationToken);
+    /// <summary>
+    /// Remove the release documents of every publication.
+    /// </summary>
+    Task<RemoveAllReleaseDocumentsResponse> RemoveAllReleaseDocuments(CancellationToken cancellationToken = default);
 }

@@ -51,11 +51,15 @@ internal class ReleaseDocumentRemover(
         return new RemoveReleaseDocumentResponse(success);
     }
 
-    public async Task RemoveAllReleaseDocuments(CancellationToken cancellationToken = default)
+    public async Task<RemoveAllReleaseDocumentsResponse> RemoveAllReleaseDocuments(
+        CancellationToken cancellationToken = default
+    )
     {
-        await azureBlobStorageClient.DeleteAllBlobsFromContainer(
+        var removedBlobNames = await azureBlobStorageClient.DeleteAllBlobsFromContainer(
             appOptions.Value.ReleaseDocumentsContainerName,
             cancellationToken
         );
+
+        return new RemoveAllReleaseDocumentsResponse(removedBlobNames);
     }
 }
