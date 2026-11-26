@@ -114,10 +114,20 @@ public class AzureBlobStorageClientIntegrationTests
             public async Task DeleteAllBlobsFromContainer()
             {
                 // ARRANGE
+                var uniqueBlobName = Guid.NewGuid().ToString();
                 var sut = GetSut();
+                await sut.UploadBlob(
+                    IntegrationTestContainerName,
+                    uniqueBlobName,
+                    new Blob("This is a test"),
+                    MediaTypeNames.Text.Plain
+                );
 
                 // ACT
-                await sut.DeleteAllBlobsFromContainer(IntegrationTestContainerName);
+                var deletedBlobNames = await sut.DeleteAllBlobsFromContainer(IntegrationTestContainerName);
+
+                // ASSERT
+                Assert.Contains(uniqueBlobName, deletedBlobNames);
             }
 
             [Fact(

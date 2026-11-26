@@ -73,16 +73,26 @@ public class AzureBlobStorageClient(BlobServiceClient blobServiceClient, ILogger
         return await blobContainerClient.ExistsAsync(cancellationToken);
     }
 
-    public async Task DeleteAllBlobsFromContainer(string containerName, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<string>> DeleteAllBlobsFromContainer(
+        string containerName,
+        CancellationToken cancellationToken = default
+    )
     {
         var blobContainerClient = BlobServiceClient.GetBlobContainerClient(containerName);
         var blobNames = await GetBlobNames(blobContainerClient, prefix: null, cancellationToken);
 
-        await Task.WhenAll(
-            blobNames.Select(blobName =>
-                blobContainerClient.DeleteBlobIfExistsAsync(blobName, cancellationToken: cancellationToken)
-            )
+        var results = await Task.WhenAll(
+            blobNames.Select(async blobName =>
+            {
+                var response = await blobContainerClient.DeleteBlobIfExistsAsync(
+                    blobName,
+                    cancellationToken: cancellationToken
+                );
+                return (BlobName: blobName, Deleted: response.Value);
+            })
         );
+
+        return [.. results.Where(result => result.Deleted).Select(result => result.BlobName)];
     }
 
     public async Task<IList<string>> ListBlobsInContainer(
