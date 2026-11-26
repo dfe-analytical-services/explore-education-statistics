@@ -1,3 +1,6 @@
+import { TenantContextProvider } from '@common/contexts/TenantContext';
+import { eesTenant } from '@common/tenants/eesTenant';
+import { Tenant } from '@common/tenants/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   render as baseRender,
@@ -11,19 +14,27 @@ export interface CustomRenderResult extends RenderResult {
   user: UserEvent;
 }
 
-const DefaultWrapper: FC = ({ children }: { children?: ReactNode }) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        gcTime: Infinity,
-        retry: false,
+const createDefaultWrapper = (tenant: Tenant): FC => {
+  const DefaultWrapper: FC = ({ children }: { children?: ReactNode }) => {
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          gcTime: Infinity,
+          retry: false,
+        },
       },
-    },
-  });
+    });
 
-  return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
+    return (
+      <TenantContextProvider tenant={tenant}>
+        <QueryClientProvider client={queryClient}>
+          {children}
+        </QueryClientProvider>
+      </TenantContextProvider>
+    );
+  };
+
+  return DefaultWrapper;
 };
 
 /**
@@ -32,12 +43,14 @@ const DefaultWrapper: FC = ({ children }: { children?: ReactNode }) => {
  */
 export default function render(
   ui: ReactNode,
-  options?: Omit<RenderOptions, 'queries'>,
+  options?: Omit<RenderOptions, 'queries'> & { tenant?: Tenant },
 ): CustomRenderResult {
+  const { tenant = eesTenant, ...restOptions } = options ?? {};
+
   return {
     ...(baseRender(ui, {
-      wrapper: DefaultWrapper,
-      ...options,
+      wrapper: createDefaultWrapper(tenant),
+      ...restOptions,
     }) as RenderResult),
     user: userEvent.setup(),
   };
