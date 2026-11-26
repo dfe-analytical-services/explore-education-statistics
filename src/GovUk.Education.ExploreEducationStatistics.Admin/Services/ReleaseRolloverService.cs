@@ -72,7 +72,7 @@ public class ReleaseRolloverService(
                         publication: publication,
                         releaseCreateRequest: request,
                         publishingOrganisations: publishingOrganisations,
-                        // Only a copy with data is a rollover. A copy without data is an ordinary release.
+                        // Only a copy WITH DATA is a rollover. A copy WITHOUT DATA is an ordinary release.
                         rolloverSourceReleaseId: request.Mode == RolloverMode.WithData
                             ? sourceReleaseVersion.ReleaseId
                             : null
