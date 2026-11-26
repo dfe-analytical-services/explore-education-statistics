@@ -10,6 +10,8 @@ const eesTenant = {
     name: 'Department for Education',
     acronym: 'DfE',
     url: 'https://www.gov.uk/government/organisations/department-for-education',
+    description:
+      'The Department for Education is responsible for children’s services and education, including early years, schools, higher and further education policy, apprenticeships and wider skills in England.',
     publicEnquiries: {
       description:
         'Have a general question about education or the Department for Education?',
@@ -47,7 +49,7 @@ const eesTenant = {
     },
   ],
   userResearchBanner: {
-    title: 'Shape the future of Explore education statistics',
+    title: 'Shape the future of explore education statistics',
     linkText: 'Share your feedback to help us improve this service',
     url: 'https://forms.office.com/e/QVWqCbbxCj',
   },

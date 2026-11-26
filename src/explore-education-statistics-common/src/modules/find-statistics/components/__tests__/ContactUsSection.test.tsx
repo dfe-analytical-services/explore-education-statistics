@@ -1,5 +1,6 @@
 import React from 'react';
 import render from '@common-test/render';
+import testTenant from '@common-test/testTenant';
 import { Matcher, screen } from '@testing-library/react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import testContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';
@@ -113,5 +114,36 @@ describe('ContactUsSection', () => {
     expect(
       screen.getAllByRole('link', { name: 'skills.england@education.gov.uk' }),
     ).toHaveLength(2);
+  });
+
+  test('renders the public enquiries details for a different tenant', () => {
+    render(
+      <ContactUsSection
+        publicationContact={testContact}
+        publicationTitle="Mock Publication Title"
+        publishingOrganisations={[]}
+      />,
+      { tenant: testTenant },
+    );
+
+    expect(
+      screen.getByText('Have a general question about testing?'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Phone: 01234 567890')).toBeInTheDocument();
+  });
+
+  test('hides the press office section for a tenant with no pressOffice', () => {
+    render(
+      <ContactUsSection
+        publicationContact={testContact}
+        publicationTitle="Mock Publication Title"
+        publishingOrganisations={[]}
+      />,
+      { tenant: testTenant },
+    );
+
+    expect(
+      screen.queryByRole('heading', { name: 'Press office' }),
+    ).not.toBeInTheDocument();
   });
 });

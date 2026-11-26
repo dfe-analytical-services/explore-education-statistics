@@ -147,8 +147,7 @@ function CookiesPage({ cookies }: Props) {
 
                       <p>
                         <Link to="/cookies/details">
-                          Find out more about cookies on Explore education
-                          statistics
+                          Find out more about cookies on {nameMidSentence}
                         </Link>
                       </p>
 

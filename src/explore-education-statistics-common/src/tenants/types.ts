@@ -18,6 +18,8 @@ export interface TenantOrganisation {
   /** Optional short acronym, e.g. "DfE". Rendered as "(acronym)" only when supplied. */
   acronym?: string;
   url: string;
+  /** A short description of the organisation's remit, used in dataset metadata (e.g. CSVW/schema.org). */
+  description: string;
   publicEnquiries?: {
     /**
      * The full sentence introducing the contact details below, e.g.

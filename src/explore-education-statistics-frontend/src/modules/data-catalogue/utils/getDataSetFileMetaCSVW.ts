@@ -44,8 +44,7 @@ export default function getDataSetFileMetaCSVW({
       {
         '@type': 'Organization',
         name: organisation.name,
-        description:
-          'The Department for Education is responsible for children’s services and education, including early years, schools, higher and further education policy, apprenticeships and wider skills in England.',
+        description: organisation.description,
         url: organisation.url,
         sameAs: 'https://ror.org/0320bge18 ',
       },
@@ -59,8 +58,7 @@ export default function getDataSetFileMetaCSVW({
     publisher: {
       '@type': 'Organization',
       name: organisation.name,
-      description:
-        'The Department for Education is responsible for children’s services and education, including early years, schools, higher and further education policy, apprenticeships and wider skills in England.',
+      description: organisation.description,
       url: organisation.url,
       sameAs: 'https://ror.org/0320bge18 ',
     },
