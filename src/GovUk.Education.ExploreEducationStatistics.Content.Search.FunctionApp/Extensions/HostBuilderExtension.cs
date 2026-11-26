@@ -67,10 +67,12 @@ public static class HostBuilderExtension
                     .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
                     .Configure<AzureSearchOptions>(context.Configuration.GetSection(AzureSearchOptions.Section))
                     // Services
-                    .AddTransient<IReleaseDocumentCreator, ReleaseDocumentCreator>()
-                    .AddTransient<IReleaseDocumentRemover, ReleaseDocumentRemover>()
+                    // Data set documents
                     .AddTransient<IDataSetDocumentCreator, DataSetDocumentCreator>()
                     .AddTransient<IDataSetDocumentRemover, DataSetDocumentRemover>()
+                    // Release documents
+                    .AddTransient<IReleaseDocumentCreator, ReleaseDocumentCreator>()
+                    .AddTransient<IReleaseDocumentRemover, ReleaseDocumentRemover>()
                     .AddTransient<IFullReleaseDocumentResetter, FullReleaseDocumentResetter>()
                     .AddDocumentCheckers()
                     // Functions
