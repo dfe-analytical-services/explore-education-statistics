@@ -2,7 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
 using Microsoft.Extensions.Logging;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetReleaseDocuments;
 
 public class FullReleaseDocumentResetter(
     IContentApiClient contentApiClient,

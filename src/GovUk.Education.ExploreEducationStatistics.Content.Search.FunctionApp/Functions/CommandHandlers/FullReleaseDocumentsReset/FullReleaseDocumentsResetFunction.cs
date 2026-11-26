@@ -1,12 +1,12 @@
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.RefreshReleaseDocument.Dto;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.Core;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetReleaseDocuments;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 #pragma warning disable IDE0060 // Suppress removing unused parameter `ignored` - must have a valid binding name for Azure function
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReset;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReleaseDocumentsReset;
 
 public class FullReleaseDocumentsResetFunction(
     IFullReleaseDocumentResetter fullReleaseDocumentResetter,

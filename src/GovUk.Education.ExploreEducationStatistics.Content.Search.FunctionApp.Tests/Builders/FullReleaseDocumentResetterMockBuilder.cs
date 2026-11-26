@@ -1,5 +1,5 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetReleaseDocuments;
 using Moq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;

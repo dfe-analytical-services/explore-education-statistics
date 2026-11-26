@@ -2,7 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Func
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReset;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReleaseDocumentsReset;
 
 /// <summary>
 /// The output of a full reset of the release documents. The function returns its HTTP response and queues its

@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReset;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Functions.CommandHandlers.FullReleaseDocumentsReset;
 
 /// <summary>
 /// The body of the response to a full reset of the release documents.

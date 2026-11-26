@@ -1,11 +1,11 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.ResetSearchableDocuments;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Services.ResetReleaseDocuments;
 
 public class FullReleaseDocumentResetterTests
 {
