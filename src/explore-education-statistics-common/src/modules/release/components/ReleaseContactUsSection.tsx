@@ -1,7 +1,4 @@
-import {
-  DfeOpeningHours,
-  DfeTelephoneLine,
-} from '@common/modules/find-statistics/components/ContactUsSection';
+import { useTenant } from '@common/contexts/TenantContext';
 import ReleasePageContentSection from '@common/modules/release/components/ReleasePageContentSection';
 import { Contact } from '@common/services/publicationService';
 import { Organisation } from '@common/services/types/organisation';
@@ -25,6 +22,7 @@ const ReleaseContactUsSection = ({
   publishingOrganisations: Organisation[];
   sectionTitle?: string;
 }) => {
+  const { organisation, pressOffice } = useTenant();
   const isSkillsEngland = !!publishingOrganisations.find(
     org => org.title === 'Skills England',
   );
@@ -89,25 +87,35 @@ const ReleaseContactUsSection = ({
         </>
       ) : (
         <>
-          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Press office
-          </h3>
-          <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
-            If you have a media enquiry:
-          </p>
-          <p>Telephone: 020 7783 8300</p>
-          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Public enquiries
-          </h3>
-          <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
-            If you have a general enquiry about the Department for Education
-            (DfE) or education:
-          </p>
-          <p>{DfeTelephoneLine}</p>
-          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Opening times
-          </h3>
-          <p className="govuk-!-margin-top-0">{DfeOpeningHours}</p>
+          {pressOffice && (
+            <>
+              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                Press office
+              </h3>
+              <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+                If you have a media enquiry:
+              </p>
+              <p>{pressOffice.telephone}</p>
+            </>
+          )}
+          {organisation.publicEnquiries && (
+            <>
+              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                Public enquiries
+              </h3>
+              <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+                {organisation.publicEnquiries.description}
+              </p>
+              <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
+              <p>{organisation.publicEnquiries.telephone}</p>
+              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                Opening times
+              </h3>
+              <p className="govuk-!-margin-top-0">
+                {organisation.publicEnquiries.openingHours}
+              </p>
+            </>
+          )}
         </>
       )}
     </ReleasePageContentSection>

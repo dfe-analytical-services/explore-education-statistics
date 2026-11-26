@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import getPublicEnv from '@frontend/utils/publicEnv';
 import React from 'react';
 import Head from 'next/head';
@@ -13,16 +14,26 @@ export interface PageMetaProps {
   additionalMeta?: PageMetaItemType[];
 }
 
-const defaultPageTitle = 'Explore education statistics - GOV.UK';
-
 const PageMeta = ({
   includeDefaultMetaTitle = true,
   canonicalPathOverride,
-  title = defaultPageTitle,
-  description = 'Find, download and explore official Department for Education (DfE) statistics and data in England.',
+  title,
+  description,
   imgUrl,
   additionalMeta = [],
 }: PageMetaProps) => {
+  const {
+    service: { nameStartSentence },
+    organisation,
+  } = useTenant();
+  const defaultPageTitle = `${nameStartSentence} - GOV.UK`;
+  const pageTitle = title ?? defaultPageTitle;
+  const pageDescription =
+    description ??
+    `Find, download and explore official ${organisation.name}${
+      organisation.acronym ? ` (${organisation.acronym})` : ''
+    } statistics and data in England.`;
+
   // Generate canonical link
   const router = useRouter();
   const { asPath } = router; // Full path including query params
@@ -36,12 +47,12 @@ const PageMeta = ({
     <Head>
       {/* <!-- Primary Meta Tags --> */}
       <title>
-        {title && title !== defaultPageTitle && includeDefaultMetaTitle
-          ? `${title} - ${defaultPageTitle}`
-          : title}
+        {pageTitle && pageTitle !== defaultPageTitle && includeDefaultMetaTitle
+          ? `${pageTitle} - ${defaultPageTitle}`
+          : pageTitle}
       </title>
-      <meta name="title" content={title} />
-      <meta name="description" content={description} />
+      <meta name="title" content={pageTitle} />
+      <meta name="description" content={pageDescription} />
       <meta name="theme-color" content="#0b0c0c" />
       <meta
         name="google-site-verification"
@@ -63,8 +74,8 @@ const PageMeta = ({
       )}
       {/* <!-- Open Graph / Facebook --> */}
       <meta property="og:type" content="website" />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={description} />
+      <meta property="og:title" content={pageTitle} />
+      <meta property="og:description" content={pageDescription} />
       {imgUrl && (
         <meta
           property="og:image"
@@ -74,8 +85,8 @@ const PageMeta = ({
 
       {/* <!-- Twitter --> */}
       <meta property="twitter:card" content="summary_large_image" />
-      <meta property="twitter:title" content={title} />
-      <meta property="twitter:description" content={description} />
+      <meta property="twitter:title" content={pageTitle} />
+      <meta property="twitter:description" content={pageDescription} />
       {imgUrl && (
         <meta
           property="twitter:image"

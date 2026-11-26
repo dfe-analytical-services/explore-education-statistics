@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import InfoIcon from '@common/components/InfoIcon';
@@ -6,6 +7,8 @@ import React from 'react';
 const triggerText = 'What are statistical releases?';
 
 export default function StatisticalReleasesGuidanceModal() {
+  const { organisation } = useTenant();
+
   return (
     <Modal
       noJsFallbackSummary={triggerText}
@@ -43,9 +46,11 @@ export default function StatisticalReleasesGuidanceModal() {
           the most important numbers (e.g., total number of pupils).
         </li>
         <li>
-          <strong>Narrative and Commentary:</strong> Written analysis by
-          Department for Education (DfE) statisticians explaining the "why"
-          behind the numbers and highlighting significant trends.
+          <strong>Narrative and Commentary:</strong> Written analysis by{' '}
+          {organisation.name}
+          {organisation.acronym && ` (${organisation.acronym})`} statisticians
+          explaining the "why" behind the numbers and highlighting significant
+          trends.
         </li>
         <li>
           <strong>Explore Data:</strong> A tool that allows you to "build your

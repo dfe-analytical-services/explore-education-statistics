@@ -1,5 +1,5 @@
 import { TenantContextProvider } from '@common/contexts/TenantContext';
-import { eesTenant } from '@common/tenants/eesTenant';
+import eesTenant from '@common/tenants/eesTenant';
 import { Tenant } from '@common/tenants/types';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {

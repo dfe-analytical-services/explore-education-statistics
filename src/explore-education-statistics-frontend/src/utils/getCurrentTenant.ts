@@ -1,4 +1,4 @@
-import { eesTenant } from '@common/tenants/eesTenant';
+import eesTenant from '@common/tenants/eesTenant';
 import { Tenant } from '@common/tenants/types';
 
 /**

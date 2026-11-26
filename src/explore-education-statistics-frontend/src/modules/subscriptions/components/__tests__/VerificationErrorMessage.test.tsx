@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen } from '@testing-library/react';
 import React from 'react';
 import VerificationErrorMessage from '@frontend/modules/subscriptions/components/VerificationErrorMessage';
 

@@ -3,6 +3,7 @@ build/
 coverage/
 dist/
 node_modules/
+vendor/
 *.min.css
 # Artifacts can leak between jobs on self-hosted runners
 wwwroot/

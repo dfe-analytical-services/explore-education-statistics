@@ -1,19 +1,21 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import FeedbackSection from '@common/components/FeedbackSection';
 import InsetText from '@common/components/InsetText';
-import {
-  DfeOpeningHours,
-  DfeTelephoneLine,
-} from '@common/modules/find-statistics/components/ContactUsSection';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
 
 function ContactPage() {
+  const {
+    service: { nameStartSentence, nameMidSentence },
+    organisation,
+    contactEmail,
+    headOfProfession,
+    freedomOfInformationUrl,
+  } = useTenant();
+
   return (
-    <Page
-      title="Contact Explore education statistics"
-      breadcrumbLabel="Contact"
-    >
+    <Page title={`Contact ${nameStartSentence}`} breadcrumbLabel="Contact">
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <section>
@@ -26,27 +28,23 @@ function ContactPage() {
               sections of the pages found under{' '}
               <Link to="/find-statistics">Find statistics and data</Link>.
             </p>
-            <p>
-              For any further queries, contact the Explore education statistics
-              team:
-            </p>
+            <p>For any further queries, contact the {nameMidSentence} team:</p>
             <InsetText>
-              Email:{' '}
-              <a href="mailto:explore.statistics@education.gov.uk">
-                explore.statistics@education.gov.uk
-              </a>
+              Email: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
             </InsetText>
 
-            <h2 className="govuk-heading-m">
-              Have a general question about education or the Department for
-              Education?
-            </h2>
-            <p>Call the DfE public enquiries line:</p>
-            <InsetText>
-              {DfeTelephoneLine}
-              <br />
-              Opening hours: {DfeOpeningHours}
-            </InsetText>
+            {organisation.publicEnquiries && (
+              <>
+                <h2 className="govuk-heading-m">Have a general enquiry?</h2>
+                <p>{organisation.publicEnquiries.description}</p>
+                <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
+                <InsetText>
+                  {organisation.publicEnquiries.telephone}
+                  <br />
+                  Opening hours: {organisation.publicEnquiries.openingHours}
+                </InsetText>
+              </>
+            )}
           </section>
 
           <section className="govuk-section-break--xl">
@@ -55,34 +53,38 @@ function ContactPage() {
               If you have a question about statistical policies such as about
               the Code of Practice, revisions and confidentiality contact:
             </p>
-            <h3 className="govuk-heading-s">
-              DfE Head of Profession for Statistics
-            </h3>
-            <p>
-              Email:{' '}
-              <a href="mailto:hop.statistics@education.gov.uk">
-                hop.statistics@education.gov.uk
-              </a>
-            </p>
+            {headOfProfession && (
+              <>
+                <h3 className="govuk-heading-s">{headOfProfession.title}</h3>
+                <p>
+                  Email:{' '}
+                  <a href={`mailto:${headOfProfession.email}`}>
+                    {headOfProfession.email}
+                  </a>
+                </p>
+              </>
+            )}
           </section>
 
-          <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-m">
-              Freedom of information (FOI) requests
-            </h2>
-            <p>
-              If you want access to data or statistics which are not available
-              within this service submit a{' '}
-              <a
-                href="https://form.education.gov.uk/en/AchieveForms/?form_uri=sandbox-publish://AF-Process-f1453496-7d8a-463f-9f33-1da2ac47ed76/AF-Stage-1e64d4cc-25fb-499a-a8d7-74e98203ac00/definition.json&redirectlink=%2Fen&cancelRedirectLink=%2Fen"
-                rel="noopener noreferrer nofollow"
-                target="_blank"
-              >
-                freedom of information (FOI) request (opens in new tab)
-              </a>
-              .
-            </p>
-          </section>
+          {freedomOfInformationUrl && (
+            <section className="govuk-section-break--xl">
+              <h2 className="govuk-heading-m">
+                Freedom of information (FOI) requests
+              </h2>
+              <p>
+                If you want access to data or statistics which are not available
+                within this service submit a{' '}
+                <a
+                  href={freedomOfInformationUrl}
+                  rel="noopener noreferrer nofollow"
+                  target="_blank"
+                >
+                  freedom of information (FOI) request (opens in new tab)
+                </a>
+                .
+              </p>
+            </section>
+          )}
 
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Provide us with feedback</h2>

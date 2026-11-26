@@ -1,6 +1,7 @@
 import testPermalinkSnapshot from '@frontend/modules/permalink/__data__/testPermalinkData';
 import PermalinkPage from '@frontend/modules/permalink/PermalinkPage';
-import { render, screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
 
 describe('PermalinkPage', () => {

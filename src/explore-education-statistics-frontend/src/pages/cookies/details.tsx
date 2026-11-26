@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import getPublicEnv from '@frontend/utils/publicEnv';
 import Page from '@frontend/components/Page';
 import React from 'react';
@@ -6,6 +7,9 @@ import Link from '@frontend/components/Link';
 import { NextPage } from 'next';
 
 const CookiesPage: NextPage = () => {
+  const {
+    service: { nameStartSentence, nameMidSentence },
+  } = useTenant();
   const trackingId = getPublicEnv('GA_TRACKING_ID').replace('G-', '');
   return (
     <Page
@@ -13,9 +17,8 @@ const CookiesPage: NextPage = () => {
       breadcrumbs={[{ name: 'Cookies', link: '/cookies' }]}
     >
       <p>
-        The Explore education statistics service puts small files (known as
-        ‘cookies’) onto your computer to collect information about how you
-        browse the site.
+        The {nameMidSentence} service puts small files (known as ‘cookies’) onto
+        your computer to collect information about how you browse the site.
       </p>
       <p>Cookies are used to:</p>
       <ul>
@@ -153,7 +156,7 @@ const CookiesPage: NextPage = () => {
         <h3>Your cookie settings</h3>
         <p>
           We will store your cookie settings as a cookie, so that they remain if
-          you return to GOV.UK: Explore education statistics.
+          you return to GOV.UK: {nameStartSentence}.
         </p>
 
         <table>

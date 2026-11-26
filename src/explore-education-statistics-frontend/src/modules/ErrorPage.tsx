@@ -1,4 +1,5 @@
 import { useApplicationInsights } from '@common/contexts/ApplicationInsightsContext';
+import { useTenant } from '@common/contexts/TenantContext';
 import Link from '@frontend/components/Link';
 import NotFoundPage from '@frontend/modules/NotFoundPage';
 import { AxiosError } from 'axios';
@@ -12,6 +13,9 @@ interface Props {
 }
 
 const ErrorPage = ({ statusCode, error }: Props) => {
+  const {
+    service: { nameMidSentence },
+  } = useTenant();
   const appInsights = useApplicationInsights();
 
   useEffect(() => {
@@ -36,10 +40,7 @@ const ErrorPage = ({ statusCode, error }: Props) => {
           <p>Try again later.</p>
           <p>
             In the meantime, if you need any help or support{' '}
-            <Link to="/contact-us">
-              contact our Explore education statistics team
-            </Link>
-            .
+            <Link to="/contact-us">contact our {nameMidSentence} team</Link>.
           </p>
         </Page>
       );

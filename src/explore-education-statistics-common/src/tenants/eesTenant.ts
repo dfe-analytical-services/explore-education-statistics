@@ -1,15 +1,19 @@
 import { Tenant } from '@common/tenants/types';
 
-// eslint-disable-next-line import/prefer-default-export -- named export matches other tenant files (e.g. egsTenant.ts) and the `index.ts` barrel
-export const eesTenant = {
+const eesTenant = {
   key: 'ees',
-  serviceName: 'Explore education statistics',
+  service: {
+    nameStartSentence: 'Explore education statistics',
+    nameMidSentence: 'explore education statistics',
+  },
   organisation: {
     name: 'Department for Education',
+    acronym: 'DfE',
     url: 'https://www.gov.uk/government/organisations/department-for-education',
     publicEnquiries: {
       description:
-        'If you have a general enquiry about the Department for Education (DfE) or education:',
+        'Have a general question about education or the Department for Education?',
+      telephoneCallToAction: 'Call the DfE public enquiries line:',
       telephone: 'Phone: 0370 000 2288',
       openingHours:
         'Monday to Friday from 9.30am to 5.30pm (closed on bank holidays)',
@@ -48,7 +52,6 @@ export const eesTenant = {
     url: 'https://forms.office.com/e/QVWqCbbxCj',
   },
   pressOffice: {
-    description: 'If you have a media enquiry:',
     telephone: 'Telephone: 020 7783 8300',
   },
   headOfProfession: {
@@ -60,3 +63,5 @@ export const eesTenant = {
   officialStatisticsStandardsUrl:
     'https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education',
 } as const satisfies Tenant;
+
+export default eesTenant;

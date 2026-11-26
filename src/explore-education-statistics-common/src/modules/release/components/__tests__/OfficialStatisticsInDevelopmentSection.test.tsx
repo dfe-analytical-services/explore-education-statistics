@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen } from '@testing-library/react';
 import OfficialStatisticsInDevelopmentSection from '@common/modules/release/components/OfficialStatisticsInDevelopmentSection';
 import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 import { Organisation } from '@common/services/types/organisation';

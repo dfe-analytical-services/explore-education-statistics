@@ -1,5 +1,6 @@
 import MethodologyPage from '@frontend/pages/methodology/[methodology]';
-import { render, screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { testMethodology } from '@frontend/modules/methodologies/__tests__/__data__/testMethodologyData';

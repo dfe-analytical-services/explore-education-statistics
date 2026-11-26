@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen } from '@testing-library/react';
 import MethodologyHelpAndSupportSection from '@common/modules/methodology/components/MethodologyHelpAndSupportSection';
 import { PublicationSummaryPreview } from '@common/services/publicationService';
 import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';

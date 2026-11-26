@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import { ReleaseTypeSectionProps } from '@common/modules/release/components/ReleaseTypeSection';
 import React from 'react';
 
@@ -5,6 +6,7 @@ export default function OfficialStatisticsInDevelopmentSection({
   publishingOrganisations,
   showHeading = true,
 }: ReleaseTypeSectionProps) {
+  const { officialStatisticsStandardsUrl } = useTenant();
   const isSkillsEngland = !!publishingOrganisations.find(
     org => org.title === 'Skills England',
   );
@@ -58,19 +60,21 @@ export default function OfficialStatisticsInDevelopmentSection({
           </a>
         </p>
       ) : (
-        <p>
-          Find out more about the standards we follow to produce these
-          statistics through our{' '}
-          <a
-            href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
-            rel="noopener noreferrer nofollow"
-            target="_blank"
-          >
-            Standards for official statistics published by DfE guidance (opens
-            in new tab)
-          </a>
-          .
-        </p>
+        officialStatisticsStandardsUrl && (
+          <p>
+            Find out more about the standards we follow to produce these
+            statistics through our{' '}
+            <a
+              href={officialStatisticsStandardsUrl}
+              rel="noopener noreferrer nofollow"
+              target="_blank"
+            >
+              Standards for official statistics published by DfE guidance (opens
+              in new tab)
+            </a>
+            .
+          </p>
+        )
       )}
     </>
   );
