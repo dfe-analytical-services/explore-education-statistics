@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@azure/identity": "^4.13.1",
-    "@azure/search-documents": "^12.2.0",
+    "@azure/search-documents": "^13.1.0",
     "@hello-pangea/dnd": "^18.0.1",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@next/bundle-analyzer": "16.4.6",
