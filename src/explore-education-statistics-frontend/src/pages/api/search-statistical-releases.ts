@@ -64,8 +64,8 @@ export default withMethods({
           configurationName: 'semantic-configuration-1',
         },
         scoringProfile: 'scoring-profile-1',
-        skip: page > 1 ? (page - 1) * 10 : 0,
-        top: 10,
+        skip: page > 1 ? (page - 1) * pageSize : 0,
+        top: pageSize,
       };
 
       // Get all search results

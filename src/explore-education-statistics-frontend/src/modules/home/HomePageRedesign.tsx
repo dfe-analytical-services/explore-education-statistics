@@ -80,6 +80,8 @@ const HomePageRedesign = ({ latestReleases }: Props) => {
             ]}
           />
 
+          <hr />
+
           <section className="govuk-!-padding-bottom-9">
             <h2 className="govuk-!-margin-top-9" id="latest-releases">
               Latest releases
@@ -98,8 +100,9 @@ const HomePageRedesign = ({ latestReleases }: Props) => {
                 ))}
               </ol>
             )}
+            {/* TODO: remove ?prototype=true when making prototype live */}
             <Link
-              to="/search-releases"
+              to="/search-releases?prototype=true"
               onClick={() => logLinkClick('Find statistics')}
             >
               Explore all of our statistical releases
@@ -190,7 +193,11 @@ const HomePageRedesign = ({ latestReleases }: Props) => {
                 If you have any specific statistical or subject-related queries,
                 contact the team or named statistician listed in the 'Contact
                 us' sections of the pages found under{' '}
-                <Link to="/search-releases">Find statistics and data</Link>.
+                {/* TODO: remove ?prototype=true when making prototype live */}
+                <Link to="/search-releases?prototype=true">
+                  Find statistics and data
+                </Link>
+                .
               </p>
               <p>
                 For any further queries, contact the Explore education
@@ -314,10 +321,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
         ],
         sortBy: 'newest',
       }),
+      pageSize: 3,
+
       latestReleases: true,
     });
 
-    return { props: { latestReleases: results.slice(0, 3) } };
+    return { props: { latestReleases: results } };
   } catch (error) {
     logger.error(error);
     return { props: { latestReleases: null } };
