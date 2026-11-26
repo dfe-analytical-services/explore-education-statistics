@@ -22,7 +22,7 @@ public class FullResetFunction(IFullReleaseDocumentResetter fullReleaseDocumentR
         var response = await fullReleaseDocumentResetter.PerformReset(cancellationToken);
 
         return response
-            .AllPublications.Select(publication => new RefreshReleaseDocumentMessageDto
+            .Publications.Select(publication => new RefreshReleaseDocumentMessageDto
             {
                 PublicationSlug = publication.PublicationSlug,
             })

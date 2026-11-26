@@ -1,5 +1,6 @@
 ﻿using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Domain;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Exceptions;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Tests.Builders;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -25,13 +26,16 @@ public class FullReleaseDocumentResetterTests
     public async Task WhenPerformReset_ThenAllReleaseDocumentsAreRemoved()
     {
         // Arrange
+        _releaseDocumentRemover.WhereRemoveAllResponseIs(new RemoveAllReleaseDocumentsResponse(["blob-1", "blob-2"]));
+
         var sut = GetSut();
 
         // Act
-        await sut.PerformReset();
+        var response = await sut.PerformReset();
 
         // Assert
         _releaseDocumentRemover.Assert.AllReleaseDocumentsRemoved();
+        Assert.Equal(2, response.RemovedBlobCount);
     }
 
     [Theory]
@@ -60,7 +64,7 @@ public class FullReleaseDocumentResetterTests
 
         // Assert
         Assert.NotNull(response);
-        var actual = response.AllPublications;
+        var actual = response.Publications;
         Assert.Equal(publications, actual);
     }
 
