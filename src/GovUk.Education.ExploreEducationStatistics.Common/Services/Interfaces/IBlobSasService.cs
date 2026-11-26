@@ -29,4 +29,15 @@ public interface IBlobSasService
         BlobServiceClient blobServiceClient,
         BlobDownloadToken token
     );
+
+    /// <summary>
+    /// Generate a short-lived, read-only SAS URI for a single blob, with which it can be read without any other
+    /// credentials, e.g. by another storage account as the source of a server-side copy.
+    /// </summary>
+    Task<Uri> CreateBlobReadSasUri(
+        BlobServiceClient blobServiceClient,
+        BlobClient blobClient,
+        TimeSpan expiryDuration,
+        CancellationToken cancellationToken = default
+    );
 }

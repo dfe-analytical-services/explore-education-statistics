@@ -35,6 +35,12 @@ param semanticRankerAvailability string
 @description('A list of IP network rules to allow access to the Search storage account from specific public internet IP address ranges.')
 param storageIpRules IpRange[]
 
+@description('Whether to store the Search storage account\'s connection string in Key Vault, for the Search Docs Function App to read.')
+param storeStorageAccountConnectionString bool = true
+
+@description('Whether the Search storage account accepts its account keys.')
+param storageSharedKeyAccessEnabled bool = true
+
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
@@ -83,10 +89,13 @@ module searchStorageAccountModule '../../common/components/storage/storage-accou
   name: 'searchStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.search.storageAccount
-    connectionStringSecret: {
-      keyVaultName: keyVault.name
-      secretName: resourceNames.keyVault.secrets.searchStorageAccountConnectionString
-    }
+    sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
+    connectionStringSecret: storeStorageAccountConnectionString
+      ? {
+          keyVaultName: keyVault.name
+          secretName: resourceNames.keyVault.secrets.searchStorageAccountConnectionString
+        }
+      : null
     publicNetworkAccessEnabled: true
     firewallRules: storageIpRules
     sku: storageAccountSku
@@ -122,7 +131,7 @@ module searchServiceBlobRoleAssignmentModule '../../common/components/storageAcc
 
 output searchServiceEndpoint string = searchServiceModule.outputs.searchServiceEndpoint
 output searchServiceName string = searchServiceModule.outputs.searchServiceName
-output searchStorageAccountConnectionStringSecretName string = searchStorageAccountModule.outputs.connectionStringSecretName!
+output searchStorageAccountConnectionStringSecretName string? = searchStorageAccountModule.outputs.?connectionStringSecretName
 output searchStorageAccountManagedIdentityConnectionString string = 'ResourceId=${searchStorageAccountModule.outputs.storageAccountId};'
 output searchStorageAccountName string = searchStorageAccountModule.outputs.storageAccountName
 output searchStorageDocumentContainers object = searchStorageDocumentContainers

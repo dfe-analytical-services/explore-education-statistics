@@ -1,0 +1,3 @@
+namespace GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveDataSetDocuments;
+
+public record RemoveDataSetDocumentsResponse(IReadOnlyList<string> RemovedBlobNames);

@@ -32,7 +32,11 @@ const ReleaseHeadlinesRedesign = ({
   const summaryTab = (
     <>
       {hasExportableContent && (
-        <KeyStatsExportMenu containerRef={containerRef} />
+        <KeyStatsExportMenu
+          containerRef={containerRef}
+          publicationTitle={release.publication.title}
+          releaseTitle={release.title}
+        />
       )}
       <div ref={containerRef}>
         <KeyStatContainer>

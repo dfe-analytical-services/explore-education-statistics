@@ -1,6 +1,8 @@
 @export()
 @sealed()
 type SearchStorageQueueNames = {
+  @description('Queue name for when data set documents are created, updated or removed.')
+  dataSetDocumentsChanged: string
   @description('Queue name for when a publication is archived.')
   publicationArchived: string
   @description('Queue name for when a publication is changed.')
@@ -11,6 +13,10 @@ type SearchStorageQueueNames = {
   publicationLatestPublishedReleaseReordered: string
   @description('Queue name for when an archived publication is restored.')
   publicationRestored: string
+  @description('Queue name for when the data set documents of a publication require a refresh.')
+  refreshPublicationDataSetDocuments: string
+  @description('Queue name for when the data set documents of a release require a refresh.')
+  refreshReleaseDataSetDocuments: string
   @description('Queue name for when a release document requires a refresh.')
   refreshReleaseDocument: string
   @description('Queue name for when a release document is created.')
@@ -19,6 +25,8 @@ type SearchStorageQueueNames = {
   releaseSlugChanged: string
   @description('Queue name for when a release version is published.')
   releaseVersionPublished: string
+  @description('Queue name for removing the data set documents of a publication, a release or a single data file.')
+  removeDataSetDocuments: string
   @description('Queue name for removing release documents associated with a publication.')
   removePublicationReleaseDocuments: string
   @description('Queue name for removing a single release document.')

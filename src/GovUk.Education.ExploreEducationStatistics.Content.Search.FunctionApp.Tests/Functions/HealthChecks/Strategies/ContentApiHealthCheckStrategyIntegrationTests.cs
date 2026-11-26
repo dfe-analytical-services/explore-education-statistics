@@ -17,7 +17,11 @@ public class ContentApiHealthCheckStrategyIntegrationTests(ITestOutputHelper out
         var sut = new ContentApiHealthCheckStrategy(
             Microsoft.Extensions.Options.Options.Create(new ContentApiOptions()),
             new NullLogger<ContentApiHealthCheckStrategy>(),
-            () => new ContentApiClient(new HttpClient { BaseAddress = new Uri(ContentApiUrl) })
+            () =>
+                new ContentApiClient(
+                    new HttpClient { BaseAddress = new Uri(ContentApiUrl) },
+                    new NullLogger<ContentApiClient>()
+                )
         );
 
         // ACT

@@ -457,13 +457,21 @@ describe('ReleaseDataBlocksPage', () => {
     });
 
     test('clicking `Confirm` button hides modal and deletes data block', async () => {
-      dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
+      dataBlockService.listDataBlocks
+        .mockResolvedValueOnce(testDataBlocks)
+        .mockResolvedValue(
+          testDataBlocks.filter(block => block.id !== 'block-1'),
+        );
       dataBlockService.getDeleteBlockPlan.mockResolvedValue(
         testBlock1DeletePlan,
       );
-      featuredTableService.listFeaturedTables.mockResolvedValue(
-        testFeaturedTables,
-      );
+      featuredTableService.listFeaturedTables
+        .mockResolvedValueOnce(testFeaturedTables)
+        .mockResolvedValue(
+          testFeaturedTables.filter(
+            table => table.dataBlockVersionId !== 'block-1',
+          ),
+        );
 
       const { user } = renderPage();
 
@@ -492,6 +500,9 @@ describe('ReleaseDataBlocksPage', () => {
         'release-1',
         'block-1',
       );
+
+      expect(dataBlockService.listDataBlocks).toHaveBeenCalledTimes(2);
+      expect(featuredTableService.listFeaturedTables).toHaveBeenCalledTimes(2);
 
       const featuredTablesTable = within(screen.getByTestId('featuredTables'));
       const featuredTablesRows = featuredTablesTable.getAllByRole('row');

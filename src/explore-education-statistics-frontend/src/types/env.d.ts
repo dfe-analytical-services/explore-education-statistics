@@ -6,5 +6,6 @@ declare namespace NodeJS {
   interface ProcessEnv {
     BUILD_NUMBER: string;
     DEFAULT_CACHE_MAX_AGE_SECONDS: string;
+    DEFAULT_CACHE_STALE_WHILE_REVALIDATE_SECONDS?: string;
   }
 }

@@ -47,10 +47,15 @@ public interface IAzureBlobStorageClient
     Task DeleteAllBlobsFromContainer(string containerName, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Get a list of all blobs in a container
+    /// Get a list of the blobs in a container
     /// </summary>
     /// <param name="containerName">The name of the storage account container</param>
+    /// <param name="prefix">If specified, only blobs whose names begin with this prefix are listed</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>An array of blob names</returns>
-    Task<IList<string>> ListBlobsInContainer(string containerName, CancellationToken cancellationToken = default);
+    Task<IList<string>> ListBlobsInContainer(
+        string containerName,
+        string? prefix = null,
+        CancellationToken cancellationToken = default
+    );
 }

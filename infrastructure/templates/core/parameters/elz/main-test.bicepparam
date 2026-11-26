@@ -11,3 +11,18 @@ param publicStorageAccountSku = 'Standard_ZRS'
 
 // Copy file share backups into the geo-redundant Recovery Services Vault.
 param vaultedFileShareBackups = true
+
+// The release pipeline grants Admin's and the Publisher's user-assigned identities their roles instead.
+param deploySystemAssignedIdentityRoleAssignments = false
+
+// The SQL Servers write auditing and vulnerability assessment output to the logging storage account with their
+// system-assigned identities.
+param sqlServerIdentityBasedAuditStorage = true
+
+// The apps connect to the core and public storage accounts with their managed identities, so their connection strings
+// aren't stored.
+param storeStorageAccountConnectionStrings = false
+
+// Everything connects to the core, public and logging storage accounts with managed identities, so they don't accept
+// account keys.
+param storageSharedKeyAccessEnabled = false

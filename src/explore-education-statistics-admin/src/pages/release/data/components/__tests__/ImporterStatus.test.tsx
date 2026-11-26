@@ -2,8 +2,11 @@ import ImporterStatus from '@admin/pages/release/data/components/ImporterStatus'
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
+import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { act, screen, waitFor, within } from '@testing-library/react';
+import React, { ReactNode } from 'react';
 
 jest.mock('@admin/services/releaseDataFileService');
 
@@ -165,6 +168,127 @@ describe('ImporterStatus', () => {
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.queryByText('100% complete')).not.toBeInTheDocument();
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
+  });
+
+  test('notifies the parent of completion and stops polling', async () => {
+    const completedStatus = {
+      status: 'COMPLETE' as const,
+      percentageComplete: 100,
+      stagePercentageComplete: 100,
+      totalRows: 100,
+    };
+    releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+      completedStatus,
+    );
+    const dataFile = { ...testDataFile, status: 'STAGE_2' as const };
+    const onStatusChange = jest.fn();
+
+    render(
+      <ImporterStatus
+        releaseVersionId="release-1"
+        dataFile={dataFile}
+        onStatusChange={onStatusChange}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(onStatusChange).toHaveBeenCalledWith(dataFile, completedStatus),
+    );
+    expect(onStatusChange).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(15000);
+    });
+
+    expect(
+      releaseDataFileService.getDataFileImportStatus,
+    ).toHaveBeenCalledTimes(1);
+    expect(onStatusChange).toHaveBeenCalledTimes(1);
+  });
+
+  test('does not notify the parent again when it passes a new callback', async () => {
+    const completedStatus = {
+      status: 'COMPLETE' as const,
+      percentageComplete: 100,
+      stagePercentageComplete: 100,
+      totalRows: 100,
+    };
+    releaseDataFileService.getDataFileImportStatus.mockResolvedValue(
+      completedStatus,
+    );
+    const dataFile = { ...testDataFile, status: 'STAGE_2' as const };
+    const onStatusChange = jest.fn();
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    const wrapper = ({ children }: { children?: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+
+    const { rerender } = render(
+      <ImporterStatus
+        releaseVersionId="release-1"
+        dataFile={dataFile}
+        onStatusChange={onStatusChange}
+      />,
+      { wrapper },
+    );
+
+    await waitFor(() => expect(onStatusChange).toHaveBeenCalledTimes(1));
+
+    const nextOnStatusChange = jest.fn();
+    rerender(
+      <ImporterStatus
+        releaseVersionId="release-1"
+        dataFile={dataFile}
+        onStatusChange={nextOnStatusChange}
+      />,
+    );
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(15000);
+    });
+
+    expect(onStatusChange).toHaveBeenCalledTimes(1);
+    expect(nextOnStatusChange).not.toHaveBeenCalled();
+  });
+
+  test('does not notify the parent with stale cached data on mount', async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    queryClient.setQueryData(
+      releaseDataFileQueries.importStatus('release-1', testDataFile.id)
+        .queryKey,
+      {
+        status: 'STAGE_2',
+        percentageComplete: 50,
+        stagePercentageComplete: 50,
+        totalRows: 100,
+      },
+    );
+    const wrapper = ({ children }: { children?: ReactNode }) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+    const onStatusChange = jest.fn();
+
+    render(
+      <ImporterStatus
+        releaseVersionId="release-1"
+        dataFile={testDataFile}
+        onStatusChange={onStatusChange}
+      />,
+      { wrapper },
+    );
+
+    await act(async () => {
+      await jest.advanceTimersByTimeAsync(15000);
+    });
+
+    expect(
+      releaseDataFileService.getDataFileImportStatus,
+    ).not.toHaveBeenCalled();
+    expect(onStatusChange).not.toHaveBeenCalled();
   });
 
   test('renders with error messages from service', async () => {

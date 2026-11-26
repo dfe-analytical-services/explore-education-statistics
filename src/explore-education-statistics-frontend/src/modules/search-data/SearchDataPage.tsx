@@ -1,11 +1,12 @@
-import getPublicEnv from '@frontend/utils/publicEnv';
 import BackToTopLink from '@common/components/BackToTopLink';
 import ButtonText from '@common/components/ButtonText';
+import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import WarningMessage from '@common/components/WarningMessage';
+import useCopySuccess from '@common/hooks/useCopySuccess';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import {
   ReleaseType,
@@ -25,8 +26,10 @@ import { SortOption } from '@frontend/components/SortControls';
 import DataSetFileSummary from '@frontend/modules/data-catalogue/components/DataSetFileSummary';
 import PublicationResultSummary from '@frontend/modules/find-statistics/components/PublicationResultSummary';
 import { PublicationSortOption } from '@frontend/modules/find-statistics/utils/publicationSortOptions';
+import DataSetsGuidanceModal from '@frontend/modules/search-data/components/DataSetsGuidanceModal';
 import SearchDataFilters from '@frontend/modules/search-data/components/SearchDataFilters';
 import SearchDataSearchForm from '@frontend/modules/search-data/components/SearchDataSearchForm';
+import StatisticalReleasesGuidanceModal from '@frontend/modules/search-data/components/StatisticalReleasesGuidanceModal';
 import styles from '@frontend/modules/search-data/SearchDataPage.module.scss';
 import { getParamsFromQuery } from '@frontend/modules/search-data/utils/createDataSetListRequest';
 import {
@@ -40,15 +43,21 @@ import publicationQueries from '@frontend/queries/publicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
 import { DataSetType } from '@frontend/services/dataSetFileService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
+import getPublicEnv from '@frontend/utils/publicEnv';
+import {
+  dehydrate,
+  keepPreviousData,
+  noop,
+  QueryClient,
+  useQuery,
+} from '@tanstack/react-query';
 import classNames from 'classnames';
 import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
+import { ParsedUrlQuery } from 'querystring';
 import { useState } from 'react';
-import DataSetsGuidanceModal from './components/DataSetsGuidanceModal';
-import StatisticalReleasesGuidanceModal from './components/StatisticalReleasesGuidanceModal';
 
 const defaultPageTitle = 'Explore our education statistics';
 
@@ -67,13 +76,37 @@ export interface SearchDataPageQuery {
   themeId?: string | string[];
 }
 
+/**
+ * Both searches run so each tab can show its result count, but only the
+ * active tab's search is paged. The inactive tab's search drops `page` so
+ * paging through one tab doesn't refetch the other, and it matches the
+ * query that tab is opened with (the tab links also drop `page`).
+ */
+function getSearchQueries(
+  query: ParsedUrlQuery,
+  isPublicationsSearch: boolean,
+): { publicationsQuery: ParsedUrlQuery; dataSetsQuery: ParsedUrlQuery } {
+  const unpagedQuery = omit(query, 'page');
+
+  return isPublicationsSearch
+    ? { publicationsQuery: query, dataSetsQuery: unpagedQuery }
+    : { publicationsQuery: unpagedQuery, dataSetsQuery: query };
+}
+
 const SearchDataPage: NextPage = () => {
   const router = useRouter();
   const { isMedia: isMobileMedia } = useMobileMedia();
 
   const [pageTitle, setPageTitle] = useState<string>(defaultPageTitle);
+  const [isLinkCopied, showLinkCopied] = useCopySuccess();
+
   const currentRoute = router.pathname as RoutePath;
   const isPublicationsSearch = currentRoute.includes('search-releases');
+
+  const { publicationsQuery, dataSetsQuery } = getSearchQueries(
+    router.query,
+    isPublicationsSearch,
+  );
 
   const {
     data: dataSetsData,
@@ -81,11 +114,10 @@ const SearchDataPage: NextPage = () => {
     isFetching: isDataSetsFetching,
     isLoading: isDataSetsLoading,
   } = useQuery({
-    ...azureDataSetQueries.list(router.query),
-    keepPreviousData: true,
+    ...azureDataSetQueries.list(dataSetsQuery),
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     staleTime: 60000,
-    enabled: !isPublicationsSearch,
   });
 
   const {
@@ -94,11 +126,10 @@ const SearchDataPage: NextPage = () => {
     isFetching: isPublicationsFetching,
     isLoading: isPublicationsLoading,
   } = useQuery({
-    ...azurePublicationQueries.listStatisticalReleases(router.query),
-    keepPreviousData: true,
+    ...azurePublicationQueries.listStatisticalReleases(publicationsQuery),
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     staleTime: 60000,
-    enabled: isPublicationsSearch,
   });
 
   const { data: organisations = [] } = useQuery({
@@ -124,10 +155,24 @@ const SearchDataPage: NextPage = () => {
     publicationsData ?? {};
 
   const {
-    page,
-    totalPages,
-    totalResults = 0,
-  } = (isPublicationsSearch ? publicationsPaging : dataSetsPaging) ?? {};
+    page: pagePublications,
+    totalPages: totalPagesPublications,
+    totalResults: totalResultsPublications = 0,
+  } = publicationsPaging ?? {};
+
+  const {
+    page: pageDataSets,
+    totalPages: totalPagesDataSets,
+    totalResults: totalResultsDataSets = 0,
+  } = dataSetsPaging ?? {};
+
+  const page = isPublicationsSearch ? pagePublications : pageDataSets;
+  const totalPages = isPublicationsSearch
+    ? totalPagesPublications
+    : totalPagesDataSets;
+  const totalResults = isPublicationsSearch
+    ? totalResultsPublications
+    : totalResultsDataSets;
 
   const {
     dataSetType,
@@ -258,6 +303,11 @@ const SearchDataPage: NextPage = () => {
         shallow: true,
       },
     );
+  };
+
+  const handleCopyLink = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    showLinkCopied();
   };
 
   const handleSortBy = async (nextSortBy: PublicationSortOption) => {
@@ -461,9 +511,7 @@ const SearchDataPage: NextPage = () => {
                 <Link
                   to={{
                     pathname: '/search-releases',
-                    query: {
-                      ...router.query,
-                    },
+                    query: omit(router.query, 'page'),
                   }}
                   shallow
                   unvisited
@@ -471,20 +519,21 @@ const SearchDataPage: NextPage = () => {
                   className={styles.navItemLink}
                 >
                   Statistical releases
+                  {publicationsPaging && ` (${totalResultsPublications})`}
                 </Link>
               </li>
               <li>
                 <Link
                   to={{
                     pathname: '/search-data',
-                    query: { ...router.query },
+                    query: omit(router.query, 'page'),
                   }}
                   shallow
                   unvisited
                   aria-current={!isPublicationsSearch ? 'page' : undefined}
                   className={styles.navItemLink}
                 >
-                  Data
+                  Data sets{dataSetsPaging && ` (${totalResultsDataSets})`}
                 </Link>
               </li>
             </ul>
@@ -674,6 +723,17 @@ const SearchDataPage: NextPage = () => {
                 </ButtonText>
               </div>
             )}
+
+            <InsetText className="govuk-!-width-full govuk-!-margin-top-3 govuk-!-margin-bottom-1">
+              Bookmark this page or{' '}
+              <ButtonText onClick={handleCopyLink}>
+                copy the link to the current page
+              </ButtonText>{' '}
+              to come back to these results.
+              <ScreenReaderMessage
+                message={isLinkCopied ? 'Link copied to the clipboard' : ''}
+              />
+            </InsetText>
           </div>
 
           <LoadingSpinner
@@ -779,22 +839,29 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   const isPublicationsSearch = resolvedUrl.startsWith('/search-releases');
 
+  const { publicationsQuery, dataSetsQuery } = getSearchQueries(
+    query,
+    isPublicationsSearch,
+  );
+
   const queryClient = new QueryClient();
 
   await Promise.all([
+    // Fetch both searches so the result count can be shown on each tab.
+    queryClient
+      .query(azurePublicationQueries.listStatisticalReleases(publicationsQuery))
+      .catch(noop),
+    queryClient.query(azureDataSetQueries.list(dataSetsQuery)).catch(noop),
     isPublicationsSearch
-      ? queryClient.prefetchQuery(
-          azurePublicationQueries.listStatisticalReleases(query),
-        )
-      : queryClient.prefetchQuery(azureDataSetQueries.list(query)),
-    isPublicationsSearch
-      ? queryClient.prefetchQuery(themeQueries.list())
-      : queryClient.prefetchQuery(
-          publicationQueries.getPublicationTree({
-            filter: 'DataCatalogue',
-          }),
-        ),
-    queryClient.prefetchQuery(organisationQueries.list()),
+      ? queryClient.query(themeQueries.list()).catch(noop)
+      : queryClient
+          .query(
+            publicationQueries.getPublicationTree({
+              filter: 'DataCatalogue',
+            }),
+          )
+          .catch(noop),
+    queryClient.query(organisationQueries.list()).catch(noop),
   ]);
 
   return {

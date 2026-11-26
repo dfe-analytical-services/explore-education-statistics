@@ -86,6 +86,23 @@ param deployRecoveryServicesVault bool = false
 @description('Whether or not to deploy the Container Registry.')
 param deployContainerRegistry bool = false
 
+// TODO EES-7502 - remove once every environment has moved to the ELZ, along with the core grants it controls and the
+// lines that turn it off in "parameters/elz".
+@description('Whether to grant the Admin App Service\'s and Publisher Function App\'s system-assigned identities permission to send Event Grid events, and the Publisher\'s permission to purge the Front Door cache. In ELZ, the release pipeline grants these roles to their user-assigned identities instead, so the param files in "parameters/elz" turn this off.')
+param deploySystemAssignedIdentityRoleAssignments bool = true
+
+// TODO EES-7502 - remove, leaving identity-based audit storage on, once every environment has moved to the ELZ.
+@description('Whether the SQL Servers write audit logs and vulnerability assessment scans to the logging storage account with their system-assigned identities, rather than with the account\'s access key. Only the param files in "parameters/elz" turn this on, for the new environments.')
+param sqlServerIdentityBasedAuditStorage bool = false
+
+// TODO EES-7502 - remove, leaving the connection strings unstored, once every environment has moved to the ELZ.
+@description('Whether to store the core and public storage accounts\' connection strings in Key Vault. The apps read them in legacy. In ELZ they connect with their managed identities instead, so the param files in "parameters/elz" turn this off.')
+param storeStorageAccountConnectionStrings bool = true
+
+// TODO EES-7502 - remove, leaving shared key access off, once every environment has moved to the ELZ.
+@description('Whether the core, public and logging storage accounts accept their account keys. In ELZ everything connects to them with managed identities, so the param files in "parameters/elz" turn this off.')
+param storageSharedKeyAccessEnabled bool = true
+
 @description('Do Azure Monitor alerts need creating or updating?')
 param deployAlerts bool = false
 
@@ -227,6 +244,7 @@ module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = 
         eventGridCustomTopicPrivateEndpoints: vNetModule.outputs.eventGridCustomTopicPrivateEndpointsSubnetName
       }
     }
+    deploySystemAssignedIdentityRoleAssignments: deploySystemAssignedIdentityRoleAssignments
     deployAlerts: deployAlerts
     tagValues: tagValues
   }
@@ -245,6 +263,7 @@ module frontDoorModule 'application/frontDoor/frontDoor.bicep' = if (deployAzure
     publicSiteUrl: publicSiteUrl
     contentApiUrl: contentApiUrl
     publisherFunctionName: resourceNames.publisher.functionApp
+    deploySystemAssignedIdentityRoleAssignments: deploySystemAssignedIdentityRoleAssignments
     certificateType: certificateType
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
     averagePublicSiteResponseTimeAlertThresholdMillis: averagePublicSiteResponseTimeAlertThresholdMillis
@@ -294,6 +313,7 @@ module loggingStorageAccountModule 'application/logging-storage-account/logging-
   name: 'loggingStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.logging
+    sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     alertsGroupName: alertsModule.outputs.actionGroupName
     blobDeleteRetentionDays: blobDeleteRetentionDays
     deployAlerts: deployAlerts
@@ -305,8 +325,11 @@ module coreStorageAccountModule 'application/core-storage-account/core-storage-a
   name: 'coreStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.core
+    sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     sku: coreStorageAccountSku
-    connectionStringSecretName: resourceNames.keyVault.secrets.coreStorageAccountConnectionString
+    connectionStringSecretName: storeStorageAccountConnectionStrings
+      ? resourceNames.keyVault.secrets.coreStorageAccountConnectionString
+      : null
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName
@@ -323,8 +346,11 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
   name: 'publicStorageAccountModuleDeploy'
   params: {
     storageAccountName: resourceNames.storageAccounts.public
+    sharedKeyAccessEnabled: storageSharedKeyAccessEnabled
     sku: publicStorageAccountSku
-    connectionStringSecretName: resourceNames.keyVault.secrets.publicStorageAccountConnectionString
+    connectionStringSecretName: storeStorageAccountConnectionStrings
+      ? resourceNames.keyVault.secrets.publicStorageAccountConnectionString
+      : null
     subnets: vNetModule.outputs.subnets
     keyVaultName: keyVaultModule.outputs.keyVaultName
     backupVaultName: backupsModule.outputs.backupVaultName
@@ -352,6 +378,7 @@ module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
     loggingStorageAccountName: loggingStorageAccountModule.outputs.storageAccountName
+    identityBasedAuditStorage: sqlServerIdentityBasedAuditStorage
     contentDbConfig: contentDbConfig
     statisticsDbConfig: statisticsDbConfig
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId
@@ -376,6 +403,7 @@ module publicSqlServerModule 'application/public-sql-server/sql-server.bicep' = 
     teamEmailAddresses: teamEmailAddresses
     databaseAuditBlobRetentionDays: databaseAuditBlobRetentionDays
     loggingStorageAccountName: loggingStorageAccountModule.outputs.storageAccountName
+    identityBasedAuditStorage: sqlServerIdentityBasedAuditStorage
     statisticsDbConfig: statisticsDbConfig
     statisticsPrimaryDatabaseId: coreSqlServerModule.outputs.statisticsDatabaseId
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceModule.outputs.logAnalyticsWorkspaceId

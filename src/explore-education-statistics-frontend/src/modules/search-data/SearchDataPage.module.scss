@@ -24,12 +24,12 @@
 
 .navItemLink {
   border-bottom: 5px solid transparent;
-  padding: govuk-spacing(3) govuk-spacing(1);
+  padding: govuk-spacing(2) govuk-spacing(1);
   text-decoration: none;
   display: inline-flex;
 
   &[aria-current='page']:not(:focus) {
-    color: govuk-colour('black');
+    font-weight: $govuk-font-weight-bold;
     border-color: govuk-colour('blue');
   }
 }

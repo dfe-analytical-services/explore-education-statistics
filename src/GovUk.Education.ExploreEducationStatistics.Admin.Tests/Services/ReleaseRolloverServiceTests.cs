@@ -13,13 +13,19 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 
@@ -341,6 +347,1557 @@ public abstract class ReleaseRolloverServiceTests
         }
 
         [Fact]
+        public async Task GivenWithDataMode_CopiesDataBlocksFromTemplateReleaseAsNewDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var newDataBlockVersion = await context
+                    .DataBlockVersions.Include(dataBlockVersion => dataBlockVersion.DataBlock)
+                    .SingleAsync(dataBlockVersion => dataBlockVersion.ReleaseVersionId == newReleaseVersionId);
+
+                // A brand-new DataBlock and DataBlockVersion in their own right, not sharing ids with the template.
+                Assert.NotEqual(templateDataBlockVersion.Id, newDataBlockVersion.Id);
+                Assert.NotEqual(templateDataBlockVersion.DataBlockId, newDataBlockVersion.DataBlockId);
+
+                Assert.Equal(0, newDataBlockVersion.Version);
+                Assert.Equal(templateDataBlockVersion.Heading, newDataBlockVersion.Heading);
+                Assert.Equal(templateDataBlockVersion.Name, newDataBlockVersion.Name);
+                Assert.Equal(templateDataBlockVersion.Source, newDataBlockVersion.Source);
+                Assert.Equal(templateDataBlockVersion.Query.SubjectId, newDataBlockVersion.Query.SubjectId);
+                Assert.Null(newDataBlockVersion.Updated);
+                Assert.Null(newDataBlockVersion.Published);
+
+                // The new DataBlock's LatestDraftVersion points at the new DataBlockVersion, not the template's.
+                Assert.Equal(newDataBlockVersion.Id, newDataBlockVersion.DataBlock.LatestDraftVersionId);
+            }
+        }
+
+        [Fact]
+        public async Task GivenSourceReleaseHasPublishedVersionAndDraftAmendment_CopiesOnlyThePublishedVersionsDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion publishedSourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithVersion(0)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            // An unpublished amendment of the source release - must NOT be the one copied from.
+            ReleaseVersion draftAmendmentReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithVersion(1)
+                .WithPreviousVersion(publishedSourceReleaseVersion)
+                .WithApprovalStatus(ReleaseApprovalStatus.Draft)
+                .Generate();
+
+            DataBlockVersion publishedDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(publishedSourceReleaseVersion)
+                .WithName("Published version's data block")
+                .Generate();
+
+            DataBlock publishedDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(publishedDataBlockVersion)
+                .Generate();
+
+            DataBlockVersion draftAmendmentDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(draftAmendmentReleaseVersion)
+                .WithName("Draft amendment's data block")
+                .Generate();
+
+            DataBlock draftAmendmentDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(draftAmendmentDataBlockVersion)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.AddRange(publishedSourceReleaseVersion, draftAmendmentReleaseVersion);
+                context.DataBlocks.AddRange(publishedDataBlock, draftAmendmentDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // SingleAsync also proves the draft amendment's data block was NOT also copied.
+                var newDataBlockVersion = await context.DataBlockVersions.SingleAsync(dataBlockVersion =>
+                    dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                );
+
+                Assert.Equal(publishedDataBlockVersion.Name, newDataBlockVersion.Name);
+            }
+        }
+
+        [Fact]
+        public async Task GivenSourceReleaseHasTwoPublishedVersions_CopiesDataBlocksFromTheLatestVersion()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion originalPublishedReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithVersion(0)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-60))
+                .Generate();
+
+            ReleaseVersion latestPublishedReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithVersion(1)
+                .WithPreviousVersion(originalPublishedReleaseVersion)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-10))
+                .Generate();
+
+            DataBlockVersion originalDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(originalPublishedReleaseVersion)
+                .WithName("Original published version's data block")
+                .Generate();
+
+            DataBlock originalDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(originalDataBlockVersion)
+                .Generate();
+
+            DataBlockVersion latestDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(latestPublishedReleaseVersion)
+                .WithName("Latest published version's data block")
+                .Generate();
+
+            DataBlock latestDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(latestDataBlockVersion)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.AddRange(originalPublishedReleaseVersion, latestPublishedReleaseVersion);
+                context.DataBlocks.AddRange(originalDataBlock, latestDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // SingleAsync also proves the original version's data block was NOT also copied.
+                var newDataBlockVersion = await context.DataBlockVersions.SingleAsync(dataBlockVersion =>
+                    dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                );
+
+                Assert.Equal(latestDataBlockVersion.Name, newDataBlockVersion.Name);
+            }
+        }
+
+        [Fact]
+        public async Task GivenStructureOnlyMode_DoesNotCopyDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.StructureOnly,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                Assert.False(
+                    await context.DataBlockVersions.AnyAsync(dataBlockVersion =>
+                        dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task GivenWithDataMode_CopiesContentBlankingHtmlAndRelinkingDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            HtmlBlock headlinesHtmlBlock = _dataFixture
+                .DefaultHtmlBlock()
+                .WithBody("Last year's headline")
+                .WithOrder(1)
+                .Generate();
+            headlinesHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            ContentSection headlinesSection = _dataFixture
+                .DefaultContentSection(ContentSectionType.Headlines)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithContentBlocks([headlinesHtmlBlock])
+                .Generate();
+
+            HtmlBlock genericHtmlBlock = _dataFixture.DefaultHtmlBlock().WithBody("Some text").WithOrder(1).Generate();
+            genericHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            DataBlockVersionLink genericDataBlockVersionLink = _dataFixture
+                .DefaultDataVersionBlockVersionLink()
+                .WithDataBlockVersion(templateDataBlockVersion)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithOrder(2)
+                .Generate();
+
+            EmbedBlockLink genericEmbedBlockLink = _dataFixture.DefaultEmbedBlockLink().WithOrder(3).Generate();
+            genericEmbedBlockLink.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            ContentSection genericSection = _dataFixture
+                .DefaultContentSection(ContentSectionType.Generic)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithHeading("Custom section")
+                .WithOrder(5)
+                .WithContentBlocks([genericHtmlBlock, genericDataBlockVersionLink, genericEmbedBlockLink])
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                context.ContentSections.AddRange(headlinesSection, genericSection);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var newDataBlockVersion = await context.DataBlockVersions.SingleAsync(dataBlockVersion =>
+                    dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                );
+
+                var newHeadlinesSection = await context
+                    .ContentSections.Include(section => section.Content)
+                    .SingleAsync(section =>
+                        section.ReleaseVersionId == newReleaseVersionId && section.Type == ContentSectionType.Headlines
+                    );
+
+                var newHeadlinesHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(newHeadlinesSection.Content));
+                Assert.Equal(string.Empty, newHeadlinesHtmlBlock.Body);
+                Assert.Equal(headlinesHtmlBlock.Order, newHeadlinesHtmlBlock.Order);
+                Assert.NotEqual(headlinesHtmlBlock.Id, newHeadlinesHtmlBlock.Id);
+
+                var newGenericSection = await context
+                    .ContentSections.Include(section => section.Content)
+                    .SingleAsync(section =>
+                        section.ReleaseVersionId == newReleaseVersionId && section.Type == ContentSectionType.Generic
+                    );
+
+                Assert.NotEqual(genericSection.Id, newGenericSection.Id);
+                Assert.Equal(genericSection.Heading, newGenericSection.Heading);
+                Assert.Equal(genericSection.Order, newGenericSection.Order);
+
+                // The EmbedBlockLink is dropped - only the HtmlBlock and the relinked DataBlockVersionLink remain.
+                Assert.Equal(2, newGenericSection.Content.Count);
+
+                var newGenericHtmlBlock = Assert.IsType<HtmlBlock>(
+                    Assert.Single(newGenericSection.Content, block => block is HtmlBlock)
+                );
+                Assert.Equal(string.Empty, newGenericHtmlBlock.Body);
+                Assert.Equal(genericHtmlBlock.Order, newGenericHtmlBlock.Order);
+
+                var newDataBlockVersionLink = Assert.IsType<DataBlockVersionLink>(
+                    Assert.Single(newGenericSection.Content, block => block is DataBlockVersionLink)
+                );
+                Assert.Equal(newDataBlockVersion.Id, newDataBlockVersionLink.DataBlockVersionId);
+                Assert.Equal(newDataBlockVersionLink.Id, newDataBlockVersionLink.DataBlockVersionId);
+                Assert.Equal(genericDataBlockVersionLink.Order, newDataBlockVersionLink.Order);
+            }
+        }
+
+        [Fact]
+        public async Task GivenStructureOnlyMode_CopiesContentButDropsDataBlockVersionLinks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            // A standard (non-Generic) section - in StructureOnly mode, unlike WithData, nothing has been saved
+            // yet when this section's own HtmlBlock is copied, so destinationSection.Id is still Guid.Empty at
+            // that point. This proves the new block's ContentSectionId still resolves correctly regardless,
+            // via EF's relationship fixup when it's added to destinationSection.Content.
+            HtmlBlock headlinesHtmlBlock = _dataFixture
+                .DefaultHtmlBlock()
+                .WithBody("Last year's headline")
+                .WithOrder(1)
+                .Generate();
+            headlinesHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            ContentSection headlinesSection = _dataFixture
+                .DefaultContentSection(ContentSectionType.Headlines)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithContentBlocks([headlinesHtmlBlock])
+                .Generate();
+
+            HtmlBlock genericHtmlBlock = _dataFixture.DefaultHtmlBlock().WithBody("Some text").WithOrder(1).Generate();
+            genericHtmlBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            DataBlockVersionLink genericDataBlockVersionLink = _dataFixture
+                .DefaultDataVersionBlockVersionLink()
+                .WithDataBlockVersion(templateDataBlockVersion)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithOrder(2)
+                .Generate();
+
+            ContentSection genericSection = _dataFixture
+                .DefaultContentSection(ContentSectionType.Generic)
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithHeading("Custom section")
+                .WithOrder(5)
+                .WithContentBlocks([genericHtmlBlock, genericDataBlockVersionLink])
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                context.ContentSections.AddRange(headlinesSection, genericSection);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.StructureOnly,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                // StructureOnly must not copy any data blocks at all, not just omit linking them into content.
+                Assert.False(
+                    await context.DataBlockVersions.AnyAsync(dataBlockVersion =>
+                        dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                    )
+                );
+
+                var newHeadlinesSection = await context
+                    .ContentSections.Include(section => section.Content)
+                    .SingleAsync(section =>
+                        section.ReleaseVersionId == newReleaseVersionId && section.Type == ContentSectionType.Headlines
+                    );
+
+                var newHeadlinesHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(newHeadlinesSection.Content));
+                Assert.Equal(string.Empty, newHeadlinesHtmlBlock.Body);
+                Assert.Equal(headlinesHtmlBlock.Order, newHeadlinesHtmlBlock.Order);
+
+                // Proves the ContentSectionId FK resolved correctly via EF's relationship fixup, even though
+                // destinationSection.Id was still Guid.Empty (nothing saved yet) at the point this was assigned.
+                Assert.Equal(newHeadlinesSection.Id, newHeadlinesHtmlBlock.ContentSectionId);
+                Assert.NotEqual(Guid.Empty, newHeadlinesHtmlBlock.ContentSectionId);
+
+                var newGenericSection = await context
+                    .ContentSections.Include(section => section.Content)
+                    .SingleAsync(section =>
+                        section.ReleaseVersionId == newReleaseVersionId && section.Type == ContentSectionType.Generic
+                    );
+
+                Assert.NotEqual(genericSection.Id, newGenericSection.Id);
+                Assert.Equal(genericSection.Heading, newGenericSection.Heading);
+                Assert.Equal(genericSection.Order, newGenericSection.Order);
+
+                // The DataBlockVersionLink is silently dropped - there's no id-map to resolve it against.
+                var newGenericHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(newGenericSection.Content));
+                Assert.Equal(string.Empty, newGenericHtmlBlock.Body);
+                Assert.Equal(genericHtmlBlock.Order, newGenericHtmlBlock.Order);
+                Assert.NotEqual(genericHtmlBlock.Id, newGenericHtmlBlock.Id);
+            }
+        }
+
+        [Fact]
+        public async Task GivenWithDataMode_CopiesFeaturedTablesRepointedAtNewDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            FeaturedTable templateFeaturedTable = _dataFixture
+                .DefaultFeaturedTable()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithDataBlockVersion(templateDataBlockVersion)
+                .WithDataBlock(templateDataBlock)
+                .WithOrder(3)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                context.FeaturedTables.Add(templateFeaturedTable);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var newDataBlockVersion = await context.DataBlockVersions.SingleAsync(dataBlockVersion =>
+                    dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                );
+
+                var newFeaturedTable = await context.FeaturedTables.SingleAsync(featuredTable =>
+                    featuredTable.ReleaseVersionId == newReleaseVersionId
+                );
+
+                Assert.NotEqual(templateFeaturedTable.Id, newFeaturedTable.Id);
+                Assert.Equal(templateFeaturedTable.Name, newFeaturedTable.Name);
+                Assert.Equal(templateFeaturedTable.Description, newFeaturedTable.Description);
+                Assert.Equal(templateFeaturedTable.Order, newFeaturedTable.Order);
+
+                // Both ids repointed at the new copies, not left sharing the template's (unlike amendment's own
+                // equivalent, which deliberately keeps DataBlockId shared).
+                Assert.Equal(newDataBlockVersion.Id, newFeaturedTable.DataBlockVersionId);
+                Assert.Equal(newDataBlockVersion.DataBlockId, newFeaturedTable.DataBlockId);
+                Assert.NotEqual(templateFeaturedTable.DataBlockVersionId, newFeaturedTable.DataBlockVersionId);
+                Assert.NotEqual(templateFeaturedTable.DataBlockId, newFeaturedTable.DataBlockId);
+            }
+        }
+
+        [Fact]
+        public async Task GivenWithDataMode_CopiesKeyStatisticDataBlocksRepointedAtNewDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            KeyStatisticDataBlock templateKeyStatisticDataBlock = _dataFixture
+                .DefaultKeyStatisticDataBlock()
+                .WithDataBlockVersion(templateDataBlockVersion)
+                .WithDataBlock(templateDataBlock)
+                .WithOrder(4)
+                .Generate();
+            templateKeyStatisticDataBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                context.KeyStatisticsDataBlock.Add(templateKeyStatisticDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var newDataBlockVersion = await context.DataBlockVersions.SingleAsync(dataBlockVersion =>
+                    dataBlockVersion.ReleaseVersionId == newReleaseVersionId
+                );
+
+                var newKeyStatisticDataBlock = await context.KeyStatisticsDataBlock.SingleAsync(keyStatistic =>
+                    keyStatistic.ReleaseVersionId == newReleaseVersionId
+                );
+
+                Assert.NotEqual(templateKeyStatisticDataBlock.Id, newKeyStatisticDataBlock.Id);
+                Assert.Equal(templateKeyStatisticDataBlock.Trend, newKeyStatisticDataBlock.Trend);
+                Assert.Equal(templateKeyStatisticDataBlock.GuidanceTitle, newKeyStatisticDataBlock.GuidanceTitle);
+                Assert.Equal(templateKeyStatisticDataBlock.GuidanceText, newKeyStatisticDataBlock.GuidanceText);
+                Assert.Equal(templateKeyStatisticDataBlock.Order, newKeyStatisticDataBlock.Order);
+
+                Assert.Equal(newDataBlockVersion.Id, newKeyStatisticDataBlock.DataBlockVersionId);
+                Assert.Equal(newDataBlockVersion.DataBlockId, newKeyStatisticDataBlock.DataBlockId);
+                Assert.NotEqual(
+                    templateKeyStatisticDataBlock.DataBlockVersionId,
+                    newKeyStatisticDataBlock.DataBlockVersionId
+                );
+                Assert.NotEqual(templateKeyStatisticDataBlock.DataBlockId, newKeyStatisticDataBlock.DataBlockId);
+            }
+        }
+
+        [Fact]
+        public async Task GivenStructureOnlyMode_DoesNotCopyFeaturedTablesOrKeyStatisticDataBlocks()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            DataBlockVersion templateDataBlockVersion = _dataFixture
+                .DefaultDataBlockVersion()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .Generate();
+
+            DataBlock templateDataBlock = _dataFixture
+                .DefaultDataBlock()
+                .WithLatestDraftVersion(templateDataBlockVersion)
+                .Generate();
+
+            FeaturedTable templateFeaturedTable = _dataFixture
+                .DefaultFeaturedTable()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithDataBlockVersion(templateDataBlockVersion)
+                .WithDataBlock(templateDataBlock)
+                .Generate();
+
+            KeyStatisticDataBlock templateKeyStatisticDataBlock = _dataFixture
+                .DefaultKeyStatisticDataBlock()
+                .WithDataBlockVersion(templateDataBlockVersion)
+                .WithDataBlock(templateDataBlock)
+                .Generate();
+            templateKeyStatisticDataBlock.ReleaseVersionId = sourceReleaseVersion.Id;
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.DataBlocks.Add(templateDataBlock);
+                context.FeaturedTables.Add(templateFeaturedTable);
+                context.KeyStatisticsDataBlock.Add(templateKeyStatisticDataBlock);
+                await context.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.StructureOnly,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                Assert.False(
+                    await context.FeaturedTables.AnyAsync(featuredTable =>
+                        featuredTable.ReleaseVersionId == newReleaseVersionId
+                    )
+                );
+                Assert.False(
+                    await context.KeyStatisticsDataBlock.AnyAsync(keyStatistic =>
+                        keyStatistic.ReleaseVersionId == newReleaseVersionId
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task GivenWithDataMode_CopiesDataFilesAndSubjectsPointingAtTheSameUnderlyingFiles()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            var subject1Id = Guid.NewGuid();
+            var subject2Id = Guid.NewGuid();
+
+            File templateDataFile1 = _dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject1Id).Generate();
+            File templateMetaFile1 = _dataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subject1Id).Generate();
+            File templateDataFile2 = _dataFixture.DefaultFile(FileType.Data).WithSubjectId(subject2Id).Generate();
+            File templateMetaFile2 = _dataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subject2Id).Generate();
+
+            // Mid-replacement - excluded from the copy entirely, per the ticket's "excluding replacements" gotcha.
+            File replacementDataFile = _dataFixture
+                .DefaultFile(FileType.Data)
+                .WithSubjectId(Guid.NewGuid())
+                .WithReplacingId(Guid.NewGuid())
+                .Generate();
+
+            ReleaseFile templateDataReleaseFile1 = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithFile(templateDataFile1)
+                .WithName("Subject one")
+                .WithSummary("Summary one")
+                .WithOrder(1)
+                .WithFilterSequence([new FilterSequenceEntry(Guid.NewGuid(), [])])
+                .WithIndicatorSequence([new IndicatorGroupSequenceEntry(Guid.NewGuid(), [])])
+                .WithPublicApiDataSetId(Guid.NewGuid())
+                .WithPublicApiDataSetVersion(1, 2)
+                .Generate();
+
+            ReleaseFile templateMetaReleaseFile1 = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithFile(templateMetaFile1)
+                .WithName("Subject one metadata")
+                .Generate();
+
+            ReleaseFile templateDataReleaseFile2 = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithFile(templateDataFile2)
+                .WithName("Subject two")
+                .Generate();
+
+            ReleaseFile templateMetaReleaseFile2 = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithFile(templateMetaFile2)
+                .WithName("Subject two metadata")
+                .Generate();
+
+            ReleaseFile templateReplacementReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithFile(replacementDataFile)
+                .Generate();
+
+            var templateSubject1 = _dataFixture.DefaultSubject().Generate();
+            var templateSubject2 = _dataFixture.DefaultSubject().Generate();
+            templateSubject1.Id = subject1Id;
+            templateSubject2.Id = subject2Id;
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.ReleaseFiles.AddRange(
+                    templateDataReleaseFile1,
+                    templateMetaReleaseFile1,
+                    templateDataReleaseFile2,
+                    templateMetaReleaseFile2,
+                    templateReplacementReleaseFile
+                );
+                await context.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.Add(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion
+                    {
+                        Id = sourceReleaseVersion.Id,
+                        PublicationId = publication.Id,
+                    }
+                );
+                statisticsDbContext.Subject.AddRange(templateSubject1, templateSubject2);
+                statisticsDbContext.ReleaseSubject.AddRange(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject
+                    {
+                        ReleaseVersionId = sourceReleaseVersion.Id,
+                        SubjectId = subject1Id,
+                    },
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject
+                    {
+                        ReleaseVersionId = sourceReleaseVersion.Id,
+                        SubjectId = subject2Id,
+                    }
+                );
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    statisticsDbContext: statisticsDbContext,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var newReleaseFiles = await context
+                    .ReleaseFiles.Include(releaseFile => releaseFile.File)
+                    .Where(releaseFile => releaseFile.ReleaseVersionId == newReleaseVersionId)
+                    .ToListAsync();
+
+                // The in-progress replacement is never copied.
+                Assert.Equal(4, newReleaseFiles.Count);
+                Assert.DoesNotContain(newReleaseFiles, releaseFile => releaseFile.FileId == replacementDataFile.Id);
+
+                var newDataReleaseFile1 = Assert.Single(
+                    newReleaseFiles,
+                    releaseFile => releaseFile.FileId == templateDataFile1.Id
+                );
+                Assert.NotEqual(templateDataReleaseFile1.Id, newDataReleaseFile1.Id);
+                Assert.Equal(templateDataReleaseFile1.Name, newDataReleaseFile1.Name);
+                Assert.Equal(templateDataReleaseFile1.Summary, newDataReleaseFile1.Summary);
+                Assert.Equal(templateDataReleaseFile1.Order, newDataReleaseFile1.Order);
+                newDataReleaseFile1.FilterSequence.AssertDeepEqualTo(templateDataReleaseFile1.FilterSequence);
+                newDataReleaseFile1.IndicatorSequence.AssertDeepEqualTo(templateDataReleaseFile1.IndicatorSequence);
+                Assert.Equal(templateDataReleaseFile1.PublicApiDataSetId, newDataReleaseFile1.PublicApiDataSetId);
+                Assert.Equal(
+                    templateDataReleaseFile1.PublicApiDataSetVersion,
+                    newDataReleaseFile1.PublicApiDataSetVersion
+                );
+
+                var newMetaReleaseFile1 = Assert.Single(
+                    newReleaseFiles,
+                    releaseFile => releaseFile.FileId == templateMetaFile1.Id
+                );
+                Assert.NotEqual(templateMetaReleaseFile1.Id, newMetaReleaseFile1.Id);
+                Assert.Equal(templateMetaReleaseFile1.Name, newMetaReleaseFile1.Name);
+
+                Assert.Single(newReleaseFiles, releaseFile => releaseFile.FileId == templateDataFile2.Id);
+                Assert.Single(newReleaseFiles, releaseFile => releaseFile.FileId == templateMetaFile2.Id);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var newStatsReleaseVersion = await statisticsDbContext.ReleaseVersion.SingleAsync(releaseVersion =>
+                    releaseVersion.Id == newReleaseVersionId
+                );
+                Assert.Equal(publication.Id, newStatsReleaseVersion.PublicationId);
+
+                var newReleaseSubjects = await statisticsDbContext
+                    .ReleaseSubject.Where(releaseSubject => releaseSubject.ReleaseVersionId == newReleaseVersionId)
+                    .ToListAsync();
+
+                Assert.Equal(2, newReleaseSubjects.Count);
+                Assert.Contains(newReleaseSubjects, releaseSubject => releaseSubject.SubjectId == subject1Id);
+                Assert.Contains(newReleaseSubjects, releaseSubject => releaseSubject.SubjectId == subject2Id);
+            }
+        }
+
+        [Fact]
+        public async Task GivenStructureOnlyMode_DoesNotCopyDataFilesOrSubjects()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            var subjectId = Guid.NewGuid();
+
+            File templateDataFile = _dataFixture.DefaultFile(FileType.Data).WithSubjectId(subjectId).Generate();
+            File templateMetaFile = _dataFixture.DefaultFile(FileType.Metadata).WithSubjectId(subjectId).Generate();
+
+            ReleaseFile templateDataReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithFile(templateDataFile)
+                .Generate();
+
+            ReleaseFile templateMetaReleaseFile = _dataFixture
+                .DefaultReleaseFile()
+                .WithReleaseVersion(sourceReleaseVersion)
+                .WithFile(templateMetaFile)
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                context.ReleaseFiles.AddRange(templateDataReleaseFile, templateMetaReleaseFile);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.Add(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion
+                    {
+                        Id = sourceReleaseVersion.Id,
+                        PublicationId = publication.Id,
+                    }
+                );
+                statisticsDbContext.ReleaseSubject.Add(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject
+                    {
+                        ReleaseVersionId = sourceReleaseVersion.Id,
+                        SubjectId = subjectId,
+                    }
+                );
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    statisticsDbContext: statisticsDbContext,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.StructureOnly,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                Assert.False(
+                    await context.ReleaseFiles.AnyAsync(releaseFile =>
+                        releaseFile.ReleaseVersionId == newReleaseVersionId
+                    )
+                );
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                Assert.False(
+                    await statisticsDbContext.ReleaseVersion.AnyAsync(releaseVersion =>
+                        releaseVersion.Id == newReleaseVersionId
+                    )
+                );
+            }
+        }
+
+        [Fact]
+        public async Task GivenWithDataMode_CopiesFootnotesLinkedToRolledOverSubjects()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            var subject1 = _dataFixture.DefaultSubject().Generate();
+
+            var subject2 = _dataFixture
+                .DefaultSubject()
+                .WithFilters(_dataFixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
+                .WithIndicatorGroups(
+                    _dataFixture
+                        .DefaultIndicatorGroup()
+                        .WithIndicators(_dataFixture.DefaultIndicator().Generate(1))
+                        .Generate(1)
+                )
+                .Generate();
+
+            // Linked directly to just one subject - no filters/indicators at all.
+            var footnoteOnSubjectOnly = _dataFixture
+                .DefaultFootnote()
+                .WithReleaseVersionId(sourceReleaseVersion.Id)
+                .WithContent("Subject-level footnote")
+                .WithOrder(0)
+                .WithSubjects([subject1])
+                .Generate();
+
+            // Linked via a filter/filter group/filter item/indicator, not directly via Subjects at all.
+            var footnoteOnFilterAndIndicator = _dataFixture
+                .DefaultFootnote()
+                .WithReleaseVersionId(sourceReleaseVersion.Id)
+                .WithContent("Filter and indicator footnote")
+                .WithOrder(1)
+                .WithFilters(subject2.Filters)
+                .WithFilterGroups(subject2.Filters[0].FilterGroups)
+                .WithFilterItems(subject2.Filters[0].FilterGroups[0].FilterItems)
+                .WithIndicators(subject2.IndicatorGroups[0].Indicators)
+                .Generate();
+
+            // Shared across both rolled-over subjects - must be copied once only, carrying BOTH subject links.
+            var footnoteSharedAcrossSubjects = _dataFixture
+                .DefaultFootnote()
+                .WithReleaseVersionId(sourceReleaseVersion.Id)
+                .WithContent("Shared footnote")
+                .WithOrder(2)
+                .WithSubjects([subject1, subject2])
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.Add(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion
+                    {
+                        Id = sourceReleaseVersion.Id,
+                        PublicationId = publication.Id,
+                    }
+                );
+                statisticsDbContext.Subject.AddRange(subject1, subject2);
+                statisticsDbContext.ReleaseSubject.AddRange(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject
+                    {
+                        ReleaseVersionId = sourceReleaseVersion.Id,
+                        SubjectId = subject1.Id,
+                    },
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject
+                    {
+                        ReleaseVersionId = sourceReleaseVersion.Id,
+                        SubjectId = subject2.Id,
+                    }
+                );
+                statisticsDbContext.Footnote.AddRange(
+                    footnoteOnSubjectOnly,
+                    footnoteOnFilterAndIndicator,
+                    footnoteSharedAcrossSubjects
+                );
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    statisticsDbContext: statisticsDbContext,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var newFootnotes = await statisticsDbContext
+                    .Footnote.Include(footnote => footnote.Filters)
+                    .Include(footnote => footnote.FilterGroups)
+                    .Include(footnote => footnote.FilterItems)
+                    .Include(footnote => footnote.Indicators)
+                    .Include(footnote => footnote.Subjects)
+                    .Where(footnote => footnote.ReleaseVersionId == newReleaseVersionId)
+                    .ToListAsync();
+
+                // Exactly 3, not 4 - confirms the shared footnote was only copied once.
+                Assert.Equal(3, newFootnotes.Count);
+
+                var newSubjectOnlyFootnote = Assert.Single(
+                    newFootnotes,
+                    footnote => footnote.Content == footnoteOnSubjectOnly.Content
+                );
+                Assert.NotEqual(footnoteOnSubjectOnly.Id, newSubjectOnlyFootnote.Id);
+                Assert.Equal(footnoteOnSubjectOnly.Order, newSubjectOnlyFootnote.Order);
+                Assert.Equal([subject1.Id], newSubjectOnlyFootnote.Subjects.Select(s => s.SubjectId));
+                Assert.Empty(newSubjectOnlyFootnote.Filters);
+                Assert.Empty(newSubjectOnlyFootnote.FilterGroups);
+                Assert.Empty(newSubjectOnlyFootnote.FilterItems);
+                Assert.Empty(newSubjectOnlyFootnote.Indicators);
+
+                var newFilterAndIndicatorFootnote = Assert.Single(
+                    newFootnotes,
+                    footnote => footnote.Content == footnoteOnFilterAndIndicator.Content
+                );
+                Assert.NotEqual(footnoteOnFilterAndIndicator.Id, newFilterAndIndicatorFootnote.Id);
+                Assert.Equal(footnoteOnFilterAndIndicator.Order, newFilterAndIndicatorFootnote.Order);
+                Assert.Empty(newFilterAndIndicatorFootnote.Subjects);
+                Assert.Equal(
+                    subject2.Filters.Select(filter => filter.Id),
+                    newFilterAndIndicatorFootnote.Filters.Select(filterFootnote => filterFootnote.FilterId)
+                );
+                Assert.Equal(
+                    subject2.Filters[0].FilterGroups.Select(filterGroup => filterGroup.Id),
+                    newFilterAndIndicatorFootnote.FilterGroups.Select(filterGroupFootnote =>
+                        filterGroupFootnote.FilterGroupId
+                    )
+                );
+                Assert.Equal(
+                    subject2.Filters[0].FilterGroups[0].FilterItems.Select(filterItem => filterItem.Id),
+                    newFilterAndIndicatorFootnote.FilterItems.Select(filterItemFootnote =>
+                        filterItemFootnote.FilterItemId
+                    )
+                );
+                Assert.Equal(
+                    subject2.IndicatorGroups[0].Indicators.Select(indicator => indicator.Id),
+                    newFilterAndIndicatorFootnote.Indicators.Select(indicatorFootnote => indicatorFootnote.IndicatorId)
+                );
+
+                var newSharedFootnote = Assert.Single(
+                    newFootnotes,
+                    footnote => footnote.Content == footnoteSharedAcrossSubjects.Content
+                );
+                Assert.NotEqual(footnoteSharedAcrossSubjects.Id, newSharedFootnote.Id);
+                Assert.Equal(footnoteSharedAcrossSubjects.Order, newSharedFootnote.Order);
+                Assert.Equal(
+                    new[] { subject1.Id, subject2.Id }.OrderBy(id => id),
+                    newSharedFootnote.Subjects.Select(subjectFootnote => subjectFootnote.SubjectId).OrderBy(id => id)
+                );
+            }
+        }
+
+        [Fact]
+        public async Task GivenStructureOnlyMode_DoesNotCopyFootnotes()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            var subject = _dataFixture.DefaultSubject().Generate();
+
+            var footnote = _dataFixture
+                .DefaultFootnote()
+                .WithReleaseVersionId(sourceReleaseVersion.Id)
+                .WithSubjects([subject])
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.Add(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion
+                    {
+                        Id = sourceReleaseVersion.Id,
+                        PublicationId = publication.Id,
+                    }
+                );
+                statisticsDbContext.Subject.Add(subject);
+                statisticsDbContext.ReleaseSubject.Add(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject
+                    {
+                        ReleaseVersionId = sourceReleaseVersion.Id,
+                        SubjectId = subject.Id,
+                    }
+                );
+                statisticsDbContext.Footnote.Add(footnote);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    statisticsDbContext: statisticsDbContext,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.StructureOnly,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                Assert.False(
+                    await statisticsDbContext.Footnote.AnyAsync(footnote =>
+                        footnote.ReleaseVersionId == newReleaseVersionId
+                    )
+                );
+            }
+        }
+
+        [Fact]
         public async Task GivenReleaseRolloverDisabled_ReturnsForbid()
         {
             Publication publication = _dataFixture.DefaultPublication();
@@ -379,6 +1936,8 @@ public abstract class ReleaseRolloverServiceTests
 
     private ReleaseRolloverService BuildService(
         ContentDbContext contentDbContext,
+        StatisticsDbContext? statisticsDbContext = null,
+        IFootnoteRepository? footnoteRepository = null,
         IReleaseVersionService? releaseVersionService = null,
         IReleaseSlugValidator? releaseSlugValidator = null,
         bool enableReleaseRollover = true
@@ -388,9 +1947,13 @@ public abstract class ReleaseRolloverServiceTests
 
         userService.Setup(s => s.GetUserId()).Returns(UserId);
 
+        var effectiveStatisticsDbContext = statisticsDbContext ?? InMemoryStatisticsDbContext();
+
         return new ReleaseRolloverService(
             appOptions: new AppOptions { EnableReleaseRollover = enableReleaseRollover }.ToOptionsWrapper(),
             context: contentDbContext,
+            statisticsDbContext: effectiveStatisticsDbContext,
+            footnoteRepository: footnoteRepository ?? new FootnoteRepository(effectiveStatisticsDbContext),
             userService: userService.Object,
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             guidGenerator: new SequentialGuidGenerator(),

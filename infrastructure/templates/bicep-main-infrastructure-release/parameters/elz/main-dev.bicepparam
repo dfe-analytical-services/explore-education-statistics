@@ -12,3 +12,17 @@ param publisherStorageAccountSku = 'Standard_ZRS'
 
 // Host every App Service and Function App on Linux.
 param appOperatingSystem = 'Linux'
+
+// Deploy a user-assigned managed identity for each of this pipeline's apps.
+param deployAppIdentities = true
+
+// No content shares for the Function Apps on Dedicated plans.
+param functionAppContentShares = false
+
+// The apps connect to the Importer's, Notifier's and Publisher's storage accounts with their managed identities, so their
+// connection strings aren't stored.
+param storeStorageAccountConnectionStrings = false
+
+// Everything connects to the Importer's, Notifier's and Publisher's storage accounts with managed identities, so they
+// don't accept account keys.
+param storageSharedKeyAccessEnabled = false

@@ -2,7 +2,7 @@ import DataUploadsPermissions from '@admin/pages/release/data/types/dataUploadsP
 import releaseDataFileQueries from '@admin/queries/releaseDataFileQueries';
 import { DataSetUpload } from '@admin/services/releaseDataFileService';
 import ButtonGroup from '@common/components/ButtonGroup';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import styles from '@admin/pages/release/data/components/data-uploads/DataFilesTable.module.scss';
 import DataSetUploadDeleteModal from './DataSetUploadDeleteModal';
@@ -37,7 +37,11 @@ export default function DataSetUploadTableRow({
 }: Props) {
   // The screener updates this upload's status out-of-band, so poll for it
   // rather than relying on the status the list was fetched with.
-  const { data: screenerProgress } = useQuery({
+  const {
+    data: screenerProgress,
+    dataUpdatedAt,
+    isFetchedAfterMount,
+  } = useQuery({
     ...releaseDataFileQueries.screeningStatus(
       releaseVersionId,
       dataSetUpload.id,
@@ -45,21 +49,39 @@ export default function DataSetUploadTableRow({
     // Don't poll if the upload has finished screening.
     enabled: !terminalScreeningStatuses.includes(dataSetUpload.screeningStatus),
     // Poll every 5 seconds until screening finishes.
-    refetchInterval: progress =>
-      progress && terminalScreeningStatuses.includes(progress.status)
+    refetchInterval: query =>
+      query.state.data &&
+      terminalScreeningStatuses.includes(query.state.data.status)
         ? false
         : 5000,
-    onSuccess: progress => {
-      // Refresh the list so the row picks up the screener results that come
-      // with the finished upload.
-      if (
-        progress.status !== dataSetUpload.screeningStatus &&
-        terminalScreeningStatuses.includes(progress.status)
-      ) {
-        onRefreshUploads();
-      }
-    },
   });
+
+  // Read the latest props from a ref so that a new callback reference from
+  // the parent doesn't re-trigger the effect below.
+  const latestProps = useRef({
+    listScreeningStatus: dataSetUpload.screeningStatus,
+    onRefreshUploads,
+  });
+  latestProps.current = {
+    listScreeningStatus: dataSetUpload.screeningStatus,
+    onRefreshUploads,
+  };
+
+  // Check once per fetch. Data that was already in the cache when this
+  // mounted is ignored, as it may be stale.
+  useEffect(() => {
+    if (!screenerProgress || !isFetchedAfterMount) return;
+    const { listScreeningStatus, onRefreshUploads: refresh } =
+      latestProps.current;
+    // Refresh the list so the row picks up the screener results that come
+    // with the finished upload.
+    if (
+      screenerProgress.status !== listScreeningStatus &&
+      terminalScreeningStatuses.includes(screenerProgress.status)
+    ) {
+      refresh();
+    }
+  }, [screenerProgress, dataUpdatedAt, isFetchedAfterMount]);
 
   const screeningStatus =
     screenerProgress?.status ?? dataSetUpload.screeningStatus;

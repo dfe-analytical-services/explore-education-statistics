@@ -22,6 +22,10 @@ param googleAnalyticsTrackingId string
 @description('The default duration in seconds for Azure Front Door to cache content.')
 param defaultCacheMaxAgeSeconds int = 30
 
+@description('The duration in seconds after content becomes stale that caches may continue to serve it while revalidating it in the background. Note this applies to browsers as well as CDNs. Set to 0 to disable.')
+@minValue(0)
+param defaultCacheStaleWhileRevalidateSeconds int = 30
+
 @description('The public URL for the public API (excluding "https://").')
 param publicApiUrl string
 
@@ -93,6 +97,7 @@ output appSettings object = union({
   PUBLIC_API_BASE_URL: 'https://${publicApiUrl}'
   PUBLIC_API_DOCS_URL: 'https://${publicApiUrl}/docs'
   DEFAULT_CACHE_MAX_AGE_SECONDS: defaultCacheMaxAgeSeconds
+  DEFAULT_CACHE_STALE_WHILE_REVALIDATE_SECONDS: defaultCacheStaleWhileRevalidateSeconds
   DEPLOYED_AT: deployedAt
   DOCKER_REGISTRY_SERVER_URL: 'https://${resourceNames.acr.serverName}${environment().suffixes.acrLoginServer}'
   DOCKER_REGISTRY_SERVER_USERNAME: secretRefs[resourceNames.keyVault.secrets.acr.dockerPullUsername]

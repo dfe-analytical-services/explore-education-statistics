@@ -1,6 +1,7 @@
 import { IpRange, FirewallRule } from '../../common/types.bicep'
 import { StorageAccountSku } from '../../common/components/storage/types.bicep'
 import { ResourceNames } from '../../common/resource-names.bicep'
+import { keylessStorageConnectionString } from '../../common/functions.bicep'
 import { SearchStorageQueueNames } from '../types.bicep'
 
 @description('The URL of the Content API.')
@@ -27,9 +28,12 @@ param searchServiceName string
 @description('Name of the Search storage account.')
 param searchStorageAccountName string
 
-@description('The connection string to the Search storage account.')
-@secure()
-param searchStorageAccountConnectionStringSecretName string
+@description('The name of the Key Vault secret holding the Search storage account\'s connection string. Not needed when the Function App connects with its managed identity.')
+param searchStorageAccountConnectionStringSecretName string?
+
+// TODO EES-7502 - remove the Key Vault alternative once every environment has moved to the ELZ.
+@description('Whether the Function App connects to the Search storage account with its managed identity, given a keyless connection string, rather than with a connection string from Key Vault.')
+param identityBasedStorageConnection bool = false
 
 @description('Storage container name for release documents in the Search storage account.')
 param releaseDocumentsContainerName string
@@ -43,20 +47,27 @@ param resourceNames ResourceNames
 @description('SKU of the storage accounts, which sets their redundancy.')
 param storageAccountSku StorageAccountSku
 
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
+
 @description('The Application Insights connection string that is associated with this resource.')
 param applicationInsightsConnectionString string = ''
 
 @description('Specifies the names of the storage queues that trigger functions within the Search Docs Function App.')
 param storageQueueNames SearchStorageQueueNames = {
+  dataSetDocumentsChanged: 'data-set-documents-changed-queue'
   publicationArchived: 'publication-archived-queue'
   publicationChanged: 'publication-changed-queue'
   publicationDeleted: 'publication-deleted-queue'
   publicationLatestPublishedReleaseReordered: 'publication-latest-published-release-reordered-queue'
   publicationRestored: 'publication-restored-queue'
+  refreshPublicationDataSetDocuments: 'refresh-publication-data-set-documents-queue'
+  refreshReleaseDataSetDocuments: 'refresh-release-data-set-documents-queue'
   refreshReleaseDocument: 'refresh-release-document-queue'
   releaseDocumentCreated: 'release-document-created-queue'
   releaseSlugChanged: 'release-slug-changed-queue'
   releaseVersionPublished: 'release-version-published-queue'
+  removeDataSetDocuments: 'remove-data-set-documents-queue'
   removePublicationReleaseDocuments: 'remove-publication-release-documents-queue'
   removeReleaseDocument: 'remove-release-document-queue'
   themeUpdated: 'theme-updated-queue'
@@ -109,13 +120,16 @@ resource searchService 'Microsoft.Search/searchServices@2025-05-01' existing = {
 module functionAppModule '../../common/components/function-app/function-app.bicep' = {
   name: 'searchDocsFunctionAppModuleDeploy'
   params: {
+    userAssignedIdentityName: useUserAssignedIdentity ? resourceNames.searchDocs.identity : ''
     functionAppName: resourceNames.searchDocs.functionApp
     applicationInsightsConnectionString: applicationInsightsConnectionString
     appServicePlanName: resourceNames.searchDocs.appServicePlan
     appSettings: [
       {
         name: 'App__SearchStorageConnectionString'
-        value: '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${searchStorageAccountConnectionStringSecretName})'
+        value: identityBasedStorageConnection
+          ? keylessStorageConnectionString(searchStorageAccount.name)
+          : '@Microsoft.KeyVault(VaultName=${keyVault.name};SecretName=${searchStorageAccountConnectionStringSecretName!})'
       }
       {
         name: 'App__ReleaseDocumentsContainerName'
@@ -142,6 +156,10 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: contentApiUrl
       }
       {
+        name: 'DataSetDocumentsChangedQueueName'
+        value: storageQueueNames.dataSetDocumentsChanged
+      }
+      {
         name: 'PublicationArchivedQueueName'
         value: storageQueueNames.publicationArchived
       }
@@ -162,6 +180,14 @@ module functionAppModule '../../common/components/function-app/function-app.bice
         value: storageQueueNames.publicationRestored
       }
       {
+        name: 'RefreshPublicationDataSetDocumentsQueueName'
+        value: storageQueueNames.refreshPublicationDataSetDocuments
+      }
+      {
+        name: 'RefreshReleaseDataSetDocumentsQueueName'
+        value: storageQueueNames.refreshReleaseDataSetDocuments
+      }
+      {
         name: 'RefreshReleaseDocumentQueueName'
         value: storageQueueNames.refreshReleaseDocument
       }
@@ -176,6 +202,10 @@ module functionAppModule '../../common/components/function-app/function-app.bice
       {
         name: 'ReleaseVersionPublishedQueueName'
         value: storageQueueNames.releaseVersionPublished
+      }
+      {
+        name: 'RemoveDataSetDocumentsQueueName'
+        value: storageQueueNames.removeDataSetDocuments
       }
       {
         name: 'RemovePublicationReleaseDocumentsQueueName'
@@ -245,6 +275,17 @@ module functionAppIdentityRoleAssignmentModule '../../common/components/search/s
     searchServiceName: searchService.name
     principalIds: [functionAppModule.outputs.functionAppIdentityPrincipalId]
     role: 'Search Service Contributor'
+  }
+}
+
+// Allow the Function App to write and delete the search documents in the search storage account.
+// TODO EES-7502 - make this grant unconditional once every environment has moved to the ELZ.
+module searchStorageAccountRoleAssignmentModule '../../common/components/storageAccountRoleAssignment.bicep' = if (useUserAssignedIdentity) {
+  name: 'searchDocsSearchStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: searchStorageAccount.name
+    principalIds: [functionAppModule.outputs.functionAppIdentityPrincipalId]
+    role: 'Storage Blob Data Contributor'
   }
 }
 

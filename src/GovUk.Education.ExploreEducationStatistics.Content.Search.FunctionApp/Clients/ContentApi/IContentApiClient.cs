@@ -70,4 +70,32 @@ public interface IContentApiClient
     /// <returns>An array of data set document keys.</returns>
     /// <exception cref="UnableToGetDataSetDocumentKeysException">Thrown if the call to the API was unsuccessful</exception>
     Task<DataSetDocumentKey[]> GetDataSetDocumentKeys(CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Retrieves the data set documents for the latest published version of the specified release. There is one per
+    /// data file.
+    /// </summary>
+    /// <param name="publicationSlug">the publication slug</param>
+    /// <param name="releaseSlug">the release slug</param>
+    /// <param name="cancellationToken">cancellation token</param>
+    /// <returns>An array of data set documents, which is empty if the release has no data files.</returns>
+    /// <exception cref="UnableToGetReleaseDataSetDocumentsException">Thrown if the call to the API was unsuccessful, including when the release is not found</exception>
+    Task<DataSetDocument[]> GetReleaseDataSetDocuments(
+        string publicationSlug,
+        string releaseSlug,
+        CancellationToken cancellationToken = default
+    );
+
+    /// <summary>
+    /// Retrieves the data set documents for the latest published version of every release of the specified
+    /// publication. There is one per data file.
+    /// </summary>
+    /// <param name="publicationSlug">the publication slug</param>
+    /// <param name="cancellationToken">cancellation token</param>
+    /// <returns>An array of data set documents, which is empty if the publication has no data files.</returns>
+    /// <exception cref="UnableToGetPublicationDataSetDocumentsException">Thrown if the call to the API was unsuccessful, including when the publication is not found</exception>
+    Task<DataSetDocument[]> GetPublicationDataSetDocuments(
+        string publicationSlug,
+        CancellationToken cancellationToken = default
+    );
 }

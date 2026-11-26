@@ -170,6 +170,8 @@ const ReleaseHomePage = ({
         headlinesSection={headlinesSection}
         keyStatistics={keyStatistics}
         keyStatisticsSecondarySection={keyStatisticsSecondarySection}
+        publicationTitle={releaseVersionSummary.publication.title}
+        releaseTitle={releaseVersionSummary.title}
         releaseVersionId={releaseVersionSummary.id}
       />
 

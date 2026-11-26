@@ -5,7 +5,7 @@ import { DataFile } from '@admin/services/releaseDataFileService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
 import Tag from '@common/components/Tag';
-import { useQuery } from '@tanstack/react-query';
+import { skipToken, useQuery } from '@tanstack/react-query';
 import React, { ReactNode } from 'react';
 import apiDataSetQueries from '@admin/queries/apiDataSetQueries';
 import downloadReleaseFileSecurely from '@admin/pages/release/data/components/utils/downloadReleaseFileSecurely';
@@ -36,11 +36,15 @@ const DataFileDetailsTable = ({
 
   const publicApiDataSetId =
     dataFile.publicApiDataSetId ?? replacementDataFile?.publicApiDataSetId;
+  const dataSetQuery = apiDataSetQueries.get(publicApiDataSetId ?? '');
   const { data: dataSet, isLoading } = useQuery({
-    ...(publicApiDataSetId ? apiDataSetQueries.get(publicApiDataSetId) : {}),
+    ...dataSetQuery,
+    queryFn: publicApiDataSetId ? dataSetQuery.queryFn : skipToken,
     enabled: !!publicApiDataSetId,
-    refetchInterval: data => {
-      return data?.draftVersion?.status === 'Processing' ? 3000 : false;
+    refetchInterval: query => {
+      return query.state.data?.draftVersion?.status === 'Processing'
+        ? 3000
+        : false;
     },
   });
 

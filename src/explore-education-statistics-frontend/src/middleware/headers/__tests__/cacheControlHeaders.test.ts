@@ -64,19 +64,61 @@ describe('cacheControlHeaders', () => {
     );
   });
 
+  test('applies a Cache-Control header for all other requests with a specific stale-while-revalidate period', async () => {
+    const response = await getResponseForUrl(
+      'https://my-env/any-other-request',
+      '25',
+      '10',
+    );
+    expect(response.headers.get('Cache-Control')).toBe(
+      'public, max-age=0, s-maxage=25, stale-while-revalidate=10',
+    );
+  });
+
+  test('applies a Cache-Control header for all other requests without stale-while-revalidate if it is set to 0', async () => {
+    const response = await getResponseForUrl(
+      'https://my-env/any-other-request',
+      '2',
+      '0',
+    );
+    expect(response.headers.get('Cache-Control')).toBe(
+      'public, max-age=0, s-maxage=2',
+    );
+  });
+
+  it.each(['', 'invalid', '-1', '1.5'])(
+    'applies a Cache-Control header for all other requests with a stale-while-revalidate of 30 seconds if the variable is "%s"',
+    async staleWhileRevalidateSeconds => {
+      const response = await getResponseForUrl(
+        'https://my-env/any-other-request',
+        '25',
+        staleWhileRevalidateSeconds,
+      );
+      expect(response.headers.get('Cache-Control')).toBe(
+        'public, max-age=0, s-maxage=25, stale-while-revalidate=30',
+      );
+    },
+  );
+
   async function getResponseForUrl(
     url: string,
     cacheMaxAgeSeconds: string | undefined = undefined,
+    staleWhileRevalidateSeconds: string | undefined = undefined,
   ) {
     if (cacheMaxAgeSeconds) {
       process.env.DEFAULT_CACHE_MAX_AGE_SECONDS = cacheMaxAgeSeconds;
+    }
+    if (staleWhileRevalidateSeconds !== undefined) {
+      process.env.DEFAULT_CACHE_STALE_WHILE_REVALIDATE_SECONDS =
+        staleWhileRevalidateSeconds;
     }
     try {
       const middlewareResult = await runMiddleware(cacheControlHeaders, url);
       return middlewareResult!;
     } finally {
-      delete (process.env as Record<string, string | undefined>)
-        .DEFAULT_CACHE_MAX_AGE_SECONDS;
+      const env = process.env as Record<string, string | undefined>;
+      delete env.DEFAULT_CACHE_MAX_AGE_SECONDS;
+      delete env.DEFAULT_CACHE_STALE_WHILE_REVALIDATE_SECONDS;
     }
   }
 });

@@ -1,5 +1,5 @@
 import render from '@common-test/render';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import SearchDataPage from '@frontend/modules/search-data/SearchDataPage';
 import _publicationService, {
@@ -8,6 +8,8 @@ import _publicationService, {
 import _azureDataSetService from '@frontend/services/azureDataSetService';
 import _azurePublicationService from '@frontend/services/azurePublicationService';
 import _organisationService from '@frontend/services/organisationService';
+import _themeService from '@common/services/themeService';
+import { testThemeSummaries } from '@frontend/modules/find-statistics/__tests__/__data__/testThemeData';
 import { testPublicationTree } from '@frontend/modules/search-data/__tests__/__data__/testPublicationTree';
 import { PaginatedList } from '@common/services/types/pagination';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
@@ -24,11 +26,13 @@ jest.mock('@common/services/publicationService');
 jest.mock('@frontend/services/azureDataSetService');
 jest.mock('@frontend/services/azurePublicationService');
 jest.mock('@frontend/services/organisationService');
+jest.mock('@common/services/themeService');
 
 const publicationService = jest.mocked(_publicationService);
 const azureDataSetService = jest.mocked(_azureDataSetService);
 const azurePublicationService = jest.mocked(_azurePublicationService);
 const organisationService = jest.mocked(_organisationService);
+const themeService = jest.mocked(_themeService);
 
 const mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
@@ -83,6 +87,7 @@ describe('SearchDataPage', () => {
       testPublicationTree,
     );
     organisationService.list.mockResolvedValue(testOrganisations);
+    themeService.listThemes.mockResolvedValue(testThemeSummaries);
   });
 
   afterEach(() => {
@@ -102,7 +107,7 @@ describe('SearchDataPage', () => {
       expect(screen.getByRole('combobox')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('heading', { name: '2 results' }),
+        await screen.findByRole('heading', { name: '2 results' }),
       ).toBeInTheDocument();
 
       expect(
@@ -126,8 +131,13 @@ describe('SearchDataPage', () => {
       const links = within(nav).getAllByRole('link');
 
       expect(links).toHaveLength(2);
-      expect(links[0]).toHaveTextContent('Statistical releases');
-      expect(links[1]).toHaveTextContent('Data');
+
+      await waitFor(() => {
+        expect(links[0]).toHaveTextContent('Statistical releases (2)');
+      });
+      await waitFor(() => {
+        expect(links[1]).toHaveTextContent('Data sets (2)');
+      });
       expect(links[1]).toHaveAttribute('aria-current', 'page');
     });
 
@@ -236,6 +246,56 @@ describe('SearchDataPage', () => {
       expect(
         await screen.findByText('There are no matching results.'),
       ).toBeInTheDocument();
+    });
+  });
+
+  describe('copy link to current page', () => {
+    afterEach(() => {
+      window.history.replaceState({}, '', '/');
+    });
+
+    test('renders the bookmark text and copy link button', async () => {
+      render(<SearchDataPage />);
+
+      expect(
+        await screen.findByText(/Bookmark this page or/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(/to come back to these results/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', {
+          name: 'copy the link to the current page',
+        }),
+      ).toBeInTheDocument();
+    });
+
+    test('copies the current page URL to the clipboard and announces it', async () => {
+      window.history.replaceState(
+        {},
+        '',
+        '/search-data?search=pupils&themeId=theme-1&page=2',
+      );
+
+      const { user } = render(<SearchDataPage />);
+
+      await waitFor(() => {
+        expect(screen.getAllByText('2 results')).toHaveLength(2);
+      });
+
+      await user.click(
+        screen.getByRole('button', {
+          name: 'copy the link to the current page',
+        }),
+      );
+
+      expect(
+        await screen.findByText('Link copied to the clipboard'),
+      ).toBeInTheDocument();
+
+      expect(await window.navigator.clipboard.readText()).toBe(
+        'http://localhost/search-data?search=pupils&themeId=theme-1&page=2',
+      );
     });
   });
 

@@ -9,6 +9,12 @@ param resourceNames ResourceNames
 @description('SKU of the storage accounts, which sets their redundancy.')
 param storageAccountSku StorageAccountSku
 
+@description('Whether the Function App uses its user-assigned managed identity rather than a system-assigned one.')
+param useUserAssignedIdentity bool = false
+
+@description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this app.')
+param adminUsesUserAssignedIdentity bool = false
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -97,11 +103,55 @@ resource adminAppServiceIdentity 'Microsoft.ManagedIdentity/identities@2023-01-3
   name: 'default'
 }
 
+// TODO EES-7502 - only look up Admin's user-assigned identity once every environment has moved to the ELZ.
+resource adminUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (adminUsesUserAssignedIdentity) {
+  name: resourceNames.admin.identity
+}
+
 resource eesyscreenerLogsStorageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: resourceNames.screener.logsStorageAccount
 }
 
-var adminAppClientId = adminAppServiceIdentity.properties.clientId
+resource screenerIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2024-11-30' existing = if (useUserAssignedIdentity) {
+  name: resourceNames.screener.identity
+}
+
+// The StartScreening queue trigger connects to the Function App's storage account with a managed identity. With a
+// system-assigned identity, the queue URI and credential type are enough. With only a user-assigned identity, the
+// trigger must also say which identity to use.
+// TODO EES-7502 - remove startScreeningSystemAssignedIdentityAppSettings once every environment has moved to the ELZ,
+// leaving only the user-assigned identity settings.
+var startScreeningQueueServiceUri = 'https://${resourceNames.screener.functionStorageAccount}.queue.core.windows.net'
+
+var startScreeningSystemAssignedIdentityAppSettings = [
+  {
+    name: 'AzureWebJobs_StartScreening__queueServiceUri'
+    value: startScreeningQueueServiceUri
+  }
+  {
+    name: 'AzureWebJobs_StartScreening__credential'
+    value: 'managedidentity'
+  }
+]
+
+var startScreeningUserAssignedIdentityAppSettings = [
+  {
+    name: 'AzureWebJobs_StartScreening__queueServiceUri'
+    value: startScreeningQueueServiceUri
+  }
+  {
+    name: 'AzureWebJobs_StartScreening__credential'
+    value: 'managedidentity'
+  }
+  {
+    name: 'AzureWebJobs_StartScreening__clientId'
+    value: screenerIdentity!.properties.clientId
+  }
+]
+
+var adminAppClientId = adminUsesUserAssignedIdentity
+  ? adminUserAssignedIdentity!.properties.clientId
+  : adminAppServiceIdentity.properties.clientId
 var coreStorageBlobEndpointWithoutTrailingSlash = endsWith(coreStorageBlobEndpoint, '/')
   ? substring(coreStorageBlobEndpoint, 0, length(coreStorageBlobEndpoint) - 1)
   : coreStorageBlobEndpoint
@@ -122,7 +172,7 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
     minimumInstanceCount: minimumInstanceCount
     maximumInstanceCount: maximumInstanceCount
     appServicePlanName: resourceNames.screener.appServicePlan
-    appSettings: [
+    appSettings: concat([
       {
         name: 'STORAGE_URL'
         value: coreStorageBlobEndpointWithoutTrailingSlash
@@ -147,16 +197,18 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
           name: 'CONCURRENT_R_WORKERS'
           value: '${concurrentRWorkers}'
       }
-      {
-        name: 'AzureWebJobs_StartScreening__queueServiceUri'
-        value: 'https://${resourceNames.screener.functionStorageAccount}.queue.core.windows.net'
-      }
-      {
-        name: 'AzureWebJobs_StartScreening__credential'
-        value: 'managedidentity'
-      }
-    ]
+    ], useUserAssignedIdentity
+      ? startScreeningUserAssignedIdentityAppSettings
+      : startScreeningSystemAssignedIdentityAppSettings)
     keyVaultName: keyVault.name
+    userAssignedManagedIdentityParams: useUserAssignedIdentity
+      ? {
+          id: screenerIdentity.id
+          name: screenerIdentity.name
+          principalId: screenerIdentity!.properties.principalId
+          clientId: screenerIdentity!.properties.clientId
+        }
+      : null
     entraIdAuthentication: {
       appRegistrationClientId: screenerAppRegistrationClientId
       allowedClientIds: [
@@ -202,6 +254,20 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
       : null
     tagValues: tagValues
   }
+}
+
+// Allow Admin's user-assigned identity to send messages to the StartScreening queue.
+// TODO EES-7502 - grant this to Admin's identity unconditionally once every environment has moved to the ELZ.
+module adminStorageAccountRoleAssignmentModule '../../common/components/storageAccountRoleAssignment.bicep' = if (adminUsesUserAssignedIdentity) {
+  name: 'screenerAdminStorageAccountRoleAssignmentModuleDeploy'
+  params: {
+    storageAccountName: resourceNames.screener.functionStorageAccount
+    principalIds: [adminUserAssignedIdentity!.properties.principalId]
+    role: 'Storage Queue Data Contributor'
+  }
+  dependsOn: [
+    containerisedFunctionAppModule
+  ]
 }
 
 output functionAppUrl string = containerisedFunctionAppModule.outputs.url
