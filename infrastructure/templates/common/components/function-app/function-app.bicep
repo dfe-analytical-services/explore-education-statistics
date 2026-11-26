@@ -195,6 +195,9 @@ param alerts {
   alertsGroupName: string
 }?
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -272,6 +275,7 @@ module storageAccountModule '../storage/storage-account.bicep' = {
           secretName: storageAccountConnectionStringSecretName!
         }
       : null
+    deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
     privateEndpointSubnetIds: privateEndpoints != null ? {
       blob: privateEndpoints!.storageAccounts
       file: privateEndpoints!.storageAccounts
@@ -526,6 +530,7 @@ module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpoints.?
     serviceId: functionApp.id
     serviceName: functionApp.name
     serviceType: 'sites'
+    deployPrivateDnsZoneGroup: deployPrivateDnsZoneGroups
     subnetId: privateEndpoints.?functionApp ?? ''
     location: location
     tagValues: tagValues

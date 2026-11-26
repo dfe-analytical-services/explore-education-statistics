@@ -117,6 +117,7 @@ module monitoringModule 'application/monitoring.bicep' = {
 module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = {
   name: 'nlSearchFunctionAppApplicationModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     useUserAssignedIdentity: deployAppIdentities
     storageAccountSku: storageAccountSku
     resourceNames: resourceNames
@@ -138,6 +139,7 @@ module nlSearchFunctionAppModule 'application/nlSearchFunctionApp.bicep' = {
 module searchDocsFunctionAppModule 'application/searchDocsFunctionApp.bicep' = {
   name: 'searchDocsFunctionAppApplicationModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     useUserAssignedIdentity: deployAppIdentities
     storageAccountSku: storageAccountSku
     resourceNames: resourceNames
@@ -183,6 +185,7 @@ module searchDocsFunctionEventSubscriptionsModule 'application/searchDocsFunctio
 module searchServiceModule 'application/searchService.bicep' = {
   name: 'searchServiceApplicationModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     storageAccountSku: storageAccountSku
     location: location
     resourceNames: resourceNames

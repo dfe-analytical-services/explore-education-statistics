@@ -83,6 +83,7 @@ module applicationInsightsModule 'application/analyticsApplicationInsights.bicep
 module analyticsStorageModule 'application/analyticsStorage.bicep' = {
   name: 'analyticsStorageAccountApplicationModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     resourceNames: resourceNames
     storageFirewallRules: maintenanceIpRanges
     deployAlerts: true
@@ -104,6 +105,7 @@ module analyticsStorageBackupModule '../common/components/recovery-services-vaul
 module analyticsFunctionAppModule 'application/analyticsFunctionApp.bicep' = {
   name: 'analyticsFunctionAppModule'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     useUserAssignedIdentity: deployAppIdentities
     storageAccountSku: storageAccountSku
     resourceNames: resourceNames

@@ -36,6 +36,9 @@ param deployBackupVaultRoleAssignment bool
 @description('Whether to register this server with Backup Vault')
 param deployBackupVaultRegistration bool
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -58,6 +61,7 @@ module postgreSqlServerModule '../../components/postgreSqlFlexibleServer.bicep' 
     serverConfig: serverConfig
     firewallRules: formattedFirewallRules
     databaseNames: ['public_data']
+    deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
     privateEndpointSubnetId: privateEndpointSubnetId
     alerts: deployAlerts ? {
       availability: true

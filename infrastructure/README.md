@@ -1,8 +1,11 @@
 # EES infrastructure
 
 The move to the DfE Enterprise Landing Zone (ELZ) is planned and tracked in
-[azure-resource-update-plan-for-elz.md](../azure-resource-update-plan-for-elz.md): naming, network layout, decisions,
+[azure-resource-update-plan-for-elz.md](azure-resource-update-plan-for-elz.md): naming, network layout, decisions,
 and the status of each action.
+
+[elz-setup-guide.md](elz-setup-guide.md) records the one-off setup an ELZ environment needs before its pipelines
+can run, such as variable groups, as we carry it out.
 
 ## Deploying a new environment
 
@@ -12,7 +15,8 @@ ones create, such as file shares to mount and the main apps' user-assigned ident
 1. Core, with Front Door (and Data Factory) but not Application Gateway.
 2. Analytics and Search, in either order.
 3. Public API, with the PostgreSQL Flexible Server but not the Container App or Data Processor, which allow calls from
-   Admin's identity. Then add the PostgreSQL users manually.
+   Admin's identity. Then add the PostgreSQL users manually. In the ELZ, also ask the DfE networking team for the
+   Container App Environment's private DNS records (see below), as we can't create private DNS zones there.
 4. Main (`bicep-main-infrastructure-release`), which mounts the Analytics and Public API file shares, and creates
    Admin's user-assigned identity. Then give Admin's identity the Public API's `Admin.Access` app role manually (see
    below).
@@ -21,6 +25,24 @@ ones create, such as file shares to mount and the main apps' user-assigned ident
    App.
 
 Each pipeline's `ci/azure-pipelines.yml` says which of these steps it covers.
+
+### Requesting the Public API's private DNS records in the ELZ
+
+The Public API Container App Environment is internal, so its apps are only reachable by their private FQDNs, which
+Admin (`PublicDataApi__PrivateUrl`) and the Application Gateway use. Outside the ELZ, the Public API pipeline creates a
+private DNS zone for the environment's domain. In the ELZ, private DNS zones are managed centrally, so the DfE
+networking team has to create it.
+
+The zone name and IP address only exist once the environment has been created, which happens on the Public API
+pipeline's first run (step 3). Then look them up:
+
+```bash
+az containerapp env show --resource-group <resource group> --name <Container App Environment name> \
+  --query "{domain: properties.defaultDomain, ip: properties.staticIp}"
+```
+
+Ask for a private DNS zone named after `domain`, linked to the environment's VNet, with `*` and `@` A records pointing
+at `ip`. It needs to be in place before step 6, when the Application Gateway starts routing to the Public API.
 
 ### Giving Admin the Public API's `Admin.Access` app role
 

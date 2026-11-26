@@ -22,6 +22,9 @@ param privateEndpointSubnetId string?
 @minLength(0)
 param privateLinkServiceConnectionNameOverride string?
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('Tags for the resources')
 param tagValues object
 
@@ -57,6 +60,7 @@ module privateEndpointModule '../privateEndpoint.bicep' = if (privateEndpointSub
     serviceId: sqlServer.id
     serviceName: sqlServerName
     serviceType: 'azureSql'
+    deployPrivateDnsZoneGroup: deployPrivateDnsZoneGroups
     subnetId: privateEndpointSubnetId!
     location: location
     privateLinkServiceConnectionNameOverride: privateLinkServiceConnectionNameOverride

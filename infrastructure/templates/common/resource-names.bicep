@@ -854,7 +854,8 @@ func getElzResourceNames(env string) ResourceNames => {
     logging: elzStorageAccountName(env, 'logging')
   }
   // TODO EES-7502 - these keep the existing one-to-one set of subnets for now. See "Subnet migration" in
-  // azure-resource-update-plan-for-elz.md for the proposed consolidation into shared private endpoint subnets.
+  // infrastructure/azure-resource-update-plan-for-elz.md for the proposed consolidation into shared private endpoint
+  // subnets.
   vnet: {
     vnet: elzName(env, elzAbbreviations.networkVirtualNetworks, 'ees')
     subnets: {

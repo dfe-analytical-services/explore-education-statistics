@@ -44,6 +44,9 @@ param storageSharedKeyAccessEnabled bool = true
 @description('The id of the Log Analytics workspace which logs and metrics will be sent to.')
 param logAnalyticsWorkspaceId string
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -105,6 +108,7 @@ module searchStorageAccountModule '../../common/components/storage/storage-accou
       latency: false
       alertsGroupName: resourceNames.alertsGroup
     }
+    deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
     privateEndpointSubnetIds: {
       blob: searchStoragePrivateEndpointSubnet.id
     }

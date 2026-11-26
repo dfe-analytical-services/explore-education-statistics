@@ -37,6 +37,9 @@ param deployAlerts bool
 @description('Whether to grant the Admin App Service\'s and Publisher Function App\'s system-assigned identities their roles here. They will have user-assigned identities under the ELZ and role management will happen in their owning pipeline.')
 param deploySystemAssignedIdentityRoleAssignments bool
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -62,6 +65,7 @@ resource eventGridCustomTopicPrivateEndpointsSubnet 'Microsoft.Network/virtualNe
 module eventGridMessagingModule '../../../common/components/event-grid/eventGridMessaging.bicep' = {
   name: 'eventGridMessagingModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
     location: location
     ipRules: ipRules
     publicNetworkAccessEnabled: publicNetworkAccessEnabled

@@ -116,6 +116,7 @@ module coreStorage 'application/shared/coreStorage.bicep' = {
 module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
   name: 'screenerLogsStorageModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     storageAccountSku: storageAccountSku
     resourceNames: resourceNames
     storageFirewallRules: maintenanceIpRanges
@@ -127,6 +128,7 @@ module screenerLogsStorageModule 'application/screenerLogsStorage.bicep' = {
 module screenerFunctionAppModule 'application/screenerContainerisedFunctionApp.bicep' = {
   name: 'screenerFunctionModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
     useUserAssignedIdentity: deployAppIdentities
     storageAccountSku: storageAccountSku

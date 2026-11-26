@@ -11,6 +11,9 @@ param config StorageAccountConfig
 @description('Firewall rules.')
 param storageFirewallRules IpRange[]
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -39,6 +42,7 @@ module publicApiStorageAccountModule '../../../common/components/storage/storage
       latency: true
       alertsGroupName: resourceNames.alertsGroup
     } : null
+    deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
     privateEndpointSubnetIds: {
       file: storagePrivateEndpointSubnet.id
     }

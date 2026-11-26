@@ -4,6 +4,8 @@ The plan for moving Explore Education Statistics (EES) to the new **s292** subsc
 
 Most of this can be done while we wait on the platform team, because it doesn't depend on IP ranges.
 
+The steps for setting up each ELZ environment in Azure DevOps and Azure are recorded, as we carry them out, in [infrastructure/elz-setup-guide.md](elz-setup-guide.md).
+
 **Status labels used below**
 - **Decided**: agreed; build it this way.
 - **Proposed**: recommended, awaiting a decision.
@@ -51,6 +53,7 @@ Most of this can be done while we wait on the platform team, because it doesn't 
 | 25 | Naming | The `01` instance number is only used on resources we could run two of for the same purpose (apps, plans, App Insights, Key Vault, SQL and PostgreSQL servers, VNet, App Gateway, Front Door profile and endpoint, Search, Container Apps environment, Data Factory, vaults, identities, alerts). Resources named by their purpose drop it: Event Grid topics and subscriptions, backup and WAF policies, the Front Door security policy, Front Door custom domains, origin groups, origins and routes, subnets and file shares. e.g. `s292d01evgt-uks-publicationchanged`, `snet-uks-admin` (see decision 26 for the prefix). | Decided |
 | 26 | Naming | Policies and child resources drop the environment prefix too, since their names only need to be unique within their parent or resource group: `{type}-uks-{purpose}`. Covers WAF policies, backup policies, the Front Door security policy, Front Door custom domains, origin groups, origins and routes, Event Grid subscriptions, subnets and file shares, e.g. `waf-uks-agwglobal`, `snet-uks-admin`, `fdfpuksees`. Event Grid topics keep the prefix because their endpoints must be unique within the region. Top-level resources keep it so they're distinguishable across environments in alerts, cost reports and Log Analytics. | Decided |
 | 27 | Naming | Event Grid topics deliberately keep the environment prefix (but not `01`), e.g. `s292d01evgt-uks-publicationchanged`. A custom topic's name becomes part of its public endpoint hostname, `https://{topic}.uksouth-1.eventgrid.azure.net/api/events`, so it must be unique within the region across all of Azure. Without the prefix, every environment would try to claim the same hostname in UK South, and any other Azure customer using the name would block us. Their child Event Grid subscriptions don't need it (decision 26). | Decided |
+| 28 | Network | We don't create private DNS zones in the ELZ: the DfE networking team manages them centrally and has confirmed we can't deploy our own. See [section 7.1](#71-private-dns). | Decided |
 
 ## 2. Actions
 
@@ -63,7 +66,7 @@ Status: **Done** (merged), **In progress** (in review or uncommitted), **To do**
 | 3 | Move every pipeline (Bicep and YAML) onto the shared names, verified with identical snapshots | In progress | Stack #7429. YAML pipelines use `get-resource-names.yml` |
 | 4 | Add the `elz` flag to `ResourceNamingContext`, the ELZ abbreviations (`abbreviations-elz.bicep`) and `getElzResourceNames()` | In progress | Legacy output verified unchanged. ELZ output matches [section 4](#4-resource-naming) except the interim subnets |
 | 5 | Make the Robot UI tests job pick its Key Vault name from the `elz` flag | In progress | Interim Bash step; see [follow-up 1](#9-follow-up-work) |
-| 6 | Pass the `elz` flag into every template's naming context, and create the `parameters/elz/` param files | In progress | All 14 templates take `param elz bool = false`. 56 ELZ param files each extend their legacy file and set `elz = true`. The new `use-elz-param-file.yml` step switches each deploy job's `$(paramFile)` to `elz/` when the variable group's `elz` is `true`. Verified by snapshot: legacy output unchanged; all 56 ELZ param files deploy-snapshot with ELZ names |
+| 6 | Pass the `elz` flag into every template's naming context, and create the `parameters/elz/` param files | In progress | All 14 templates take `param elz bool = false`. 56 ELZ param files each extend their legacy file and set `elz = true`. The new `common/ci/tasks/choose-elz-or-legacy-bicepparam-files.yml` step switches each deploy job's `$(paramFile)` to `elz/` when the variable group's `elz` is `true`. Verified by snapshot: legacy output unchanged; all 56 ELZ param files deploy-snapshot with ELZ names |
 | 7 | Let `get-resource-names.yml` take the `elz` flag | In progress | Sets `RESOURCE_NAMES_ELZ=true` only when the variable group's `elz` is exactly `true` |
 | 8 | Add `elz: true` and `subscription` to the s292 environments' variable groups | To do | Once the environments exist |
 | 9 | Send the questions in [section 8](#8-open-questions) to the platform team | To do | Draft message written |
@@ -87,6 +90,9 @@ Status: **Done** (merged), **In progress** (in review or uncommitted), **To do**
 | 23 | Tidy-ups: retire `infrastructure/infrastructure-pipeline.yml`, delete the unused Basic ACR module, update preview API versions | To do | [Section 6.9](#69-api-versions-and-leftovers) |
 | 24 | Stop using the overrides that reproduce legacy, ARM-template-era names in ELZ, so new resources get the standard Bicep names. Role assignments: the `legacyKeyVaultRoleAssignmentName` flag (`function-app.bicep`, `app-service.bicep`, and set to `true` by the Admin, Content API, Data API, Public Site, Importer, Notifier and Publisher templates) and explicit `roleAssignmentNameOverride` values (Data Factory's Key Vault role, the Public Site's Search Index Data Reader role, and the Backup vault's roles on core and public storage). Private endpoints: `privateEndpointNameOverride` (`<account>-file`, `-blob`, `-queue`, `-table` in `storage-account.bicep`) and `privateLinkServiceConnectionNameOverride` (`<server>-pep-conn` for both SQL servers). Once legacy is retired, remove the overrides and the `legacyKeyVaultRoleAssignmentName` flag altogether | To do | Role assignment names can change later at the cost of recreating the assignments, but private endpoint names are fixed once created, so these need settling before the first ELZ build. Private endpoint names overlap with action 13. Already tracked in code as `TODO EES-7502 - standardise role assignment GUIDs` (`storageAccountRoleAssignment.bicep`, `keyVaultRoleAssignment.bicep`, `searchServiceRoleAssignment.bicep`, `core-storage-account.bicep`, `public-storage-account.bicep`). Function apps with a user-assigned identity already ignore `legacyKeyVaultRoleAssignmentName` (EES-7805 part 2) |
 | 25 | Re-tag the `TODO EES-7502` comments, as EES-7502 is closed. Post-migration clean-ups go to the new clean-up ticket: legacy naming quirks (`abbreviations.bicep`, and the Core and Notifier storage, Public Site Front Door, and Data Processor and Screener plan names in `resource-names.bicep`), `systemAssignedIdentityAppSettings` (`function-app.bicep`, `containerised-function-app.bicep`) and `startScreeningSystemAssignedIdentityAppSettings` (`screenerContainerisedFunctionApp.bicep`), Admin's and the Publisher's system-assigned identities for PostgreSQL (`keepSystemAssignedIdentity` in `function-app.bicep`, `app-service.bicep`, `swap-slot.bicep`, `admin/main.bicep` and `publisher/main.bicep`, `PsqlUseSystemAssignedIdentity` in `Common/Extensions/ServiceCollectionExtensions.cs`), the core grants to Admin's system-assigned identity, the `adminUsesUserAssignedIdentity` lookups (`screenerContainerisedFunctionApp.bicep`, `publicApiApp.bicep`, `publicApiDataProcessor.bicep`), the Data Processor's connection-string alternative to identity-based storage (`identityBasedStorageConnections` in `durableFunctionApp.bicep` and `publicApiDataProcessor.bicep`), the Key Vault alternatives to keyless storage connection strings (`identityBasedStorageConnections` in the release pipeline's app settings templates, `search/main.bicep` and `searchDocsFunctionApp.bicep`, `dataProcessorPrivateStorageConnectionString` in `public-api/main.bicep`), the stored storage connection strings (`storeStorageAccountConnectionStrings` in `core/main.bicep` and `bicep-main-infrastructure-release/main.bicep`), the storage accounts' shared key access (`storageSharedKeyAccessEnabled` in `core/main.bicep`, `bicep-main-infrastructure-release/main.bicep` and `search/main.bicep`, `dataProcessorManagementStorageSharedKeyAccessEnabled` in `public-api/main.bicep`), the SQL servers' access key alternative to identity-based audit storage (`sqlServerIdentityBasedAuditStorage` in `core/main.bicep`, `identityBasedAuditStorage` in `azure-sql/sql-server.bicep` and `diagnostics-and-auditing.bicep`), the content share switch for the Dedicated plan Function Apps (`functionAppContentShares` in `bicep-main-infrastructure-release/main.bicep`), the conditional storage data role grants (`admin`, `importer`, `notifier`, `publisher`, `content-api` and `data-api` `main.bicep`, `screenerContainerisedFunctionApp.bicep`, `searchDocsFunctionApp.bicep`), the core grants to the Publisher's system-assigned identity and `deploySystemAssignedIdentityRoleAssignments` (`content-api-front-door.bicep`, `eventMessaging.bicep`, `core/main.bicep`, `publisher/main.bicep`), and the removal of the legacy role assignment and private endpoint name overrides. Pre-migration ELZ work goes to its ELZ ticket: subnet naming and the one-to-one ELZ subnets (`resource-names.bicep`, actions 10a and 12), and standard names for new ELZ role assignments and private endpoints (action 24). Separate improvements get their own tickets: `run-robot-tests.yml` (follow-up 1) and `get-new-appsettings.yml` (Bicep snapshot). Drop the tag from the explanatory comment in `core-sql-server/sql-server.bicep` | To do | Find them with `grep -rn "EES-7502" --exclude-dir=node_modules`, about 30 references when this was added. Needs the new ticket numbers first |
+| 26 | Don't create private DNS zones in the ELZ (decision 28) | In progress | EES-7886. [Section 7.1](#71-private-dns) lists every change. Done: core's shared zones, the Public API Container App Environment's private zone, and the private endpoints' DNS zone groups. Verified by snapshot. Still to do: confirm with the networking team that policy registers our private endpoints in the central zones ([question 4](#8-open-questions)), and request the Container App Environment's zone and records once the environment exists |
+| 27 | Pass `resourceTags` to the Main infrastructure pipeline (`bicep-main-infrastructure-release`), so its resources get the ELZ's mandatory tags | To do | The Core, Public API, Screener, Search and Analytics pipelines pass the `Common` variable group's `resourceTags` to their templates, and extra tags such as `Service Offering` and `Product` pass through. The Main template takes a `tags` param instead, which its pipeline never sets, so its resources get empty legacy tag values plus `Environment` and `DateProvisioned`. Data Factory pipelines only deploys Data Factory's child resources, which can't be tagged |
+| 28 | Add ELZ support to `scripts/create-vmss-agent-pool.sh`, which creates the pipeline agent scale sets | To do | It hardcodes the legacy resource group, `westeurope` and a subnet ID containing the legacy subscription ID. In the ELZ it needs: the shared tooling resource group and its network (action 15, [question 6](#8-open-questions)); UK South; the ELZ's mandatory tags (`--tags`); outbound internet access for the agents ([question 5](#8-open-questions)); and the `EncryptionAtHost` feature registered in the new subscription. Environment-specific values should come from outside the script rather than be committed. Keep the Azure DevOps pool names (`ees-ubuntu2604-large-v2`, `ees-ubuntu2604-xlarge-v2`), which the pipelines refer to. Do action 16 at the same time, as the new scale sets boot from the bootstrap script |
 
 ## 3. Approach
 
@@ -434,15 +440,15 @@ Already on Linux: the Public Site (container), the Public API (Container App), a
 Changes needed:
 - **Build pipeline:** `azure-pipelines-main.yml` publishes the Data API, Content API and Admin with `--self-contained true -r win-x64` (lines 177, 193 and 372). Switch to `linux-x64`, or drop self-contained. Importer, Notifier and Publisher publish without a runtime identifier, so check what they output.
 - **App settings:**
-  - `WEBSITE_LOAD_CERTIFICATES: '*'` is only set on Windows ([app-service.bicep:187-189](infrastructure/templates/common/components/app-service/app-service.bicep#L187-L189)). Check whether any app reads certificates from the store; on Linux they're files under `/var/ssl`.
-  - `WEBSITE_NODE_DEFAULT_VERSION` is set on every App Service ([app-service.bicep:174](infrastructure/templates/common/components/app-service/app-service.bicep#L174)) but does nothing on Linux.
+  - `WEBSITE_LOAD_CERTIFICATES: '*'` is only set on Windows ([app-service.bicep:187-189](templates/common/components/app-service/app-service.bicep#L187-L189)). Check whether any app reads certificates from the store; on Linux they're files under `/var/ssl`.
+  - `WEBSITE_NODE_DEFAULT_VERSION` is set on every App Service ([app-service.bicep:174](templates/common/components/app-service/app-service.bicep#L174)) but does nothing on Linux.
 - **Runtime stack:** Linux uses `linuxFxVersion` (e.g. `DOTNETCORE|10.0`) in place of `netFrameworkVersion: 'v10.0'`.
 - **Code and testing:** Linux file paths are case-sensitive, so test all six apps. The Importer's `libmagic` dependency ships a Linux `.so`, but it hasn't been run on Linux.
-- **Tidy-up:** the Data Processor site is `kind: 'functionapp'` while its plan is Linux ([durableFunctionApp.bicep:322](infrastructure/templates/public-api/components/durableFunctionApp.bicep#L322)). Make it `functionapp,linux`.
+- **Tidy-up:** the Data Processor site is `kind: 'functionapp'` while its plan is Linux ([durableFunctionApp.bicep:322](templates/public-api/components/durableFunctionApp.bicep#L322)). Make it `functionapp,linux`.
 
 ### 6.3 App Service plan tiers
 **Proposed.**
-- **Move PremiumV2 plans to PremiumV3.** Every App Service plan today is on Pv2, Basic or Standard, and the SKU type only allows Basic, Standard, PremiumV2 and ElasticPremium ([app-service-plan/types.bicep](infrastructure/templates/common/components/app-service-plan/types.bicep)). Pv3 gives more memory per core and usually costs less for the same capacity † (e.g. P0v3/P1v3 against P1V2/P2V2). Compare current pricing before choosing sizes, and consider Pv4 where it's offered †.
+- **Move PremiumV2 plans to PremiumV3.** Every App Service plan today is on Pv2, Basic or Standard, and the SKU type only allows Basic, Standard, PremiumV2 and ElasticPremium ([app-service-plan/types.bicep](templates/common/components/app-service-plan/types.bicep)). Pv3 gives more memory per core and usually costs less for the same capacity † (e.g. P0v3/P1v3 against P1V2/P2V2). Compare current pricing before choosing sizes, and consider Pv4 where it's offered †.
 - **Consider Flex Consumption for Notifier and Publisher** once they're on Linux. They run on B1/S1 dedicated plans today. Flex Consumption supports VNet integration and identity-based storage, but has no deployment slots. Only worth it if slot swapping isn't needed for them.
 - **Keep Elastic Premium (EP1, EP3 for Screener in Prod)** for the Linux function apps.
 
@@ -469,15 +475,15 @@ Also:
 ### 6.5 Databases
 **Proposed.**
 - **Azure SQL:** every database has `zoneRedundant: false`. Turn it on ([decision 19](#1-key-decisions), section 6.10). Entra-only authentication is covered in [section 7](#7-identity-and-network-access).
-- **SQL `publicNetworkAccess`:** Prod is still Enabled (the default at [core/main.bicep:86](infrastructure/templates/core/main.bicep#L86)), while Dev, Test and Pre-Prod disable it. Build ELZ with it Disabled everywhere.
+- **SQL `publicNetworkAccess`:** Prod is still Enabled (the default at [core/main.bicep:86](templates/core/main.bicep#L86)), while Dev, Test and Pre-Prod disable it. Build ELZ with it Disabled everywhere.
 - **SQL tiers:** Content uses DTU Standard on Dev, Test and Pre-Prod but vCore serverless on Prod. DTU Standard can't be zone-redundant †, so use vCore (serverless or provisioned) wherever zone redundancy is wanted. That also makes non-Prod behave like Prod.
 - **PostgreSQL:** HA is Disabled in every environment, and the Burstable tier used everywhere (B1ms, B2s in Prod) doesn't support HA †. Zone-redundant HA means moving to General Purpose, which roughly doubles the compute cost because a standby runs in a second zone. Update the API version from `2023-03-01-preview` to a GA version.
 
 ### 6.6 Monitoring
 **Decided** ([decision 17](#1-key-decisions)). Move the last instrumentation-key uses to connection strings as part of the move. Ingestion by instrumentation key stopped being supported on 31 March 2025 †.
-- App Services: `APPINSIGHTS_INSTRUMENTATIONKEY` and `AppInsights__InstrumentationKey` ([app-service.bicep:166-173](infrastructure/templates/common/components/app-service/app-service.bicep#L166-L173)). Admin also sends its key to the browser.
-- The Data Processor: `APPINSIGHTS_INSTRUMENTATIONKEY` ([durableFunctionApp.bicep:415](infrastructure/templates/public-api/components/durableFunctionApp.bicep#L415)).
-- The Container Apps environment: `daprAIInstrumentationKey` ([containerAppEnvironment.bicep:48](infrastructure/templates/public-api/components/containerAppEnvironment.bicep#L48)).
+- App Services: `APPINSIGHTS_INSTRUMENTATIONKEY` and `AppInsights__InstrumentationKey` ([app-service.bicep:166-173](templates/common/components/app-service/app-service.bicep#L166-L173)). Admin also sends its key to the browser.
+- The Data Processor: `APPINSIGHTS_INSTRUMENTATIONKEY` ([durableFunctionApp.bicep:415](templates/public-api/components/durableFunctionApp.bicep#L415)).
+- The Container Apps environment: `daprAIInstrumentationKey` ([containerAppEnvironment.bicep:48](templates/public-api/components/containerAppEnvironment.bicep#L48)).
 
 The function apps and the Public API Container App already use connection strings.
 
@@ -493,7 +499,7 @@ The function apps and the Public API Container App already use connection string
 | Static Web App (API docs) | Free; Standard on Prod | Keep. Private endpoints need Standard †. |
 | Logic App (Slack alerts) | Consumption | Drop it if the Slack webhooks are removed (EES-7608) |
 | Recovery Services and Backup vaults | Geo-redundant | Keep |
-| Unused Basic ACR module | [public-api/components/containerRegistry.bicep](infrastructure/templates/public-api/components/containerRegistry.bicep) isn't referenced | Delete |
+| Unused Basic ACR module | [public-api/components/containerRegistry.bicep](templates/public-api/components/containerRegistry.bicep) isn't referenced | Delete |
 
 ### 6.8 Runtime versions to watch
 - **Node 22** (Public Site image `node:22.23.3-alpine`, `NodeVersion` in the build): end of life April 2027 †. Plan a move to Node 24 LTS.
@@ -545,7 +551,7 @@ Things to handle:
 ### 6.12 Data processor Durable Functions storage
 **Decided** ([decision 20](#1-key-decisions)): keep the Azure Storage backend, connected by managed identity.
 
-Today the processor has three storage accounts, all connected by Key Vault-stored connection strings ([durableFunctionApp.bicep:157-159,391-440](infrastructure/templates/public-api/components/durableFunctionApp.bicep#L157-L159)):
+Today the processor has three storage accounts, all connected by Key Vault-stored connection strings ([durableFunctionApp.bicep:157-159,391-440](templates/public-api/components/durableFunctionApp.bicep#L157-L159)):
 
 | Account | Used for | ELZ connection |
 |---|---|---|
@@ -573,9 +579,37 @@ These are hard to change once the environments exist, so they belong in the init
 - **Move other secrets to identity:** Durable Functions storage, ACR pulls (service principal password today), SignalR, Azure OpenAI and App Insights (instrumentation keys).
 - **Key Vault:** set `enableRbacAuthorization: true` explicitly.
 - **Pipeline service connections** using workload identity federation.
-- **Private endpoints with public access off**, replacing the service endpoints and VNet rules on SQL and storage. Private DNS zones would be needed for `vault`, `signalr`, `search`, `azurecr` and Azure Monitor, unless the ELZ provides central zones.
+- **Private endpoints with public access off**, replacing the service endpoints and VNet rules on SQL and storage. The ELZ's private DNS zones are central, so the networking team provides the zones these need; see [section 7.1](#71-private-dns).
 - **No fixed outbound IPs needed.** Nothing external allowlists our apps' outbound IPs. The EES-5446 TODOs are about the *pipeline agents'* IPs reaching our resources (the `AzureCloud` service-tag rule and the open SCM site in the Public API templates). They go away once the agents reach us over the private network.
 - **Self-hosted pipeline runners with network access to each environment.** Once public access is off, deploys and SQL migrations need a network path in. The agent VMSS will sit in the shared tooling resource group with the Container Registry ([decision 13](#1-key-decisions)), connected to the environment VNets.
+
+### 7.1 Private DNS
+
+In the ELZ, the DfE networking team manages private DNS zones centrally, and has confirmed that we can't create our own ([decision 28](#1-key-decisions)). These are the places where the templates use private DNS today, and what happens to each in the ELZ:
+
+| What | Where | Legacy | ELZ |
+|---|---|---|---|
+| The shared `privatelink` zones, each linked to our VNet: SQL (linked as `{vnet}-database-vnetlink`), PostgreSQL, sites, Event Grid, file, blob, queue and table | `core/application/virtual-network/private-dns-zones.bicep`, only when the core pipeline's `deployPrivateDnsZones` parameter is `Yes` | Created. They already exist, so the parameter defaults to `No` | Never created: `deployPrivateDnsZones && !elz` in `core/main.bicep`, so the pipeline parameter is ignored. The networking team provides the zones and links them to our VNet |
+| A private zone for the Public API Container App Environment's default domain, with `*` and `@` A records pointing at the environment's static IP, an SOA record and a VNet link. Admin (`PublicDataApi__PrivateUrl`) and the App Gateway reach the Public API through it | `public-api/components/containerAppPrivateDns.bicep`, switched by `deployPrivateDns` in `publicApiApp.bicep` | Created on every Public API deploy | Not created (`deployPrivateDns: !elz` in `public-api/main.bicep`). The domain and IP only exist once the Public API pipeline's first run has created the environment, so we request the zone and records from the networking team then. See "Requesting the Public API's private DNS records in the ELZ" in `infrastructure/README.md` |
+| A DNS zone group (`default`) on every private endpoint, which keeps an A record for the endpoint in the matching `privatelink` zone | `common/components/privateEndpoint.bicep` | Created, pointing at the zone in our resource group | Not created, as the zone it points at won't exist in our resource group. `deployPrivateDnsZoneGroup` in `privateEndpoint.bicep`, passed down as `deployPrivateDnsZoneGroups` through every component and template that creates private endpoints, set to `!elz` by the core, Public API, Screener, Analytics and Search templates. Still to confirm with the networking team that policy creates the zone groups (or the A records) for us. If they want us to point them at the central zones instead, the zone group would take the central zone's resource ID ([question 4](#8-open-questions)) |
+
+Data Factory's managed private endpoints (`data-factory-pipelines/application/configuration/private-endpoints.bicep`) aren't affected, as Data Factory resolves them within its own managed VNet.
+
+**Zones the ELZ needs to provide**, and the private endpoints that use them. Taken from a Dev ELZ snapshot, plus PostgreSQL, which Dev's param files don't deploy:
+
+| Zone | Group ID | Private endpoints |
+|---|---|---|
+| `privatelink.database.windows.net` | `sqlServer` | Both SQL servers |
+| `privatelink.postgres.database.azure.com` | `postgresqlServer` | The PostgreSQL Flexible Server |
+| `privatelink.eventgrid.azure.net` | `topic` | The four Event Grid custom topics |
+| `privatelink.azurewebsites.net` | `sites` | The Data Processor, Screener, NL Search and Search Docs Function Apps (inbound) |
+| `privatelink.file.core.windows.net` | `file` | Public API data storage, the Data Processor's two slot storage accounts, Screener logs and Screener function storage, NL Search and Search Docs function storage, Analytics storage and Analytics function storage |
+| `privatelink.blob.core.windows.net` | `blob` | The Data Processor's management and slot storage accounts, Screener function storage, search storage, NL Search and Search Docs function storage, Analytics function storage |
+| `privatelink.queue.core.windows.net` | `queue` | The Data Processor's management and slot storage accounts, Screener function storage, NL Search and Search Docs function storage, Analytics function storage |
+| `privatelink.table.core.windows.net` | `table` | The Data Processor's management and slot storage accounts |
+| The Container App Environment's default domain (`{name}.uksouth.azurecontainerapps.io`) | - | None: `*` and `@` A records pointing at the environment's static IP |
+
+Moving everything else to private endpoints ([decision 15](#1-key-decisions)) adds more: at least Key Vault (`privatelink.vaultcore.azure.net`), SignalR (`privatelink.service.signalr.net`), AI Search (`privatelink.search.windows.net`) and Azure Monitor, plus blob, queue and table endpoints on the core, public and logging storage accounts and the main apps' storage, and `sites` endpoints for the App Services and other Function Apps. The Container Registry (`privatelink.azurecr.io`) moves to the shared tooling resource group ([decision 13](#1-key-decisions)).
 
 ## 8. Open questions
 
@@ -584,7 +618,7 @@ For the DfE platform team. Their answers could change [section 5](#5-subnet-migr
 1. Can we have a /21 per environment? The ranges allocated (Dev `10.226.192.0/24`, Test `10.221.192.0/24`, Pre-Prod `10.216.192.0/25`, Prod `10.216.192.128/25`) can't hold our subnets; see [section 5](#5-subnet-migration).
 2. Is there a hub VNet, and does traffic between subnets go through a firewall (route tables)?
 3. Does policy require one subnet per trust zone, or NSGs on every subnet?
-4. Are private DNS zones central (managed by policy), or ours to create?
+4. Are private DNS zones central (managed by policy), or ours to create? **Answered:** central; we can't create our own ([decision 28](#1-key-decisions)). Still to ask: does policy create the DNS zone groups on our private endpoints? We've assumed so, and the ELZ templates don't create them. Or should we point them at the central zones' resource IDs? And which of the zones in [section 7.1](#71-private-dns) exist already?
 5. How does outbound internet traffic leave our spoke (e.g. forced through the hub firewall)? If so, what do we need to request so our apps can reach GOV.UK Notify and other external APIs? We don't need fixed outbound IPs.
 6. How should the shared tooling resource group (Container Registry and agent VMSS) connect to the environment VNets: VNet peering to each, or through the hub? Can it reach Test, Pre-Prod and Prod as well as Dev?
 7. Which roles can our pipelines' service principal assign? The legacy subscriptions limit this with role assignment conditions. The ELZ templates assign Storage Blob Data Owner, Storage Blob Data Contributor, Storage Blob Data Reader, Storage Queue Data Contributor, Storage Queue Data Message Sender (new, for Event Grid's queue delivery) and Storage Table Data Contributor (Table is new, for the Data Processor's Durable Functions storage and the Publisher's and Notifier's tables), as well as the Key Vault, Event Grid, Search and Front Door roles they already assign.

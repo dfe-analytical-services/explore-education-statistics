@@ -48,6 +48,9 @@ param functionAppFirewallRules FirewallRule[]
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -105,6 +108,7 @@ module dataProcessorFunctionAppModule '../../components/durableFunctionApp.bicep
     location: location
     applicationInsightsKey: applicationInsightsKey
     subnetId: outboundVnetSubnet.id
+    deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
     privateEndpoints: {
       functionApp: privateEndpointsSubnet.id
       storageAccounts: privateEndpointsSubnet.id

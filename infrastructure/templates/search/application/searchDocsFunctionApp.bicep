@@ -73,6 +73,9 @@ param storageQueueNames SearchStorageQueueNames = {
   themeUpdated: 'theme-updated-queue'
 }
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -248,6 +251,7 @@ module functionAppModule '../../common/components/function-app/function-app.bice
     publicNetworkAccessEnabled: true
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
+    deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
     privateEndpoints: {
       functionApp: searchDocsFunctionAppPrivateEndpointSubnet.id
       storageAccounts: searchDocsFunctionAppPrivateEndpointSubnet.id

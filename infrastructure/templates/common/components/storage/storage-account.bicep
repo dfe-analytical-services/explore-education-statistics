@@ -48,6 +48,9 @@ param alerts {
   alertsGroupName: string
 }?
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -93,6 +96,7 @@ module fileServicePrivateEndpointModule '../privateEndpoint.bicep' = if (private
     serviceName: storageAccount.name
     privateEndpointNameOverride: '${storageAccount.name}-file'
     serviceType: 'fileService'
+    deployPrivateDnsZoneGroup: deployPrivateDnsZoneGroups
     subnetId: privateEndpointSubnetIds.?file ?? ''
     location: location
     tagValues: tagValues
@@ -106,6 +110,7 @@ module blobStoragePrivateEndpointModule '../privateEndpoint.bicep' = if (private
     serviceName: storageAccount.name
     privateEndpointNameOverride: '${storageAccount.name}-blob'
     serviceType: 'blobStorage'
+    deployPrivateDnsZoneGroup: deployPrivateDnsZoneGroups
     subnetId: privateEndpointSubnetIds.?blob ?? ''
     location: location
     tagValues: tagValues
@@ -119,6 +124,7 @@ module queuePrivateEndpointModule '../privateEndpoint.bicep' = if (privateEndpoi
     serviceName: storageAccount.name
     privateEndpointNameOverride: '${storageAccount.name}-queue'
     serviceType: 'queue'
+    deployPrivateDnsZoneGroup: deployPrivateDnsZoneGroups
     subnetId: privateEndpointSubnetIds.?queue ?? ''
     location: location
     tagValues: tagValues
@@ -132,6 +138,7 @@ module tableStoragePrivateEndpointModule '../privateEndpoint.bicep' = if (privat
     serviceName: storageAccount.name
     privateEndpointNameOverride: '${storageAccount.name}-table'
     serviceType: 'tableStorage'
+    deployPrivateDnsZoneGroup: deployPrivateDnsZoneGroups
     subnetId: privateEndpointSubnetIds.?table ?? ''
     location: location
     tagValues: tagValues

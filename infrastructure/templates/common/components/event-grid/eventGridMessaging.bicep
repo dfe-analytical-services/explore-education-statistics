@@ -27,6 +27,9 @@ param customTopics {
   }?
 }?
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('Specifies a set of tags with which to tag resources in Azure.')
 param tagValues object
 
@@ -39,6 +42,7 @@ module eventGridCustomTopicModule 'eventGridCustomTopic.bicep' = [
       name: topicName
       location: location
       ipRules: ipRules
+      deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
       privateEndpointSubnetId: customTopics.?privateEndpointSubnetId
       publicNetworkAccessEnabled: publicNetworkAccessEnabled
       systemAssignedIdentity: true

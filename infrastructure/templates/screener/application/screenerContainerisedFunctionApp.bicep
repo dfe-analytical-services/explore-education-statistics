@@ -71,6 +71,9 @@ param maximumInstanceCount int
 @description('Whether to create or update Azure Monitor alerts during this deploy.')
 param deployAlerts bool
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('A set of tags with which to tag the resource in Azure.')
 param tagValues object
 
@@ -225,6 +228,7 @@ module containerisedFunctionAppModule '../../common/components/function-app/cont
     functionAppFirewallRules: functionAppFirewallRules
     storageFirewallRules: storageFirewallRules
     publicNetworkAccessEnabled: true
+    deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
     privateEndpoints: {
       functionApp: privateEndpointSubnet.id
       storageAccounts: privateEndpointSubnet.id

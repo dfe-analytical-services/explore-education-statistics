@@ -26,6 +26,9 @@ param location string
 @description('Specifies the type of service being attached to the private endpoint')
 param serviceType PrivateDnsZone
 
+@description('Whether to create a DNS zone group, which keeps an A record for the private endpoint in the matching private DNS zone in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroup bool = true
+
 @description('A set of tags with which to tag the resource in Azure')
 param tagValues object
 
@@ -61,14 +64,14 @@ resource privateEndpoint 'Microsoft.Network/privateEndpoints@2024-01-01' = {
   }
 }
 
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing = {
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing = if (deployPrivateDnsZoneGroup) {
   name: privateDnsZoneName
 }
 
 // The private DNS zone group establishes a hard connection between the service being
 // connected and the DNS records in the private DNS zone. It handles updates to DNS
 // records automatically.
-resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = {
+resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2024-01-01' = if (deployPrivateDnsZoneGroup) {
   name: 'default'
   parent: privateEndpoint
   properties: {
@@ -76,7 +79,7 @@ resource privateDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneG
       {
         name: replace(privateDnsZoneName, '.', '-')
         properties: {
-          privateDnsZoneId: privateDnsZone.id
+          privateDnsZoneId: privateDnsZone!.id
         }
       }
     ]

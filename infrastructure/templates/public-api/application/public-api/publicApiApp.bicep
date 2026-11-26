@@ -8,6 +8,9 @@ param resourceNames ResourceNames
 @description('Whether the Admin App Service uses its user-assigned managed identity, rather than its system-assigned one, when calling this app.')
 param adminUsesUserAssignedIdentity bool = false
 
+@description('Whether to create the private DNS zone and records for the Container App Environment\'s domain. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDns bool = true
+
 @description('Specifies the location for all resources.')
 param location string
 
@@ -96,7 +99,7 @@ module apiContainerAppModule '../../components/containerApp.bicep' = {
     userAssignedManagedIdentityId: apiContainerAppManagedIdentity.id
     environmentId: containerAppEnvironmentId
     environmentIpAddress: containerAppEnvironmentIpAddress
-    deployPrivateDns: true
+    deployPrivateDns: deployPrivateDns
     corsPolicy: {
       allowedOrigins: [
         publicSiteUrl

@@ -213,6 +213,7 @@ module vNetModule 'application/shared/virtualNetwork.bicep' = {
 module publicApiStorageModule 'application/public-api/publicApiStorage.bicep' = {
   name: 'publicApiStorageAccountApplicationModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     resourceNames: resourceNames
     config: publicApiStorageConfig
     storageFirewallRules: maintenanceIpRanges
@@ -243,6 +244,7 @@ module appInsightsModule 'application/public-api/publicApiAppInsights.bicep' = {
 module postgreSqlServerModule 'application/shared/postgreSqlFlexibleServer.bicep' = if (deployPsqlFlexibleServer) {
   name: 'postgreSqlFlexibleServerApplicationModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     location: location
     resourceNames: resourceNames
     adminName: postgreSqlAdminName
@@ -288,6 +290,7 @@ module apiAppModule 'application/public-api/publicApiApp.bicep' = if (deployCont
   name: 'publicApiAppApplicationModuleDeploy'
   params: {
     adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity
+    deployPrivateDns: !elz
     location: location
     resourceNames: resourceNames
     apiAppRegistrationClientId: keyVault.getSecret('ees-public-api-app-registration-client-id')
@@ -326,6 +329,7 @@ module docsModule 'application/public-api/publicApiDocs.bicep' = if (deployDocsS
 module dataProcessorModule 'application/public-api/publicApiDataProcessor.bicep' = if (deployDataProcessor) {
   name: 'publicApiDataProcessorApplicationModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     identityBasedStorageConnections: dataProcessorIdentityBasedStorageConnections
     managementStorageSharedKeyAccessEnabled: dataProcessorManagementStorageSharedKeyAccessEnabled
     adminUsesUserAssignedIdentity: adminUsesUserAssignedIdentity

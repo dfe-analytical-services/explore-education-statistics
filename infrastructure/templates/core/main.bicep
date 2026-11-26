@@ -68,7 +68,7 @@ param deploySubnets bool = false
 @description('CIDR address ranges for the VNet and each of its subnets.')
 param vNetAddressRanges VNetAddressRanges
 
-@description('Whether or not to deploy Private DNS Zones.')
+@description('Whether or not to deploy Private DNS Zones. Ignored in the ELZ, where they are managed centrally.')
 param deployPrivateDnsZones bool = false
 
 @description('Whether or not to deploy Azure Front Door.')
@@ -180,7 +180,8 @@ module vNetModule 'application/virtual-network/virtual-network.bicep' = {
   }
 }
 
-module privateDnsZonesModule 'application/virtual-network/private-dns-zones.bicep' = if (deployPrivateDnsZones) {
+// The ELZ's private DNS zones are managed centrally by the DfE networking team, and we can't create our own.
+module privateDnsZonesModule 'application/virtual-network/private-dns-zones.bicep' = if (deployPrivateDnsZones && !elz) {
   name: 'privateDnsZonesApplicationModuleDeploy'
   params: {
     vnetName: vNetModule.outputs.vNetName
@@ -233,6 +234,7 @@ module backupsModule 'application/backups/backups.bicep' = {
 module eventMessagingModule 'application/eventMessaging/eventMessaging.bicep' = {
   name: 'eventMessagingModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     location: location
     eventGridNames: resourceNames.eventGrid
     resourceNames: {
@@ -366,6 +368,7 @@ module publicStorageAccountModule 'application/public-storage-account/public-sto
 module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
   name: 'coreSqlServerModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     serverName: resourceNames.databases.coreSqlServer
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin
@@ -391,6 +394,7 @@ module coreSqlServerModule 'application/core-sql-server/sql-server.bicep' = {
 module publicSqlServerModule 'application/public-sql-server/sql-server.bicep' = {
   name: 'publicSqlServerModuleDeploy'
   params: {
+    deployPrivateDnsZoneGroups: !elz
     serverName: resourceNames.databases.publicSqlServer
     location: location
     sqlAdministratorLogin: sqlAdministratorLogin

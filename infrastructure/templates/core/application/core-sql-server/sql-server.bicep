@@ -56,6 +56,9 @@ param alertsGroupName string
 @description('Whether to create or update Azure Monitor alerts during this deploy')
 param deployAlerts bool
 
+@description('Whether to create DNS zone groups on the private endpoints, which keep their A records in the matching private DNS zones in this resource group. Off in the ELZ, where private DNS zones are managed centrally.')
+param deployPrivateDnsZoneGroups bool = true
+
 @description('Tags for the resources')
 param tagValues object
 
@@ -88,6 +91,7 @@ module sqlServerModule '../../../common/components/azure-sql/sql-server.bicep' =
     sqlAzureAdministratorSid: sqlAzureAdministratorSid
     sqlServerPublicNetworkAccess: sqlServerPublicNetworkAccess
     allowedSubnets: allowedSubnets
+    deployPrivateDnsZoneGroups: deployPrivateDnsZoneGroups
     privateEndpointSubnetId: subnets.sqlServerPrivateEndpoints.id
     // TODO EES-7502 - use standardised name for private endpoint connections.
     privateLinkServiceConnectionNameOverride: '${serverName}-pep-conn'
