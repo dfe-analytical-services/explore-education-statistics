@@ -1,1 +1,4 @@
-export { default } from '@frontend/modules/home/HomePageRedesign';
+export {
+  default,
+  getServerSideProps,
+} from '@frontend/modules/home/HomePageRedesign';

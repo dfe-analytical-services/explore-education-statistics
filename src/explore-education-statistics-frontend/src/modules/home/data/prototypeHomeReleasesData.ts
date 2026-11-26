@@ -49,39 +49,3 @@ export const latestReleases: HomeRelease[] = [
     type: 'AccreditedOfficialStatistics',
   },
 ];
-
-export const popularReleases: HomeRelease[] = [
-  {
-    publicationSlug: 'school-pupils-and-their-characteristics',
-    publicationSummary:
-      'School and pupil statistics for England including age, gender, free school meals (FSM), ethnicity, English as additional language (EAL), class size.',
-    publicationTitle: 'Schools, pupils and their characteristics',
-    publishedDate: '2026-06-04T08:30:09Z',
-    releaseSlug: '2025-26',
-    releaseTitle: 'Academic year 2025/26',
-    theme: 'Pupils and schools',
-    type: 'AccreditedOfficialStatistics',
-  },
-  {
-    publicationSlug: 'special-educational-needs-in-england',
-    publicationSummary:
-      'Pupils in England with SEN support or an education, health and care (EHC) plan. Including type of need, age, sex, free school meals (FSM) and ethnicity.',
-    publicationTitle: 'Special educational needs in England',
-    publishedDate: '2026-06-11T08:30:04Z',
-    releaseSlug: '2025-26',
-    releaseTitle: 'Academic year 2025/26',
-    theme: 'Pupils and schools',
-    type: 'AccreditedOfficialStatistics',
-  },
-  {
-    publicationSlug: 'pupil-attendance-in-schools',
-    publicationSummary:
-      'Fortnightly data on pupil attendance, including by reason, phase and geography.',
-    publicationTitle: 'Pupil attendance in schools',
-    publishedDate: '2026-08-06T08:30:01Z',
-    releaseSlug: '2026-week-29-end-of-25-26-ay',
-    releaseTitle: 'Week 29 2026 (End of 25/26 AY)',
-    theme: 'Pupils and schools',
-    type: 'OfficialStatistics',
-  },
-];

@@ -266,8 +266,11 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         name: 'On this page',
       }),
     );
+    await waitFor(() => {
+      expect(nav.getAllByRole('listitem')).toHaveLength(8);
+    });
+
     const navItems = nav.getAllByRole('listitem');
-    expect(navItems).toHaveLength(8);
 
     expect(
       within(navItems[0]).getByRole('link', {
@@ -1231,9 +1234,13 @@ describe('ReleaseApiDataSetFiltersMappingPage', () => {
         screen.getByRole('navigation', { name: 'On this page' }),
       );
 
-      const navItems = nav.getAllByRole('listitem');
+      // Nav items are derived from state populated in a useEffect after
+      // the mapping query resolves, so wait for them to be rendered.
+      await waitFor(() => {
+        expect(nav.getAllByRole('listitem')).toHaveLength(6);
+      });
 
-      expect(navItems).toHaveLength(6);
+      const navItems = nav.getAllByRole('listitem');
 
       expect(
         within(navItems[0]).getByRole('link', {

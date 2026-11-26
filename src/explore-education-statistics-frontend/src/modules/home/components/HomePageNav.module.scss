@@ -1,0 +1,11 @@
+@use '~govuk-frontend/dist/govuk/base' as *;
+
+.navigationContainer {
+  display: flex;
+  flex-direction: column;
+
+  @include govuk-media-query($from: desktop) {
+    flex-direction: row;
+    gap: govuk-spacing(6);
+  }
+}

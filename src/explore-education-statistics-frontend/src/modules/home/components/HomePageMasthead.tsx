@@ -21,9 +21,10 @@ const HomePageMasthead = () => (
               the Department for Education
             </p>
 
+            {/* TODO: remove ?prototype=true when making prototype live */}
             <SearchDataSearchForm
               method="get"
-              action="/search-releases"
+              action="/search-releases?prototype=true"
               fromHomepage
             />
           </div>
@@ -38,12 +39,17 @@ const HomePageMasthead = () => (
             </h2>
             <ul className="govuk-list">
               <li>
-                <Link to="/find-statistics" className={styles.link}>
+                {/* TODO: remove ?prototype=true when making prototype live */}
+                <Link
+                  to="/search-releases?prototype=true"
+                  className={styles.link}
+                >
                   Explore publications
                 </Link>
               </li>
               <li>
-                <Link to="/data-catalogue" className={styles.link}>
+                {/* TODO: remove ?prototype=true when making prototype live */}
+                <Link to="/search-data?prototype=true" className={styles.link}>
                   Browse data catalogue
                 </Link>
               </li>

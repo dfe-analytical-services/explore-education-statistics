@@ -16,10 +16,11 @@ import {
   AzurePublicationSearchResult,
 } from '@frontend/services/azurePublicationService';
 import { NextApiRequest, NextApiResponse } from 'next';
+import mockSearchLatestReleases from '@frontend/modules/api/search/mock-search-latest-releases';
 
 interface Request extends NextApiRequest {
   body: {
-    searchOptions: AzurePublicationListRequest;
+    searchOptions: AzurePublicationListRequest & { latestReleases?: boolean };
   };
 }
 
@@ -37,9 +38,15 @@ export default withMethods({
       body: { searchOptions },
     } = req;
 
-    const azureSearchClient = initialiseAzurePublicationsSearchClient();
+    if (
+      searchOptions.latestReleases === true &&
+      process.env.USE_MOCK_LATEST_RELEASES === 'true'
+    ) {
+      return res.status(200).send(mockSearchLatestReleases());
+    }
 
     try {
+      const azureSearchClient = initialiseAzurePublicationsSearchClient();
       const {
         filter,
         orderBy,
@@ -57,8 +64,8 @@ export default withMethods({
           configurationName: 'semantic-configuration-1',
         },
         scoringProfile: 'scoring-profile-1',
-        skip: page > 1 ? (page - 1) * 10 : 0,
-        top: 10,
+        skip: page > 1 ? (page - 1) * pageSize : 0,
+        top: pageSize,
       };
 
       // Get all search results

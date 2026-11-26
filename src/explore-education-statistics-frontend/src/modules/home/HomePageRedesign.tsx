@@ -5,6 +5,8 @@ import {
   DfeOpeningHours,
   DfeTelephoneLine,
 } from '@common/modules/find-statistics/components/ContactUsSection';
+import logger from '@common/services/logger';
+import { PublicationListSummary } from '@common/services/publicationService';
 import CookieBanner from '@frontend/components/CookieBanner';
 import Link from '@frontend/components/Link';
 import PageFeedback from '@frontend/components/PageFeedback';
@@ -12,15 +14,19 @@ import PageFooter from '@frontend/components/PageFooter';
 import PageMeta from '@frontend/components/PageMeta';
 import HomePageHeader from '@frontend/modules/home/components/HomePageHeader';
 import HomePageMasthead from '@frontend/modules/home/components/HomePageMasthead';
+import HomePageNav from '@frontend/modules/home/components/HomePageNav';
 import HomeReleaseLink from '@frontend/modules/home/components/HomeReleaseLink';
-import {
-  latestReleases,
-  popularReleases,
-} from '@frontend/modules/home/data/prototypeHomeReleasesData';
+import createStatisticalReleasesListRequest from '@frontend/modules/search-data/utils/createStatisticalReleasesListRequest';
+import azurePublicationService from '@frontend/services/azurePublicationService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
+import { GetServerSideProps } from 'next';
 import React from 'react';
 
-const HomePageRedesign = () => {
+interface Props {
+  latestReleases: PublicationListSummary[] | null;
+}
+
+const HomePageRedesign = ({ latestReleases }: Props) => {
   const logLinkClick = (label: string) =>
     logEvent({
       category: 'Homepage',
@@ -53,44 +59,50 @@ const HomePageRedesign = () => {
         <HomePageMasthead />
 
         <div className="govuk-width-container dfe-width-container--wide">
+          <HomePageNav
+            links={[
+              {
+                id: 'latest-releases',
+                label: 'Latest releases',
+              },
+              {
+                id: 'supporting-information',
+                label: 'Supporting information',
+              },
+              {
+                id: 'contact-us',
+                label: 'Contact us',
+              },
+              {
+                id: 'related-services',
+                label: 'Related services',
+              },
+            ]}
+          />
+
+          <hr />
+
           <section className="govuk-!-padding-bottom-9">
-            <h2 className="govuk-!-margin-top-9">
-              Latest statistical releases
+            <h2 className="govuk-!-margin-top-9" id="latest-releases">
+              Latest releases
             </h2>
 
-            <ol className="govuk-grid-row govuk-list">
-              {latestReleases.map(release => (
-                <li
-                  className="govuk-grid-column-one-third"
-                  key={`${release.publicationSlug}-${release.releaseSlug}`}
-                >
-                  <HomeReleaseLink release={release} onClick={logLinkClick} />
-                </li>
-              ))}
-            </ol>
+            {latestReleases === null && (
+              <p>Could not load the latest releases.</p>
+            )}
+            {latestReleases?.length === 0 && <p>No releases found.</p>}
+            {!!latestReleases?.length && (
+              <ol className="govuk-grid-row govuk-list">
+                {latestReleases.map(release => (
+                  <li className="govuk-grid-column-one-third" key={release.id}>
+                    <HomeReleaseLink release={release} onClick={logLinkClick} />
+                  </li>
+                ))}
+              </ol>
+            )}
+            {/* TODO: remove ?prototype=true when making prototype live */}
             <Link
-              to="/find-statistics"
-              onClick={() => logLinkClick('Find statistics')}
-            >
-              Explore all of our statistical releases
-            </Link>
-
-            <h2 className="govuk-!-margin-top-9">
-              Most popular statistical releases
-            </h2>
-
-            <ol className="govuk-grid-row govuk-list">
-              {popularReleases.map(release => (
-                <li
-                  className="govuk-grid-column-one-third"
-                  key={`${release.publicationSlug}-${release.releaseSlug}`}
-                >
-                  <HomeReleaseLink release={release} onClick={logLinkClick} />
-                </li>
-              ))}
-            </ol>
-            <Link
-              to="/find-statistics"
+              to="/search-releases?prototype=true"
               onClick={() => logLinkClick('Find statistics')}
             >
               Explore all of our statistical releases
@@ -99,7 +111,9 @@ const HomePageRedesign = () => {
 
           <hr />
 
-          <h2 className="govuk-!-margin-top-9">Supporting information</h2>
+          <h2 className="govuk-!-margin-top-9" id="supporting-information">
+            Supporting information
+          </h2>
 
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
@@ -162,8 +176,8 @@ const HomePageRedesign = () => {
 
           <hr />
 
-          <h2 className="govuk-!-margin-top-9">
-            Contact us for help and support
+          <h2 className="govuk-!-margin-top-9" id="contact-us">
+            Contact us
           </h2>
           <div className="govuk-grid-row govuk-!-margin-bottom-3">
             <div className="govuk-grid-column-two-thirds">
@@ -179,7 +193,11 @@ const HomePageRedesign = () => {
                 If you have any specific statistical or subject-related queries,
                 contact the team or named statistician listed in the 'Contact
                 us' sections of the pages found under{' '}
-                <Link to="/find-statistics">Find statistics and data</Link>.
+                {/* TODO: remove ?prototype=true when making prototype live */}
+                <Link to="/search-releases?prototype=true">
+                  Find statistics and data
+                </Link>
+                .
               </p>
               <p>
                 For any further queries, contact the Explore education
@@ -210,8 +228,8 @@ const HomePageRedesign = () => {
 
           <hr />
 
-          <h2 className="govuk-!-margin-top-9">
-            Other services provided by the Department for Education (DfE)
+          <h2 className="govuk-!-margin-top-9" id="related-services">
+            Related services
           </h2>
           <div className="govuk-grid-row govuk-!-margin-bottom-3">
             <div className="govuk-grid-column-two-thirds">
@@ -290,6 +308,29 @@ const HomePageRedesign = () => {
       <PageFooter width="wide" />
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
+  try {
+    const { results } = await azurePublicationService.listStatisticalReleases({
+      ...createStatisticalReleasesListRequest({
+        releaseType: [
+          'OfficialStatistics',
+          'AccreditedOfficialStatistics',
+          'OfficialStatisticsInDevelopment',
+        ],
+        sortBy: 'newest',
+      }),
+      pageSize: 3,
+
+      latestReleases: true,
+    });
+
+    return { props: { latestReleases: results } };
+  } catch (error) {
+    logger.error(error);
+    return { props: { latestReleases: null } };
+  }
 };
 
 export default HomePageRedesign;
