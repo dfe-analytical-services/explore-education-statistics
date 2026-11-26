@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Predicates;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -26,6 +27,7 @@ public class ReleaseRolloverService(
     IOptions<AppOptions> appOptions,
     ContentDbContext context,
     StatisticsDbContext statisticsDbContext,
+    IFootnoteRepository footnoteRepository,
     IUserService userService,
     IReleaseVersionService releaseVersionService,
     IGuidGenerator guidGenerator,
@@ -78,6 +80,8 @@ public class ReleaseRolloverService(
                         newReleaseVersion: newReleaseVersion
                     );
 
+                    List<Guid> rolledOverSubjectIds = [];
+
                     switch (request.Mode)
                     {
                         case RolloverMode.WithData:
@@ -101,11 +105,10 @@ public class ReleaseRolloverService(
                                 newReleaseVersionId: newReleaseVersion.Id,
                                 dataBlockVersionMap: dataBlockVersionsByTemplateId
                             );
-                            await CopyDataFilesAndSubjects(
+                            rolledOverSubjectIds = await CopyDataFiles(
                                 templateReleaseVersionId: sourceReleaseVersion.Id,
                                 newReleaseVersionId: newReleaseVersion.Id
                             );
-                            // M1.8 copies footnotes.
                             break;
                         case RolloverMode.StructureOnly:
                             CopyContent(
@@ -119,9 +122,34 @@ public class ReleaseRolloverService(
 
                     await context.SaveChangesAsync();
 
-                    return await releaseVersionService.GetRelease(newReleaseVersion.Id);
+                    return (
+                        TemplateReleaseVersionId: sourceReleaseVersion.Id,
+                        NewReleaseVersionId: newReleaseVersion.Id,
+                        RolledOverSubjectIds: rolledOverSubjectIds
+                    );
                 })
-            );
+            )
+            // The Statistics DB is a separate database, so it can't join the Content DB transaction above without
+            // a distributed transaction, which isn't enabled. As in ReleaseAmendmentService, it's copied once the
+            // Content DB side has committed instead.
+            .OnSuccessDo(async rollover =>
+            {
+                if (request.Mode != RolloverMode.WithData)
+                {
+                    return;
+                }
+
+                await CopyStatisticsReleaseVersionAndSubjects(
+                    templateReleaseVersionId: rollover.TemplateReleaseVersionId,
+                    newReleaseVersionId: rollover.NewReleaseVersionId,
+                    rolledOverSubjectIds: rollover.RolledOverSubjectIds
+                );
+                await CopyFootnotes(
+                    templateReleaseVersionId: rollover.TemplateReleaseVersionId,
+                    newReleaseVersionId: rollover.NewReleaseVersionId
+                );
+            })
+            .OnSuccess(rollover => releaseVersionService.GetRelease(rollover.NewReleaseVersionId));
     }
 
     private async Task<Either<ActionResult, ReleaseVersion>> ValidateSourceRelease(ReleaseRolloverCreateRequest request)
@@ -329,8 +357,6 @@ public class ReleaseRolloverService(
         }
     }
 
-    // Only ever called from WithData - a FeaturedTable without a copied DataBlockVersion to repoint at would be
-    // meaningless, and StructureOnly never produces a dataBlockVersionMap.
     private async Task CopyFeaturedTables(
         Guid templateReleaseVersionId,
         Guid newReleaseVersionId,
@@ -365,7 +391,6 @@ public class ReleaseRolloverService(
         context.FeaturedTables.AddRange(newFeaturedTables);
     }
 
-    // Only ever called from WithData - see CopyFeaturedTables.
     private async Task CopyKeyStatisticDataBlocks(
         Guid templateReleaseVersionId,
         Guid newReleaseVersionId,
@@ -399,7 +424,7 @@ public class ReleaseRolloverService(
         context.KeyStatisticsDataBlock.AddRange(newKeyStatisticDataBlocks);
     }
 
-    private async Task CopyDataFilesAndSubjects(Guid templateReleaseVersionId, Guid newReleaseVersionId)
+    private async Task<List<Guid>> CopyDataFiles(Guid templateReleaseVersionId, Guid newReleaseVersionId)
     {
         var templateDataReleaseFiles = await context
             .ReleaseFiles.Include(releaseFile => releaseFile.File)
@@ -432,33 +457,9 @@ public class ReleaseRolloverService(
             context.ReleaseFiles.Add(BuildNewReleaseFile(templateMetadataReleaseFile, newReleaseVersionId));
         }
 
-        var templateStatsReleaseVersion = await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(
-            releaseVersion => releaseVersion.Id == templateReleaseVersionId
-        );
-
-        // A release doesn't have to have any stats uploaded.
-        if (templateStatsReleaseVersion is null)
-        {
-            return;
-        }
-
-        statisticsDbContext.ReleaseVersion.Add(
-            new Data.Model.ReleaseVersion
-            {
-                Id = newReleaseVersionId,
-                PublicationId = templateStatsReleaseVersion.PublicationId,
-            }
-        );
-
-        statisticsDbContext.ReleaseSubject.AddRange(
-            templateDataReleaseFiles.Select(templateDataReleaseFile => new Data.Model.ReleaseSubject
-            {
-                ReleaseVersionId = newReleaseVersionId,
-                SubjectId = templateDataReleaseFile.File.SubjectId!.Value,
-            })
-        );
-
-        await statisticsDbContext.SaveChangesAsync();
+        return templateDataReleaseFiles
+            .Select(templateDataReleaseFile => templateDataReleaseFile.File.SubjectId!.Value)
+            .ToList();
     }
 
     private ReleaseFile BuildNewReleaseFile(ReleaseFile templateReleaseFile, Guid newReleaseVersionId) =>
@@ -479,4 +480,70 @@ public class ReleaseRolloverService(
             PublicApiDataSetVersion = templateReleaseFile.PublicApiDataSetVersion,
             PublicApiCompatible = templateReleaseFile.PublicApiCompatible,
         };
+
+    private async Task CopyStatisticsReleaseVersionAndSubjects(
+        Guid templateReleaseVersionId,
+        Guid newReleaseVersionId,
+        List<Guid> rolledOverSubjectIds
+    )
+    {
+        var templateStatsReleaseVersion = await statisticsDbContext.ReleaseVersion.SingleOrDefaultAsync(
+            releaseVersion => releaseVersion.Id == templateReleaseVersionId
+        );
+
+        // A release doesn't have to have any stats uploaded.
+        if (templateStatsReleaseVersion is null)
+        {
+            return;
+        }
+
+        statisticsDbContext.ReleaseVersion.Add(
+            new Data.Model.ReleaseVersion
+            {
+                Id = newReleaseVersionId,
+                PublicationId = templateStatsReleaseVersion.PublicationId,
+            }
+        );
+
+        statisticsDbContext.ReleaseSubject.AddRange(
+            rolledOverSubjectIds.Select(subjectId => new Data.Model.ReleaseSubject
+            {
+                ReleaseVersionId = newReleaseVersionId,
+                SubjectId = subjectId,
+            })
+        );
+
+        await statisticsDbContext.SaveChangesAsync();
+    }
+
+    private async Task<Dictionary<Guid, Guid>> CopyFootnotes(Guid templateReleaseVersionId, Guid newReleaseVersionId)
+    {
+        var templateFootnotes = await footnoteRepository.GetFootnotes(templateReleaseVersionId);
+
+        var newFootnoteIdToTemplateFootnoteId = new Dictionary<Guid, Guid>();
+
+        foreach (var templateFootnote in templateFootnotes)
+        {
+            var newFootnote = await footnoteRepository.CreateFootnote(
+                releaseVersionId: newReleaseVersionId,
+                content: templateFootnote.Content,
+                filterIds: templateFootnote.Filters.Select(filterFootnote => filterFootnote.FilterId).ToHashSet(),
+                filterGroupIds: templateFootnote
+                    .FilterGroups.Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId)
+                    .ToHashSet(),
+                filterItemIds: templateFootnote
+                    .FilterItems.Select(filterItemFootnote => filterItemFootnote.FilterItemId)
+                    .ToHashSet(),
+                indicatorIds: templateFootnote
+                    .Indicators.Select(indicatorFootnote => indicatorFootnote.IndicatorId)
+                    .ToHashSet(),
+                subjectIds: templateFootnote.Subjects.Select(subjectFootnote => subjectFootnote.SubjectId).ToHashSet(),
+                order: templateFootnote.Order
+            );
+
+            newFootnoteIdToTemplateFootnoteId[newFootnote.Id] = templateFootnote.Id;
+        }
+
+        return newFootnoteIdToTemplateFootnoteId;
+    }
 }

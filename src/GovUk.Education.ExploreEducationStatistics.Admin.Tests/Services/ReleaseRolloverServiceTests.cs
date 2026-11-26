@@ -14,6 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -1603,6 +1605,299 @@ public abstract class ReleaseRolloverServiceTests
         }
 
         [Fact]
+        public async Task GivenWithDataMode_CopiesFootnotesLinkedToRolledOverSubjects()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            var subject1 = _dataFixture.DefaultSubject().Generate();
+
+            var subject2 = _dataFixture
+                .DefaultSubject()
+                .WithFilters(_dataFixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(1))
+                .WithIndicatorGroups(
+                    _dataFixture
+                        .DefaultIndicatorGroup()
+                        .WithIndicators(_dataFixture.DefaultIndicator().Generate(1))
+                        .Generate(1)
+                )
+                .Generate();
+
+            // Linked directly to just one subject - no filters/indicators at all.
+            var footnoteOnSubjectOnly = _dataFixture
+                .DefaultFootnote()
+                .WithReleaseVersionId(sourceReleaseVersion.Id)
+                .WithContent("Subject-level footnote")
+                .WithOrder(0)
+                .WithSubjects([subject1])
+                .Generate();
+
+            // Linked via a filter/filter group/filter item/indicator, not directly via Subjects at all.
+            var footnoteOnFilterAndIndicator = _dataFixture
+                .DefaultFootnote()
+                .WithReleaseVersionId(sourceReleaseVersion.Id)
+                .WithContent("Filter and indicator footnote")
+                .WithOrder(1)
+                .WithFilters(subject2.Filters)
+                .WithFilterGroups(subject2.Filters[0].FilterGroups)
+                .WithFilterItems(subject2.Filters[0].FilterGroups[0].FilterItems)
+                .WithIndicators(subject2.IndicatorGroups[0].Indicators)
+                .Generate();
+
+            // Shared across both rolled-over subjects - must be copied once only, carrying BOTH subject links.
+            var footnoteSharedAcrossSubjects = _dataFixture
+                .DefaultFootnote()
+                .WithReleaseVersionId(sourceReleaseVersion.Id)
+                .WithContent("Shared footnote")
+                .WithOrder(2)
+                .WithSubjects([subject1, subject2])
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.Add(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion
+                    {
+                        Id = sourceReleaseVersion.Id,
+                        PublicationId = publication.Id,
+                    }
+                );
+                statisticsDbContext.Subject.AddRange(subject1, subject2);
+                statisticsDbContext.ReleaseSubject.AddRange(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject
+                    {
+                        ReleaseVersionId = sourceReleaseVersion.Id,
+                        SubjectId = subject1.Id,
+                    },
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject
+                    {
+                        ReleaseVersionId = sourceReleaseVersion.Id,
+                        SubjectId = subject2.Id,
+                    }
+                );
+                statisticsDbContext.Footnote.AddRange(
+                    footnoteOnSubjectOnly,
+                    footnoteOnFilterAndIndicator,
+                    footnoteSharedAcrossSubjects
+                );
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    statisticsDbContext: statisticsDbContext,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.WithData,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var newFootnotes = await statisticsDbContext
+                    .Footnote.Include(footnote => footnote.Filters)
+                    .Include(footnote => footnote.FilterGroups)
+                    .Include(footnote => footnote.FilterItems)
+                    .Include(footnote => footnote.Indicators)
+                    .Include(footnote => footnote.Subjects)
+                    .Where(footnote => footnote.ReleaseVersionId == newReleaseVersionId)
+                    .ToListAsync();
+
+                // Exactly 3, not 4 - confirms the shared footnote was only copied once.
+                Assert.Equal(3, newFootnotes.Count);
+
+                var newSubjectOnlyFootnote = Assert.Single(
+                    newFootnotes,
+                    footnote => footnote.Content == footnoteOnSubjectOnly.Content
+                );
+                Assert.NotEqual(footnoteOnSubjectOnly.Id, newSubjectOnlyFootnote.Id);
+                Assert.Equal(footnoteOnSubjectOnly.Order, newSubjectOnlyFootnote.Order);
+                Assert.Equal([subject1.Id], newSubjectOnlyFootnote.Subjects.Select(s => s.SubjectId));
+                Assert.Empty(newSubjectOnlyFootnote.Filters);
+                Assert.Empty(newSubjectOnlyFootnote.FilterGroups);
+                Assert.Empty(newSubjectOnlyFootnote.FilterItems);
+                Assert.Empty(newSubjectOnlyFootnote.Indicators);
+
+                var newFilterAndIndicatorFootnote = Assert.Single(
+                    newFootnotes,
+                    footnote => footnote.Content == footnoteOnFilterAndIndicator.Content
+                );
+                Assert.NotEqual(footnoteOnFilterAndIndicator.Id, newFilterAndIndicatorFootnote.Id);
+                Assert.Equal(footnoteOnFilterAndIndicator.Order, newFilterAndIndicatorFootnote.Order);
+                Assert.Empty(newFilterAndIndicatorFootnote.Subjects);
+                Assert.Equal(
+                    subject2.Filters.Select(filter => filter.Id),
+                    newFilterAndIndicatorFootnote.Filters.Select(filterFootnote => filterFootnote.FilterId)
+                );
+                Assert.Equal(
+                    subject2.Filters[0].FilterGroups.Select(filterGroup => filterGroup.Id),
+                    newFilterAndIndicatorFootnote.FilterGroups.Select(filterGroupFootnote =>
+                        filterGroupFootnote.FilterGroupId
+                    )
+                );
+                Assert.Equal(
+                    subject2.Filters[0].FilterGroups[0].FilterItems.Select(filterItem => filterItem.Id),
+                    newFilterAndIndicatorFootnote.FilterItems.Select(filterItemFootnote =>
+                        filterItemFootnote.FilterItemId
+                    )
+                );
+                Assert.Equal(
+                    subject2.IndicatorGroups[0].Indicators.Select(indicator => indicator.Id),
+                    newFilterAndIndicatorFootnote.Indicators.Select(indicatorFootnote => indicatorFootnote.IndicatorId)
+                );
+
+                var newSharedFootnote = Assert.Single(
+                    newFootnotes,
+                    footnote => footnote.Content == footnoteSharedAcrossSubjects.Content
+                );
+                Assert.NotEqual(footnoteSharedAcrossSubjects.Id, newSharedFootnote.Id);
+                Assert.Equal(footnoteSharedAcrossSubjects.Order, newSharedFootnote.Order);
+                Assert.Equal(
+                    new[] { subject1.Id, subject2.Id }.OrderBy(id => id),
+                    newSharedFootnote.Subjects.Select(subjectFootnote => subjectFootnote.SubjectId).OrderBy(id => id)
+                );
+            }
+        }
+
+        [Fact]
+        public async Task GivenStructureOnlyMode_DoesNotCopyFootnotes()
+        {
+            Publication publication = _dataFixture.DefaultPublication();
+
+            Release sourceRelease = _dataFixture
+                .DefaultRelease()
+                .WithPublication(publication)
+                .WithSlug("2023-24")
+                .Generate();
+
+            ReleaseVersion sourceReleaseVersion = _dataFixture
+                .DefaultReleaseVersion()
+                .WithRelease(sourceRelease)
+                .WithApprovalStatus(ReleaseApprovalStatus.Approved)
+                .WithPublished(DateTimeOffset.UtcNow.AddDays(-30))
+                .Generate();
+
+            var subject = _dataFixture.DefaultSubject().Generate();
+
+            var footnote = _dataFixture
+                .DefaultFootnote()
+                .WithReleaseVersionId(sourceReleaseVersion.Id)
+                .WithSubjects([subject])
+                .Generate();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                context.Publications.Add(publication);
+                context.Releases.Add(sourceRelease);
+                context.ReleaseVersions.Add(sourceReleaseVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                statisticsDbContext.ReleaseVersion.Add(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseVersion
+                    {
+                        Id = sourceReleaseVersion.Id,
+                        PublicationId = publication.Id,
+                    }
+                );
+                statisticsDbContext.Subject.Add(subject);
+                statisticsDbContext.ReleaseSubject.Add(
+                    new GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject
+                    {
+                        ReleaseVersionId = sourceReleaseVersion.Id,
+                        SubjectId = subject.Id,
+                    }
+                );
+                statisticsDbContext.Footnote.Add(footnote);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            Guid? newReleaseVersionId = null;
+
+            var releaseVersionViewModel = new ReleaseVersionViewModel();
+            var releaseVersionServiceMock = new Mock<IReleaseVersionService>(Strict);
+            releaseVersionServiceMock
+                .Setup(rvs => rvs.GetRelease(It.IsAny<Guid>()))
+                .ReturnsAsync(releaseVersionViewModel)
+                .Callback((Guid releaseVersionId) => newReleaseVersionId = releaseVersionId);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var sut = BuildService(
+                    contentDbContext: context,
+                    statisticsDbContext: statisticsDbContext,
+                    releaseVersionService: releaseVersionServiceMock.Object
+                );
+
+                var result = await sut.CreateReleaseRollover(
+                    ValidRequest(publication.Id, sourceRelease.Id) with
+                    {
+                        Mode = RolloverMode.StructureOnly,
+                    }
+                );
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                Assert.False(
+                    await statisticsDbContext.Footnote.AnyAsync(footnote =>
+                        footnote.ReleaseVersionId == newReleaseVersionId
+                    )
+                );
+            }
+        }
+
+        [Fact]
         public async Task GivenReleaseRolloverDisabled_ReturnsForbid()
         {
             Publication publication = _dataFixture.DefaultPublication();
@@ -1642,6 +1937,7 @@ public abstract class ReleaseRolloverServiceTests
     private ReleaseRolloverService BuildService(
         ContentDbContext contentDbContext,
         StatisticsDbContext? statisticsDbContext = null,
+        IFootnoteRepository? footnoteRepository = null,
         IReleaseVersionService? releaseVersionService = null,
         IReleaseSlugValidator? releaseSlugValidator = null,
         bool enableReleaseRollover = true
@@ -1651,10 +1947,13 @@ public abstract class ReleaseRolloverServiceTests
 
         userService.Setup(s => s.GetUserId()).Returns(UserId);
 
+        var effectiveStatisticsDbContext = statisticsDbContext ?? InMemoryStatisticsDbContext();
+
         return new ReleaseRolloverService(
             appOptions: new AppOptions { EnableReleaseRollover = enableReleaseRollover }.ToOptionsWrapper(),
             context: contentDbContext,
-            statisticsDbContext: statisticsDbContext ?? InMemoryStatisticsDbContext(),
+            statisticsDbContext: effectiveStatisticsDbContext,
+            footnoteRepository: footnoteRepository ?? new FootnoteRepository(effectiveStatisticsDbContext),
             userService: userService.Object,
             releaseVersionService: releaseVersionService ?? Mock.Of<IReleaseVersionService>(Strict),
             guidGenerator: new SequentialGuidGenerator(),
