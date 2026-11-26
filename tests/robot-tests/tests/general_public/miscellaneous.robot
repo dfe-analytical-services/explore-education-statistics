@@ -69,7 +69,7 @@ Validate Feedback page
 
 Validate Cookies page
     user clicks link    Cookies
-    user waits until h1 is visible    Cookies on Explore education statistics    %{WAIT_MEDIUM}
+    user waits until h1 is visible    Cookies on explore education statistics    %{WAIT_MEDIUM}
 
     user checks url contains    %{PUBLIC_URL}/cookies
 
@@ -88,7 +88,7 @@ Disable google analytics
 Enable google analytics
     user reloads page
     user checks page does not contain    Your cookie settings were saved
-    user waits until h1 is visible    Cookies on Explore education statistics
+    user waits until h1 is visible    Cookies on explore education statistics
 
     sleep    1    # NOTE(mark): Without the wait, the click doesn't select the radio despite the DOM being loaded
     user clicks element    id:cookieSettingsForm-googleAnalytics-on
@@ -98,7 +98,7 @@ Enable google analytics
     cookie should have value    ees_disable_google_analytics    false
 
 Validate Cookies Details page
-    user clicks link    Find out more about cookies on Explore education statistics
+    user clicks link    Find out more about cookies on explore education statistics
     user waits until h1 is visible    Details about cookies
     user checks url contains    %{PUBLIC_URL}/cookies/details
 
@@ -125,7 +125,7 @@ Validate Contact page
 
 Validate Accessibility statement page
     user clicks link    Accessibility statement
-    user waits until h1 is visible    Accessibility statement for Explore education statistics
+    user waits until h1 is visible    Accessibility statement for explore education statistics
     user waits until h2 is visible    How you should be able to use this website
 
     user checks url contains    %{PUBLIC_URL}/accessibility-statement
