@@ -7,7 +7,7 @@ import React from 'react';
 
 function ContactPage() {
   const {
-    service: { nameStartSentence, nameMidSentence },
+    service: { nameMidSentence },
     organisation,
     contactEmail,
     headOfProfession,
@@ -15,7 +15,7 @@ function ContactPage() {
   } = useTenant();
 
   return (
-    <Page title={`Contact ${nameStartSentence}`} breadcrumbLabel="Contact">
+    <Page title={`Contact ${nameMidSentence}`} breadcrumbLabel="Contact">
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <section>

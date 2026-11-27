@@ -26,7 +26,7 @@ export default function DataSetFileApiVersionHistory({
   currentVersion,
 }: Props) {
   const {
-    service: { nameStartSentence },
+    service: { nameMidSentence },
   } = useTenant();
   const router = useRouter();
 
@@ -74,7 +74,7 @@ export default function DataSetFileApiVersionHistory({
             target="_blank"
             rel="noopener noreferrer"
           >
-            Versioning - {nameStartSentence} API
+            Versioning - {nameMidSentence} API
           </Link>
           .
         </p>
