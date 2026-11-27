@@ -49,7 +49,7 @@ internal class AzureBlobStorageClientMockBuilder
 
         _mock
             .Setup(mock => mock.DeleteAllBlobsFromContainer(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
+            .ReturnsAsync(() => [.. _blobNames]);
 
         _mock
             .Setup(mock => mock.ContainerExists(It.IsAny<string>(), It.IsAny<CancellationToken>()))

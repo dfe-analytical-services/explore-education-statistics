@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Serv
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.CreateReleaseDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveDataSetDocuments;
 using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.RemoveReleaseDocuments;
-using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetSearchableDocuments;
+using GovUk.Education.ExploreEducationStatistics.Content.Search.FunctionApp.Services.ResetReleaseDocuments;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -67,10 +67,12 @@ public static class HostBuilderExtension
                     .Configure<ContentApiOptions>(context.Configuration.GetSection(ContentApiOptions.Section))
                     .Configure<AzureSearchOptions>(context.Configuration.GetSection(AzureSearchOptions.Section))
                     // Services
-                    .AddTransient<IReleaseDocumentCreator, ReleaseDocumentCreator>()
-                    .AddTransient<IReleaseDocumentRemover, ReleaseDocumentRemover>()
+                    // Data set documents
                     .AddTransient<IDataSetDocumentCreator, DataSetDocumentCreator>()
                     .AddTransient<IDataSetDocumentRemover, DataSetDocumentRemover>()
+                    // Release documents
+                    .AddTransient<IReleaseDocumentCreator, ReleaseDocumentCreator>()
+                    .AddTransient<IReleaseDocumentRemover, ReleaseDocumentRemover>()
                     .AddTransient<IFullReleaseDocumentResetter, FullReleaseDocumentResetter>()
                     .AddDocumentCheckers()
                     // Functions

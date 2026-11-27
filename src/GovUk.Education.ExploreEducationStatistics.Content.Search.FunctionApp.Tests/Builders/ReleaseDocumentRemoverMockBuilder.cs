@@ -8,6 +8,7 @@ public class ReleaseDocumentRemoverMockBuilder
     private readonly Mock<IReleaseDocumentRemover> _mock = new(MockBehavior.Strict);
     private RemovePublicationReleaseDocumentsResponse? _removePublicationReleaseDocumentsResponse;
     private RemoveReleaseDocumentResponse? _removeReleaseDocumentResponse;
+    private RemoveAllReleaseDocumentsResponse? _removeAllReleaseDocumentsResponse;
 
     public IReleaseDocumentRemover Build()
     {
@@ -29,7 +30,9 @@ public class ReleaseDocumentRemoverMockBuilder
             )
             .ReturnsAsync(() => _removeReleaseDocumentResponse ?? new RemoveReleaseDocumentResponse(Success: true));
 
-        _mock.Setup(m => m.RemoveAllReleaseDocuments(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        _mock
+            .Setup(m => m.RemoveAllReleaseDocuments(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(() => _removeAllReleaseDocumentsResponse ?? new RemoveAllReleaseDocumentsResponse([]));
 
         return _mock.Object;
     }
@@ -43,6 +46,12 @@ public class ReleaseDocumentRemoverMockBuilder
     public ReleaseDocumentRemoverMockBuilder WhereResponseIs(RemoveReleaseDocumentResponse response)
     {
         _removeReleaseDocumentResponse = response;
+        return this;
+    }
+
+    public ReleaseDocumentRemoverMockBuilder WhereRemoveAllResponseIs(RemoveAllReleaseDocumentsResponse response)
+    {
+        _removeAllReleaseDocumentsResponse = response;
         return this;
     }
 
