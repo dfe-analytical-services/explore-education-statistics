@@ -3,7 +3,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -120,6 +123,37 @@ public abstract class BauParquetControllerTests
         }
     }
 
+    public class CompareDataFileWithParquetTests : BauParquetControllerTests
+    {
+        [Fact]
+        public async Task DataFileNotFound_ReturnsNotFound()
+        {
+            var result = await BuildController().CompareDataFileWithParquet(Guid.NewGuid());
+
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task DataFileHasNoParquet_ReturnsBadRequest()
+        {
+            var file = await SeedDataFile();
+
+            var result = await BuildController().CompareDataFileWithParquet(file.Id);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+
+        [Fact]
+        public async Task DataFileNotStoredInStatsDb_ReturnsBadRequest()
+        {
+            var file = await SeedDataFile(dataStorageVersion: DataStorageVersion.ParquetV1, hasParquet: true);
+
+            var result = await BuildController().CompareDataFileWithParquet(file.Id);
+
+            Assert.IsType<BadRequestObjectResult>(result);
+        }
+    }
+
     private async Task<File> SeedDataFile(
         DataStorageVersion dataStorageVersion = DataStorageVersion.StatsDB,
         bool hasParquet = false,
@@ -166,9 +200,13 @@ public abstract class BauParquetControllerTests
 
     private BauParquetController BuildController(IDataProcessorClient? dataProcessorClient = null)
     {
+        var serviceProvider = new ServiceCollection().BuildServiceProvider();
+
         return new BauParquetController(
             InMemoryApplicationDbContext(_contentDbContextId),
-            dataProcessorClient ?? Mock.Of<IDataProcessorClient>(Strict)
+            dataProcessorClient ?? Mock.Of<IDataProcessorClient>(Strict),
+            new StatisticsDbDataSetFactory(serviceProvider),
+            new ParquetV1DataSetFactory(serviceProvider)
         );
     }
 }

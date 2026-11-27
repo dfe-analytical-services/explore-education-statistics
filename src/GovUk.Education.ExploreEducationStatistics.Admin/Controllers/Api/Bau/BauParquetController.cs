@@ -3,6 +3,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,14 +14,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 
 /// <summary>
 /// Temporary endpoints for migrating data sets imported into StatsDB to parquet files. Remove these, along with
-/// ExportParquetFunction and ParquetDataSetService.ExportStatsDbDataSet in the data processor, once every StatsDB data
-/// set has been migrated. Exported data files are marked as having parquet files, but continue to be read from StatsDB.
+/// ExportParquetFunction and ParquetDataSetService.ExportStatsDbDataSet in the data processor and ParquetExportComparer,
+/// once every StatsDB data set has been migrated. Exported data files are marked as having parquet files, but continue to be read from StatsDB.
 /// </summary>
 [Route("api/bau/data-files")]
 [ApiController]
 [Authorize(Roles = RoleNames.BauUser)]
-public class BauParquetController(ContentDbContext contentDbContext, IDataProcessorClient dataProcessorClient)
-    : ControllerBase
+public class BauParquetController(
+    ContentDbContext contentDbContext,
+    IDataProcessorClient dataProcessorClient,
+    StatisticsDbDataSetFactory statisticsDbDataSetFactory,
+    ParquetV1DataSetFactory parquetV1DataSetFactory
+) : ControllerBase
 {
     [HttpPost("{fileId:guid}/parquet")]
     public async Task<ActionResult> ExportDataFileToParquet(Guid fileId, CancellationToken cancellationToken = default)
@@ -61,16 +67,14 @@ public class BauParquetController(ContentDbContext contentDbContext, IDataProces
 
     [HttpPost("parquet")]
     public async Task<ActionResult> ExportDataFilesToParquet(
-        int? limit = null,
+        int limit = 6,
         bool dryRun = true,
         CancellationToken cancellationToken = default
     )
     {
-        // @MarkFix Nothing records that a file's export is queued or running, so calling this again before earlier
-        // exports finish queues the same files again. Two exports of one file share a staging DB, and
-        // ParquetDataSetService.ExportStatsDbDataSet sets HasParquet without comparing the staged row count with
-        // StatsDB. Record queued/running exports and skip them here, and fail an export whose row counts differ.
-        var query = contentDbContext
+        // @MarkFix ParquetDataSetService.ExportStatsDbDataSet sets HasParquet without comparing the exported row count
+        // with StatsDB. Fail an export whose row counts differ.
+        var fileIds = await contentDbContext
             .Files.Where(f =>
                 f.Type == FileType.Data
                 && f.DataStorageVersion == DataStorageVersion.StatsDB
@@ -78,14 +82,9 @@ public class BauParquetController(ContentDbContext contentDbContext, IDataProces
                 && contentDbContext.DataImports.Any(i => i.FileId == f.Id && i.Status == DataImportStatus.COMPLETE)
             )
             .OrderBy(f => f.Created)
-            .Select(f => f.Id);
-
-        if (limit is not null)
-        {
-            query = query.Take(limit.Value);
-        }
-
-        var fileIds = await query.ToListAsync(cancellationToken);
+            .Select(f => f.Id)
+            .Take(limit)
+            .ToListAsync(cancellationToken);
 
         if (!dryRun)
         {
@@ -103,5 +102,40 @@ public class BauParquetController(ContentDbContext contentDbContext, IDataProces
                 FileIds = fileIds,
             }
         );
+    }
+
+    [HttpGet("{fileId:guid}/parquet/compare")]
+    public async Task<ActionResult> CompareDataFileWithParquet(
+        Guid fileId,
+        CancellationToken cancellationToken = default
+    )
+    {
+        var file = await contentDbContext.Files.SingleOrDefaultAsync(
+            f => f.Id == fileId && f.Type == FileType.Data,
+            cancellationToken
+        );
+
+        if (file is null)
+        {
+            return NotFound();
+        }
+
+        if (file.DataStorageVersion != DataStorageVersion.StatsDB || file.SubjectId is not { } subjectId)
+        {
+            return BadRequest($"Data file {fileId} is not stored in StatsDB");
+        }
+
+        if (!file.HasParquet)
+        {
+            return BadRequest($"Data file {fileId} has no parquet files");
+        }
+
+        var comparison = await ParquetExportComparer.Compare(
+            statisticsDbDataSetFactory.Create(subjectId),
+            parquetV1DataSetFactory.Create(subjectId),
+            cancellationToken
+        );
+
+        return Ok(comparison);
     }
 }
