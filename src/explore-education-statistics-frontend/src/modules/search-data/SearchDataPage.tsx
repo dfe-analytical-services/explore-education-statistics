@@ -103,6 +103,13 @@ const SearchDataPage: NextPage = () => {
   const currentRoute = router.pathname as RoutePath;
   const isPublicationsSearch = currentRoute.includes('search-releases');
 
+  const analyticsCategory = isPublicationsSearch
+    ? 'Find statistics and data'
+    : 'Data catalogue';
+  const analyticsResultsName = isPublicationsSearch
+    ? 'Publications'
+    : 'Data sets';
+
   const { publicationsQuery, dataSetsQuery } = getSearchQueries(
     router.query,
     isPublicationsSearch,
@@ -308,6 +315,11 @@ const SearchDataPage: NextPage = () => {
   const handleCopyLink = async () => {
     await navigator.clipboard.writeText(window.location.href);
     showLinkCopied();
+
+    logEvent({
+      category: analyticsCategory,
+      action: 'Copy link clicked',
+    });
   };
 
   const handleSortBy = async (nextSortBy: PublicationSortOption) => {
@@ -317,8 +329,8 @@ const SearchDataPage: NextPage = () => {
     });
 
     logEvent({
-      category: 'Find statistics and data',
-      action: 'Publications sorted',
+      category: analyticsCategory,
+      action: `${analyticsResultsName} sorted`,
       label: nextSortBy,
     });
   };
@@ -338,8 +350,20 @@ const SearchDataPage: NextPage = () => {
       ...omit(router.query, 'page'),
     };
 
+    const addedFilters: { filterType: string; value: string }[] = [];
+    const removedFilters: { filterType: string; value: string }[] = [];
+
     // Apply batch updates
     Object.entries(updates).forEach(([key, values]) => {
+      const currentValues = getAsArray(router.query[key]) ?? [];
+
+      values
+        .filter(value => !currentValues.includes(value))
+        .forEach(value => addedFilters.push({ filterType: key, value }));
+      currentValues
+        .filter(value => !values.includes(value))
+        .forEach(value => removedFilters.push({ filterType: key, value }));
+
       if (values.length === 0) {
         newQuery = omit(newQuery, key);
       } else {
@@ -349,10 +373,26 @@ const SearchDataPage: NextPage = () => {
 
     await updateQueryParams(newQuery as SearchDataPageQuery);
 
-    logEvent({
-      category: 'Find statistics and data',
-      action: `Data filtered by themes or release`,
-    });
+    // Selecting a theme or publication can also deselect related ones,
+    // so only log the removals when nothing was added (i.e. the user
+    // unticked something) to reflect what the user actually did.
+    if (addedFilters.length > 0) {
+      addedFilters.forEach(({ filterType, value }) => {
+        logEvent({
+          category: analyticsCategory,
+          action: `${analyticsResultsName} filtered by ${filterType}`,
+          label: value,
+        });
+      });
+    } else {
+      removedFilters.forEach(({ filterType, value }) => {
+        logEvent({
+          category: analyticsCategory,
+          action: `Reset ${filterType} filter`,
+          label: value,
+        });
+      });
+    }
   };
 
   const handleChangeFilter = async ({
@@ -373,15 +413,18 @@ const SearchDataPage: NextPage = () => {
       sortBy: nextSortBy,
     };
 
-    // 3. Determine if this filter should be handled as an array (checkboxes) or a single string (radios/selects)
-    if (multiValueFilters.includes(filterType)) {
-      // Safely grab the current query param and ensure it's an array.
-      const currentParam = router.query[filterType] as
-        string | string[] | undefined;
-      const currentValues = getAsArray(currentParam) ?? [];
+    // Safely grab the current query param and ensure it's an array.
+    const currentParam = router.query[filterType] as
+      string | string[] | undefined;
+    const currentValues = getAsArray(currentParam) ?? [];
+    const isMultiValueFilter = multiValueFilters.includes(filterType);
+    // Unticking a checkbox or removing a filter tag deselects the value.
+    const isRemoval = isMultiValueFilter && currentValues.includes(nextValue);
 
+    // 3. Determine if this filter should be handled as an array (checkboxes) or a single string (radios/selects)
+    if (isMultiValueFilter) {
       let updatedValues: string[];
-      if (currentValues.includes(nextValue)) {
+      if (isRemoval) {
         // Remove it if already selected
         updatedValues = currentValues.filter(v => v !== nextValue);
       } else {
@@ -406,8 +449,10 @@ const SearchDataPage: NextPage = () => {
     await updateQueryParams(newQuery as SearchDataPageQuery);
 
     logEvent({
-      category: 'Find statistics and data',
-      action: `Publications filtered by ${filterType}`,
+      category: analyticsCategory,
+      action: isRemoval
+        ? `Reset ${filterType} filter`
+        : `${analyticsResultsName} filtered by ${filterType}`,
       label: nextValue,
     });
   };
@@ -433,7 +478,7 @@ const SearchDataPage: NextPage = () => {
     await updateQueryParams(newParams);
 
     logEvent({
-      category: 'Find statistics and data',
+      category: analyticsCategory,
       action: `Reset ${filterType} filter`,
     });
   };
@@ -808,7 +853,7 @@ const SearchDataPage: NextPage = () => {
                   // otherwise the wrong page number is announced.
                   setPageTitle(`${defaultPageTitle} - page ${pageNumber}`);
                   logEvent({
-                    category: 'Find statistics and data',
+                    category: analyticsCategory,
                     action: `Pagination clicked`,
                     label: `Page ${pageNumber}`,
                   });

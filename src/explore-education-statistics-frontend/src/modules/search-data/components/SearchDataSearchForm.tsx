@@ -49,6 +49,10 @@ export default function SearchForm({
   const autocompleteRef = useRef<Autocomplete>(null);
   const activeSearchModeRef = useRef(isSearchDataSets);
 
+  const analyticsCategory = isSearchDataSets
+    ? 'Data catalogue'
+    : 'Find statistics and data';
+
   // The accessible-autocomplete component generates a text input element.
   // We need to access the created elements to:
   // 1) change input type to 'search'
@@ -281,7 +285,7 @@ export default function SearchForm({
 
             if (isDataSetResult(result)) {
               logEvent({
-                category: 'Find statistics and data',
+                category: analyticsCategory,
                 action: `Autocomplete dataset suggestion accepted`,
                 label: result.title,
               });
@@ -291,7 +295,7 @@ export default function SearchForm({
             }
 
             logEvent({
-              category: 'Find statistics and data',
+              category: analyticsCategory,
               action: `Autocomplete suggestion accepted`,
               label: result.title,
             });

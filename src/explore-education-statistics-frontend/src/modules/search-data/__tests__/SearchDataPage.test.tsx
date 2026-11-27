@@ -15,6 +15,7 @@ import { PaginatedList } from '@common/services/types/pagination';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
 import { testDataSetFileSummaries } from '@frontend/modules/data-catalogue/__data__/testDataSets';
 import { testOrganisations } from '@frontend/modules/search-data/__tests__/__data__/testOrganisations';
+import { logEvent as _logEvent } from '@frontend/services/googleAnalyticsService';
 
 jest.mock('@azure/search-documents', () => ({
   SearchClient: jest.fn(),
@@ -27,7 +28,9 @@ jest.mock('@frontend/services/azureDataSetService');
 jest.mock('@frontend/services/azurePublicationService');
 jest.mock('@frontend/services/organisationService');
 jest.mock('@common/services/themeService');
+jest.mock('@frontend/services/googleAnalyticsService');
 
+const logEvent = jest.mocked(_logEvent);
 const publicationService = jest.mocked(_publicationService);
 const azureDataSetService = jest.mocked(_azureDataSetService);
 const azurePublicationService = jest.mocked(_azurePublicationService);
@@ -375,6 +378,111 @@ describe('SearchDataPage', () => {
       ).not.toBeInTheDocument();
       const resetButtons = screen.getAllByTestId('filter-reset');
       expect(resetButtons).toHaveLength(1);
+    });
+  });
+
+  describe('analytics events', () => {
+    test('logs filter events with the Data catalogue category on the data sets tab', async () => {
+      const { user } = render(<SearchDataPage />);
+
+      await user.click(
+        await screen.findByRole('checkbox', {
+          name: 'Department for Education',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(logEvent).toHaveBeenCalledWith({
+          category: 'Data catalogue',
+          action: 'Data sets filtered by organisationId',
+          label: 'organisation-id-1',
+        });
+      });
+    });
+
+    test('logs filter events with the Find statistics category on the releases tab', async () => {
+      mockRouter.pathname = '/search-releases';
+
+      const { user } = render(<SearchDataPage />);
+
+      await user.click(
+        await screen.findByRole('checkbox', {
+          name: 'Department for Education',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(logEvent).toHaveBeenCalledWith({
+          category: 'Find statistics and data',
+          action: 'Publications filtered by organisationId',
+          label: 'organisation-id-1',
+        });
+      });
+    });
+
+    test('logs a reset event with the value when a multi-value filter is removed', async () => {
+      mockRouter.query = { organisationId: ['organisation-id-1'] };
+
+      const { user } = render(<SearchDataPage />);
+
+      await user.click(
+        await screen.findByRole('checkbox', {
+          name: 'Department for Education',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(logEvent).toHaveBeenCalledWith({
+          category: 'Data catalogue',
+          action: 'Reset organisationId filter',
+          label: 'organisation-id-1',
+        });
+      });
+    });
+
+    test('logs the selected publication when filtering by theme and release', async () => {
+      mockRouter.query = { themeId: 'theme-id-1' };
+
+      const { user } = render(<SearchDataPage />);
+
+      await user.click(
+        await screen.findByRole('button', {
+          name: 'Show 2 statistical releases for Theme 1',
+        }),
+      );
+      await user.click(
+        screen.getByRole('checkbox', { name: 'Publication Title 1' }),
+      );
+
+      await waitFor(() => {
+        expect(logEvent).toHaveBeenCalledWith({
+          category: 'Data catalogue',
+          action: 'Data sets filtered by publicationId',
+          label: 'publication-id-1',
+        });
+      });
+
+      // Selecting the publication also deselects its theme, but this
+      // wasn't the user's action so isn't logged.
+      expect(logEvent).toHaveBeenCalledTimes(1);
+    });
+
+    test('logs a reset event when a theme is deselected', async () => {
+      mockRouter.query = { themeId: 'theme-id-1' };
+
+      const { user } = render(<SearchDataPage />);
+
+      await user.click(
+        await screen.findByRole('checkbox', { name: 'Theme 1' }),
+      );
+
+      await waitFor(() => {
+        expect(logEvent).toHaveBeenCalledWith({
+          category: 'Data catalogue',
+          action: 'Reset themeId filter',
+          label: 'theme-id-1',
+        });
+      });
     });
   });
 
