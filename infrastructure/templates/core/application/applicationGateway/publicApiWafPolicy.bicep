@@ -4,9 +4,14 @@ param location string
 @description('Specifies the name of the WAF policy.')
 param policyName string
 
-@description('Secret header value from FUAPI.')
+@description('''
+Secret header values from FaUAPI, as a JSON array of strings, for example ["value1", "value2"]. A request is allowed if
+its header matches any one of them, so a new value can be added before FaUAPI switches to it and the old value removed
+afterwards, allowing us to rotate secrets. This is a string rather than an array because Key Vault secrets can only be
+passed into secure string parameters.
+''')
 @secure()
-param fuapiSecretValue string
+param fauapiSecretValues string
 
 @description('Specifies a set of tags with which to tag the resource in Azure.')
 param tagValues object
@@ -20,7 +25,7 @@ module wafPolicyModule '../../../common/components/application-gateway/appGatewa
     // will cover these cases.
     managedRuleSets: []
     // Add a custom rule to only allow traffic that contains a correct secret 
-    // header value that is included from FUAPI.
+    // header value that is included from FaUAPI.
     customRules: [
       {
         name: 'fuapisecretnotpresent'
@@ -43,9 +48,7 @@ module wafPolicyModule '../../../common/components/application-gateway/appGatewa
             selector: 'X-FUAPI-Secret'
             operator: 'Equal'
             negateOperator: true
-            matchValues: [
-              fuapiSecretValue
-            ]
+            matchValues: json(fauapiSecretValues)
           }
         ]
       }
