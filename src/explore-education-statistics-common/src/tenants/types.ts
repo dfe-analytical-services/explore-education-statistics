@@ -14,7 +14,14 @@ export interface TenantRelatedService {
 }
 
 export interface TenantOrganisation {
+  /** Bare name, for labels, modifiers and metadata, e.g. "official Department for Education statistics". */
   name: string;
+  /**
+   * Name preceded by "the" where the organisation takes one, e.g. "operated by
+   * the Department for Education". Same as `name` for an organisation that
+   * doesn't. Use `upperFirst()` at the start of a sentence.
+   */
+  nameWithArticle: string;
   /** Optional short acronym, e.g. "DfE". Rendered as "(acronym)" only when supplied. */
   acronym?: string;
   url: string;

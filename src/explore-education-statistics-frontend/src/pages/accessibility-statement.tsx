@@ -2,6 +2,7 @@ import { useTenant } from '@common/contexts/TenantContext';
 import Page from '@frontend/components/Page';
 import React from 'react';
 import Link from '@frontend/components/Link';
+import upperFirst from 'lodash/upperFirst';
 
 function AcccessibilityStatementPage() {
   const {
@@ -20,18 +21,18 @@ function AcccessibilityStatementPage() {
           <p>
             This accessibility statement applies to the
             explore-education-statistics.service.gov.uk website. This website is
-            run by the{' '}
+            run by{' '}
             <a
               rel="noopener noreferrer nofollow"
               target="_blank"
               href={organisation.url}
             >
-              {organisation.name}
+              {organisation.nameWithArticle}
               {organisation.acronym && ` (${organisation.acronym})`} (opens in
               new tab)
             </a>
-            . This statement does not cover any other services run by the
-            {organisation.name}
+            . This statement does not cover any other services run by{' '}
+            {organisation.nameWithArticle}
             {organisation.acronym && ` (${organisation.acronym})`} or GOV.UK.
           </p>
           <h2>How you should be able to use this website</h2>
@@ -117,7 +118,7 @@ function AcccessibilityStatementPage() {
           </p>
           <h2>Technical information about this website's accessibility</h2>
           <p>
-            The {organisation.name}
+            {upperFirst(organisation.nameWithArticle)}
             {organisation.acronym && ` (${organisation.acronym})`} is committed
             to making its website accessible, in accordance with the Public
             Sector Bodies (Websites and Mobile Applications) (No. 2)

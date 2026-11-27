@@ -29,7 +29,7 @@ function HelpSupportPage() {
                 rel="noopener noreferrer nofollow"
                 target="_blank"
               >
-                the {organisation.name}
+                {organisation.nameWithArticle}
                 {organisation.acronym && ` (${organisation.acronym})`} (opens in
                 new tab)
               </a>{' '}
@@ -49,7 +49,7 @@ function HelpSupportPage() {
               and{' '}
               {organisation.acronym
                 ? `${organisation.acronym}'s`
-                : `the ${organisation.name}'s`}{' '}
+                : `${organisation.nameWithArticle}'s`}{' '}
               {officialStatisticsStandardsUrl && (
                 <a
                   href={officialStatisticsStandardsUrl}
@@ -67,7 +67,7 @@ function HelpSupportPage() {
             The service contains all of{' '}
             {organisation.acronym
               ? `${organisation.acronym}'s`
-              : `the ${organisation.name}'s`}{' '}
+              : `${organisation.nameWithArticle}'s`}{' '}
             published official statistics.
             <p>
               To find specific sets of statistics currently published via the
@@ -143,8 +143,8 @@ function HelpSupportPage() {
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Contact us for help and support</h2>
             <p className="govuk-!-margin-top-1">
-              The {nameMidSentence} service is operated by the{' '}
-              {organisation.name}
+              The {nameMidSentence} service is operated by{' '}
+              {organisation.nameWithArticle}
               {organisation.acronym && ` (${organisation.acronym})`}.
             </p>
 

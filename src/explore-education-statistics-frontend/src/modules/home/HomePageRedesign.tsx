@@ -186,8 +186,8 @@ const HomePageRedesign = ({ latestReleases }: Props) => {
           <div className="govuk-grid-row govuk-!-margin-bottom-3">
             <div className="govuk-grid-column-two-thirds">
               <p className="govuk-!-margin-top-1">
-                The {nameMidSentence} service is operated by the{' '}
-                {organisation.name}
+                The {nameMidSentence} service is operated by{' '}
+                {organisation.nameWithArticle}
                 {organisation.acronym && ` (${organisation.acronym})`}.
               </p>
 

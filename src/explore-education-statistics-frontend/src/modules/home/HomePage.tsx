@@ -116,7 +116,7 @@ function HomePage() {
             <div className="govuk-grid-column-two-thirds">
               <p>
                 Use these services to find related information and other
-                statistical services provided by the {organisation.name}
+                statistical services provided by {organisation.nameWithArticle}
                 {organisation.acronym && ` (${organisation.acronym})`}, these
                 links will open in a new tab:
               </p>
@@ -149,7 +149,8 @@ function HomePage() {
       <div className="govuk-grid-row govuk-!-margin-bottom-3">
         <div className="govuk-grid-column-two-thirds">
           <p className="govuk-!-margin-top-1">
-            The {nameMidSentence} service is operated by the {organisation.name}
+            The {nameMidSentence} service is operated by{' '}
+            {organisation.nameWithArticle}
             {organisation.acronym && ` (${organisation.acronym})`}.
           </p>
 

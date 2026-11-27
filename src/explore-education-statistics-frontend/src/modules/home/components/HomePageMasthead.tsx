@@ -24,8 +24,8 @@ const HomePageMasthead = () => {
               <p
                 className={`govuk-!-font-size-24 govuk-!-margin-bottom-6 ${styles.mastheadSubtitle}`}
               >
-                View statistical releases, find data sets and create tables from
-                the {organisation.name}
+                View statistical releases, find data sets and create tables from{' '}
+                {organisation.nameWithArticle}
               </p>
 
               {/* TODO: remove ?prototype=true when making prototype live */}
