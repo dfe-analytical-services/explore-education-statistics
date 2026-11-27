@@ -46,7 +46,10 @@ function HelpSupportPage() {
               >
                 Code of Practice for Official Statistics (opens in new tab)
               </a>{' '}
-              and DfE's{' '}
+              and{' '}
+              {organisation.acronym
+                ? `${organisation.acronym}'s`
+                : `the ${organisation.name}'s`}{' '}
               {officialStatisticsStandardsUrl && (
                 <a
                   href={officialStatisticsStandardsUrl}
@@ -61,7 +64,11 @@ function HelpSupportPage() {
           </section>
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Find statistics and data</h2>
-            The service contains all of DfE's published official statistics.
+            The service contains all of{' '}
+            {organisation.acronym
+              ? `${organisation.acronym}'s`
+              : `the ${organisation.name}'s`}{' '}
+            published official statistics.
             <p>
               To find specific sets of statistics currently published via the
               service, browse our{' '}
