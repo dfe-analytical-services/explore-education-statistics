@@ -270,6 +270,7 @@ module stagingSlotModule 'swap-slot.bicep' = if (swapSlotEnabled) {
     tagValues: tagValues
     healthCheckPath: healthCheckPath
     connectionStrings: connectionStrings
+    azureFileShares: azureFileShares
   }
 }
 
