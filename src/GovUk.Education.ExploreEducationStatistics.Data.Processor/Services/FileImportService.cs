@@ -15,8 +15,7 @@ public class FileImportService(
     IPrivateBlobStorageService privateBlobStorageService,
     IDataImportService dataImportService,
     IDataSetMappingService dataSetMappingService,
-    IImporterService importerService,
-    IParquetDataSetService parquetDataSetService
+    IImporterService importerService
 ) : IFileImportService
 {
     public async Task ImportObservations(DataImport import, IStorageDataSetWriter dataSetWriter)
@@ -119,12 +118,6 @@ public class FileImportService(
         try
         {
             await dataSetWriter.Complete();
-
-            if (import.File.DataStorageVersion == DataStorageVersion.ParquetV1)
-            {
-                await parquetDataSetService.SetHasParquet(import.FileId);
-            }
-
             await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId, dataSetWriter.DataSet);
             await dataImportService.WriteDataSetFileMeta(import, dataSetWriter);
         }

@@ -9,11 +9,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 public class ReleaseDataFileRepositoryTests
 {
     [Theory]
-    [InlineData(FileType.Data, DataStorageVersion.StatsDB)]
-    [InlineData(FileType.Metadata, null)]
-    public async Task Create_SetsDataStorageVersionOnDataFilesOnly(
+    [InlineData(FileType.Data, DataStorageVersion.StatsDB, DataStorageVersion.StatsDB, false)]
+    [InlineData(FileType.Data, DataStorageVersion.ParquetV1, DataStorageVersion.ParquetV1, true)]
+    [InlineData(FileType.Metadata, DataStorageVersion.ParquetV1, null, false)]
+    public async Task Create_SetsDataStorageVersionAndHasParquetOnDataFilesOnly(
         FileType type,
-        DataStorageVersion? expectedDataStorageVersion
+        DataStorageVersion dataStorageVersion,
+        DataStorageVersion? expectedDataStorageVersion,
+        bool expectedHasParquet
     )
     {
         var contentDbContextId = Guid.NewGuid().ToString();
@@ -28,7 +31,8 @@ public class ReleaseDataFileRepositoryTests
                 filename: "data.csv",
                 contentLength: 1024,
                 type: type,
-                createdById: Guid.NewGuid()
+                createdById: Guid.NewGuid(),
+                dataStorageVersion: dataStorageVersion
             );
 
             fileId = file.Id;
@@ -38,6 +42,7 @@ public class ReleaseDataFileRepositoryTests
         {
             var file = await contentDbContext.Files.SingleAsync(f => f.Id == fileId);
             Assert.Equal(expectedDataStorageVersion, file.DataStorageVersion);
+            Assert.Equal(expectedHasParquet, file.HasParquet);
         }
     }
 }

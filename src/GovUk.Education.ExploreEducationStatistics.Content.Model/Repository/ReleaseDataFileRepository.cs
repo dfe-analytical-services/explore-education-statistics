@@ -60,6 +60,7 @@ public class ReleaseDataFileRepository : IReleaseDataFileRepository
                 ContentType = "text/csv",
                 Type = type,
                 DataStorageVersion = type == Data ? dataStorageVersion : null,
+                HasParquet = type == Data && dataStorageVersion == DataStorageVersion.ParquetV1,
                 Replacing = replacingDataFile,
             },
             PublicApiCompatible = apiCompatible,

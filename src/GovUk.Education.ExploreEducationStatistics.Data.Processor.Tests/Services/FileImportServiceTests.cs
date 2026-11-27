@@ -73,60 +73,6 @@ public class FileImportServiceTests
     }
 
     [Fact]
-    public async Task CompleteImport_ParquetV1_SetsHasParquet()
-    {
-        var file = new File
-        {
-            Id = Guid.NewGuid(),
-            Filename = "my_data_file.csv",
-            DataStorageVersion = DataStorageVersion.ParquetV1,
-        };
-
-        var import = new DataImport
-        {
-            Id = Guid.NewGuid(),
-            Errors = new List<DataImportError>(),
-            FileId = file.Id,
-            File = file,
-            SubjectId = Guid.NewGuid(),
-            Status = STAGE_3,
-            ExpectedImportedRows = 2,
-            TotalRows = 2,
-        };
-
-        var dataSet = Mock.Of<IStorageDataSet>(Strict);
-
-        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
-        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
-        dataSetWriter.Setup(s => s.Complete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-        dataSetWriter.SetupGet(s => s.DataSet).Returns(dataSet);
-        dataSetWriter.Setup(s => s.CleanUp(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
-
-        var dataImportService = new Mock<IDataImportService>(Strict);
-        dataImportService.Setup(s => s.UpdateStatus(import.Id, COMPLETE, 100)).Returns(Task.CompletedTask);
-        dataImportService.Setup(s => s.WriteDataSetFileMeta(import, dataSetWriter.Object)).Returns(Task.CompletedTask);
-
-        var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
-        dataSetMappingService
-            .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId, dataSet))
-            .Returns(Task.CompletedTask);
-
-        var parquetDataSetService = new Mock<IParquetDataSetService>(Strict);
-        parquetDataSetService
-            .Setup(s => s.SetHasParquet(file.Id, It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        var service = BuildFileImportService(
-            dataImportService: dataImportService.Object,
-            dataSetMappingService: dataSetMappingService.Object,
-            parquetDataSetService: parquetDataSetService.Object
-        );
-        await service.CompleteImport(import, dataSetWriter.Object);
-
-        VerifyAllMocks(dataImportService, dataSetMappingService, parquetDataSetService, dataSetWriter);
-    }
-
-    [Fact]
     public async Task CompleteImport_Errors()
     {
         var file = new File { Id = Guid.NewGuid(), Filename = "my_data_file.csv" };
@@ -260,8 +206,7 @@ public class FileImportServiceTests
         IImporterService importerService = null,
         ILogger<FileImportService> logger = null,
         IDataImportService dataImportService = null,
-        IDataSetMappingService dataSetMappingService = null,
-        IParquetDataSetService parquetDataSetService = null
+        IDataSetMappingService dataSetMappingService = null
     )
     {
         return new FileImportService(
@@ -269,8 +214,7 @@ public class FileImportServiceTests
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             dataSetMappingService ?? Mock.Of<IDataSetMappingService>(Strict),
-            importerService ?? Mock.Of<IImporterService>(Strict),
-            parquetDataSetService ?? Mock.Of<IParquetDataSetService>(Strict)
+            importerService ?? Mock.Of<IImporterService>(Strict)
         );
     }
 }

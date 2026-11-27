@@ -199,8 +199,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -404,8 +403,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -529,8 +527,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -669,8 +666,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -801,8 +797,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -963,8 +958,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -1096,8 +1090,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -1213,8 +1206,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -1361,8 +1353,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -1530,8 +1521,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            Mock.Of<IParquetDataSetService>(Strict)
+            importerService
         );
 
         var processorService = new ProcessorService(
@@ -1664,7 +1654,6 @@ public class ProcessorStage3Tests
                 .Files.Include(f => f.DataSetFileVersionGeographicLevels)
                 .Single(f => f.Type == FileType.Data && f.SubjectId == import.File.SubjectId);
 
-            Assert.True(file.HasParquet);
             Assert.Equal(DataStorageVersion.ParquetV1, file.DataStorageVersion);
 
             // The data set file meta is read from the parquet files.
@@ -1829,14 +1818,7 @@ public class ProcessorStage3Tests
             privateBlobStorageService.Object,
             dataImportService,
             dataSetMappingService,
-            importerService,
-            new ParquetDataSetService(
-                dbContextSupplier,
-                new StatisticsDbDataSetFactory(Mock.Of<IServiceProvider>(Strict)),
-                new ParquetV1DataSetWriterFactory(Mock.Of<IServiceProvider>(Strict)),
-                Mock.Of<IParquetDataSetPathResolver>(Strict),
-                Mock.Of<ILogger<ParquetDataSetService>>()
-            )
+            importerService
         );
 
         var processorService = new ProcessorService(

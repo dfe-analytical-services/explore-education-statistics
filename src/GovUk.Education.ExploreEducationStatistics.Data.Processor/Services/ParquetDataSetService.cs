@@ -27,16 +27,6 @@ public class ParquetDataSetService(
     private const string ExportLockFilename = "export.lock";
     private static readonly TimeSpan StaleExportLockAge = TimeSpan.FromHours(4);
 
-    public async Task SetHasParquet(Guid fileId, CancellationToken cancellationToken = default)
-    {
-        await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
-
-        var file = await contentDbContext.Files.SingleAsync(f => f.Id == fileId, cancellationToken);
-        file.HasParquet = true;
-
-        await contentDbContext.SaveChangesAsync(cancellationToken);
-    }
-
     public async Task ExportStatsDbDataSet(Guid fileId, CancellationToken cancellationToken = default)
     {
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();

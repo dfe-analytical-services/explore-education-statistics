@@ -26,21 +26,6 @@ public abstract class ParquetDataSetServiceTests : IDisposable
 
     public void Dispose() => _testDataSet.Dispose();
 
-    public class SetHasParquetTests : ParquetDataSetServiceTests
-    {
-        [Fact]
-        public async Task HasParquetSet()
-        {
-            var file = await SeedDataSet(hasParquet: false, DataStorageVersion.ParquetV1);
-
-            await BuildService(Mock.Of<IParquetDataSetWriter>(Strict)).SetHasParquet(file.Id);
-
-            await using var contentDbContext = InMemoryContentDbContext(_contentDbContextId);
-
-            Assert.True(contentDbContext.Files.Single(f => f.Id == file.Id).HasParquet);
-        }
-    }
-
     public class ExportStatsDbDataSetTests : ParquetDataSetServiceTests
     {
         [Fact]
