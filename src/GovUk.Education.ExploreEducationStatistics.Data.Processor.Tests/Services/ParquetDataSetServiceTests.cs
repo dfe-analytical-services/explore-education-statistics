@@ -61,6 +61,7 @@ public abstract class ParquetDataSetServiceTests : IDisposable
             }
 
             Assert.False(System.IO.File.Exists(_testDataSet.PathResolver.StagingDbPath(_testDataSet.SubjectId)));
+            Assert.False(System.IO.File.Exists(ExportLockPath()));
 
             var observations = await _testDataSet.BuildDataSet().ListObservations([], [], null);
 
@@ -85,6 +86,47 @@ public abstract class ParquetDataSetServiceTests : IDisposable
             await BuildService(Mock.Of<IParquetDataSetWriter>(Strict)).ExportStatsDbDataSet(file.Id);
 
             Assert.False(Directory.Exists(_testDataSet.PathResolver.DirectoryPath(_testDataSet.SubjectId)));
+        }
+
+        [Fact]
+        public async Task ExportLockHeld_DoesNothing()
+        {
+            var file = await SeedDataSet(hasParquet: false);
+            CreateExportLock();
+
+            await BuildService(Mock.Of<IParquetDataSetWriter>(Strict)).ExportStatsDbDataSet(file.Id);
+
+            await using var contentDbContext = InMemoryContentDbContext(_contentDbContextId);
+
+            Assert.False(contentDbContext.Files.Single(f => f.Id == file.Id).HasParquet);
+            Assert.True(System.IO.File.Exists(ExportLockPath()));
+        }
+
+        [Fact]
+        public async Task StaleExportLock_ExportsAndRemovesLock()
+        {
+            var file = await SeedDataSet(hasParquet: false);
+            CreateExportLock();
+            System.IO.File.SetLastWriteTimeUtc(ExportLockPath(), DateTime.UtcNow.AddHours(-5));
+
+            await BuildService(_testDataSet.BuildWriter()).ExportStatsDbDataSet(file.Id);
+
+            await using var contentDbContext = InMemoryContentDbContext(_contentDbContextId);
+
+            Assert.True(contentDbContext.Files.Single(f => f.Id == file.Id).HasParquet);
+            Assert.False(System.IO.File.Exists(ExportLockPath()));
+        }
+
+        [Fact]
+        public async Task ExportFails_RemovesLock()
+        {
+            var file = await SeedDataSet(hasParquet: false);
+
+            await Assert.ThrowsAsync<MockException>(() =>
+                BuildService(Mock.Of<IParquetDataSetWriter>(Strict)).ExportStatsDbDataSet(file.Id)
+            );
+
+            Assert.False(System.IO.File.Exists(ExportLockPath()));
         }
 
         [Fact]
@@ -132,6 +174,15 @@ public abstract class ParquetDataSetServiceTests : IDisposable
         return file;
     }
 
+    private string ExportLockPath() =>
+        Path.Combine(_testDataSet.PathResolver.DirectoryPath(_testDataSet.SubjectId), "export.lock");
+
+    private void CreateExportLock()
+    {
+        Directory.CreateDirectory(_testDataSet.PathResolver.DirectoryPath(_testDataSet.SubjectId));
+        System.IO.File.WriteAllText(ExportLockPath(), "");
+    }
+
     private ParquetDataSetService BuildService(IParquetDataSetWriter writer)
     {
         var dbContextSupplier = new InMemoryDbContextSupplier(
@@ -148,6 +199,7 @@ public abstract class ParquetDataSetServiceTests : IDisposable
                 writer,
                 _testDataSet.PathResolver
             ),
+            _testDataSet.PathResolver,
             Mock.Of<ILogger<ParquetDataSetService>>()
         );
     }

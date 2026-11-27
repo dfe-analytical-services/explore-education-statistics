@@ -1834,6 +1834,7 @@ public class ProcessorStage3Tests
                 dbContextSupplier,
                 new StatisticsDbDataSetFactory(Mock.Of<IServiceProvider>(Strict)),
                 new ParquetV1DataSetWriterFactory(Mock.Of<IServiceProvider>(Strict)),
+                Mock.Of<IParquetDataSetPathResolver>(Strict),
                 Mock.Of<ILogger<ParquetDataSetService>>()
             )
         );

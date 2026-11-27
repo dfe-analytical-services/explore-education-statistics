@@ -7,9 +7,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 
@@ -17,10 +19,13 @@ public class ParquetDataSetService(
     IDbContextSupplier dbContextSupplier,
     StatisticsDbDataSetFactory statisticsDbDataSetFactory,
     ParquetV1DataSetWriterFactory parquetV1DataSetWriterFactory,
+    IParquetDataSetPathResolver pathResolver,
     ILogger<ParquetDataSetService> logger
 ) : IParquetDataSetService
 {
     private const int ExportBatchSize = 10_000;
+    private const string ExportLockFilename = "export.lock";
+    private static readonly TimeSpan StaleExportLockAge = TimeSpan.FromHours(4);
 
     public async Task SetHasParquet(Guid fileId, CancellationToken cancellationToken = default)
     {
@@ -55,6 +60,39 @@ public class ParquetDataSetService(
         }
 
         var subjectId = file.SubjectId.Value;
+
+        if (!TryAcquireExportLock(subjectId))
+        {
+            logger.LogInformation("Data file {FileId} is already being exported to parquet - skipping export", fileId);
+            return;
+        }
+
+        try
+        {
+            await contentDbContext.Entry(file).ReloadAsync(cancellationToken);
+
+            if (file.HasParquet)
+            {
+                logger.LogInformation("Data file {FileId} already has parquet files - skipping export", fileId);
+                return;
+            }
+
+            await WriteParquetFiles(contentDbContext, file, subjectId, cancellationToken);
+        }
+        finally
+        {
+            System.IO.File.Delete(ExportLockPath(subjectId));
+        }
+    }
+
+    private async Task WriteParquetFiles(
+        ContentDbContext contentDbContext,
+        File file,
+        Guid subjectId,
+        CancellationToken cancellationToken
+    )
+    {
+        var fileId = file.Id;
 
         var statisticsDbDataSet = statisticsDbDataSetFactory.Create(subjectId);
         var dataSetWriter = parquetV1DataSetWriterFactory.Create(subjectId);
@@ -126,4 +164,33 @@ public class ParquetDataSetService(
 
         await dataSetWriter.CleanUp(cancellationToken);
     }
+
+    private bool TryAcquireExportLock(Guid subjectId)
+    {
+        var lockPath = ExportLockPath(subjectId);
+
+        Directory.CreateDirectory(pathResolver.DirectoryPath(subjectId));
+
+        if (
+            System.IO.File.Exists(lockPath)
+            && DateTime.UtcNow - System.IO.File.GetLastWriteTimeUtc(lockPath) > StaleExportLockAge
+        )
+        {
+            logger.LogWarning("Removing stale parquet export lock for subject {SubjectId}", subjectId);
+            System.IO.File.Delete(lockPath);
+        }
+
+        try
+        {
+            using var _ = new FileStream(lockPath, FileMode.CreateNew);
+            return true;
+        }
+        catch (IOException) when (System.IO.File.Exists(lockPath))
+        {
+            return false;
+        }
+    }
+
+    private string ExportLockPath(Guid subjectId) =>
+        Path.Combine(pathResolver.DirectoryPath(subjectId), ExportLockFilename);
 }
