@@ -1,5 +1,6 @@
 import { useTenant } from '@common/contexts/TenantContext';
 import InsetText from '@common/components/InsetText';
+import formatOrganisationPossessive from '@common/tenants/utils/formatOrganisationPossessive';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
@@ -17,7 +18,7 @@ function HelpSupportPage() {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p>
-            Find out more about {nameMidSentence} - including how to use it
+            Find out more about {nameMidSentence} - including how to use its
             services and get further help and support.
           </p>
           <section className="govuk-section-break--xl">
@@ -45,19 +46,19 @@ function HelpSupportPage() {
                 target="_blank"
               >
                 Code of Practice for Official Statistics (opens in new tab)
-              </a>{' '}
-              and{' '}
-              {organisation.acronym
-                ? `${organisation.acronym}'s`
-                : `${organisation.nameWithArticle}'s`}{' '}
+              </a>
               {officialStatisticsStandardsUrl && (
-                <a
-                  href={officialStatisticsStandardsUrl}
-                  rel="noopener noreferrer nofollow"
-                  target="_blank"
-                >
-                  Standards for official statistics (opens in new tab)
-                </a>
+                <>
+                  {' '}
+                  and {formatOrganisationPossessive(organisation)}{' '}
+                  <a
+                    href={officialStatisticsStandardsUrl}
+                    rel="noopener noreferrer nofollow"
+                    target="_blank"
+                  >
+                    Standards for official statistics (opens in new tab)
+                  </a>
+                </>
               )}
               .
             </p>
@@ -65,10 +66,8 @@ function HelpSupportPage() {
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Find statistics and data</h2>
             The service contains all of{' '}
-            {organisation.acronym
-              ? `${organisation.acronym}'s`
-              : `${organisation.nameWithArticle}'s`}{' '}
-            published official statistics.
+            {formatOrganisationPossessive(organisation)} published official
+            statistics.
             <p>
               To find specific sets of statistics currently published via the
               service, browse our{' '}
@@ -167,7 +166,7 @@ function HelpSupportPage() {
                 <h3 className="govuk-!-margin-top-8 govuk-heading-s">
                   Have a general enquiry?
                 </h3>
-                <p>{organisation.publicEnquiries.description}</p>
+                <p>{organisation.publicEnquiries.question}</p>
                 <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
                 <InsetText>
                   {organisation.publicEnquiries.telephone}

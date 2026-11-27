@@ -14,8 +14,21 @@ export interface CustomRenderResult extends RenderResult {
   user: UserEvent;
 }
 
-const createDefaultWrapper = (tenant: Tenant): FC => {
+const createDefaultWrapper = (
+  tenant: Tenant,
+  CustomWrapper?: RenderOptions['wrapper'],
+): FC => {
   const DefaultWrapper: FC = ({ children }: { children?: ReactNode }) => {
+    if (CustomWrapper) {
+      // A caller-supplied wrapper replaces the default QueryClientProvider,
+      // as before tenants were added, but is still given the tenant.
+      return (
+        <TenantContextProvider tenant={tenant}>
+          <CustomWrapper>{children}</CustomWrapper>
+        </TenantContextProvider>
+      );
+    }
+
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: {
@@ -40,17 +53,20 @@ const createDefaultWrapper = (tenant: Tenant): FC => {
 /**
  * Custom test render function that is pre-configured with any contexts
  * that would otherwise create unnecessary boilerplate.
+ *
+ * The tenant context is always provided, using `tenant` (EES by default),
+ * including when a custom `wrapper` is passed.
  */
 export default function render(
   ui: ReactNode,
   options?: Omit<RenderOptions, 'queries'> & { tenant?: Tenant },
 ): CustomRenderResult {
-  const { tenant = eesTenant, ...restOptions } = options ?? {};
+  const { tenant = eesTenant, wrapper, ...restOptions } = options ?? {};
 
   return {
     ...(baseRender(ui, {
-      wrapper: createDefaultWrapper(tenant),
       ...restOptions,
+      wrapper: createDefaultWrapper(tenant, wrapper),
     }) as RenderResult),
     user: userEvent.setup(),
   };

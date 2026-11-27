@@ -3,6 +3,7 @@ import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import formatOrganisationPossessive from '@common/tenants/utils/formatOrganisationPossessive';
 import React from 'react';
 
 const triggerText = 'What are release types?';
@@ -53,10 +54,8 @@ const ReleaseTypesModal = () => {
         </SummaryListItem>
         <SummaryListItem term="Ad hoc statistics">
           Releases of statistics which are not part of{' '}
-          {organisation.acronym
-            ? `${organisation.acronym}'s regular`
-            : 'the regular'}{' '}
-          annual official statistical release calendar.
+          {formatOrganisationPossessive(organisation)} regular annual official
+          statistical release calendar.
         </SummaryListItem>
         <SummaryListItem term="Management information (MI)">
           Management information describes aggregate information collated and

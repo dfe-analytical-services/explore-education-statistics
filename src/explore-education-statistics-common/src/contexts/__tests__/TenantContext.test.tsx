@@ -21,6 +21,7 @@ describe('useTenant', () => {
     const testTenant: Tenant = {
       ...eesTenant,
       service: {
+        ...eesTenant.service,
         nameStartSentence: 'Test tenant',
         nameMidSentence: 'test tenant',
       },

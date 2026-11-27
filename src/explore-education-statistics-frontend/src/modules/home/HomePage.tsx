@@ -171,7 +171,7 @@ function HomePage() {
           {organisation.publicEnquiries && (
             <>
               <h3>Have a general enquiry?</h3>
-              <p>{organisation.publicEnquiries.description}</p>
+              <p>{organisation.publicEnquiries.question}</p>
               <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
               <InsetText>
                 {organisation.publicEnquiries.telephone}

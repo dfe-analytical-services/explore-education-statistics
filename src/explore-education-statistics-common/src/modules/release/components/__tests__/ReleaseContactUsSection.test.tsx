@@ -1,4 +1,8 @@
 import render from '@common-test/render';
+import testTenant, {
+  fullTestTenant,
+  minimalTestTenant,
+} from '@common-test/testTenant';
 import testContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';
 import testOrganisation from '@common/modules/find-statistics/components/__tests__/__data__/testOrganisation';
 import ReleaseContactUsSection from '@common/modules/release/components/ReleaseContactUsSection';
@@ -110,6 +114,135 @@ describe('ReleaseContactUsSection', () => {
       />,
     );
 
+    expect(
+      screen.getAllByRole('link', { name: 'skills.england@education.gov.uk' }),
+    ).toHaveLength(2);
+  });
+
+  test('renders the EES press office and public enquiries details by default', () => {
+    render(
+      <ReleaseContactUsSection
+        publicationContact={testContact}
+        publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Press office' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Telephone: 020 7783 8300')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Public enquiries' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'If you have a general enquiry about the Department for Education (DfE) or education:',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText('Call the DfE public enquiries line:'),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Phone: 0370 000 2288')).toBeInTheDocument();
+  });
+
+  test('renders the press office and public enquiries details from the tenant', () => {
+    render(
+      <ReleaseContactUsSection
+        publicationContact={testContact}
+        publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
+      />,
+      { tenant: fullTestTenant },
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Press office' }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Telephone: 09876 543210')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Public enquiries' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('If you have a general enquiry about testing:'),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Phone: 01234 567890')).toBeInTheDocument();
+    expect(
+      screen.getByText('Monday to Friday from 9am to 5pm'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByText(/Department for Education/),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText(/DfE/)).not.toBeInTheDocument();
+  });
+
+  test('hides the press office section for a tenant with no pressOffice', () => {
+    render(
+      <ReleaseContactUsSection
+        publicationContact={testContact}
+        publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
+      />,
+      { tenant: testTenant },
+    );
+
+    expect(
+      screen.queryByRole('heading', { name: 'Press office' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('If you have a media enquiry:'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Public enquiries' }),
+    ).toBeInTheDocument();
+  });
+
+  test('hides the public enquiries section for a tenant with no publicEnquiries', () => {
+    render(
+      <ReleaseContactUsSection
+        publicationContact={testContact}
+        publicationTitle="Mock Publication Title"
+        publishingOrganisations={[testOrganisation]}
+      />,
+      { tenant: minimalTestTenant },
+    );
+
+    expect(
+      screen.queryByRole('heading', { name: 'Public enquiries' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Opening times' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders the Skills England contact details regardless of the tenant', () => {
+    render(
+      <ReleaseContactUsSection
+        publicationContact={testContact}
+        publicationTitle="Mock Publication Title"
+        publishingOrganisations={[
+          {
+            id: 'test-id',
+            title: 'Skills England',
+            url: 'test-url',
+            useGISLogo: true,
+            logoFileName: 'logo.png',
+          },
+        ]}
+      />,
+      { tenant: minimalTestTenant },
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Press office' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Public enquiries' }),
+    ).toBeInTheDocument();
     expect(
       screen.getAllByRole('link', { name: 'skills.england@education.gov.uk' }),
     ).toHaveLength(2);

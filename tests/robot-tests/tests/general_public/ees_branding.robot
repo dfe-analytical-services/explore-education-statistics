@@ -34,6 +34,7 @@ Validate homepage contact details
     user checks page contains link with text and url    explore.statistics@education.gov.uk
     ...    mailto:explore.statistics@education.gov.uk
 
+    user waits until h3 is visible    Have a general enquiry?
     user checks page contains    Have a general question about education or the Department for Education?
     user checks page contains    Call the DfE public enquiries line:
     user checks page contains    Phone: 0370 000 2288

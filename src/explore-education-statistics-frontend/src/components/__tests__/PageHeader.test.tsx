@@ -16,7 +16,7 @@ describe('PageHeader', () => {
   test('renders the service name from a different tenant', () => {
     render(<PageHeader />, { tenant: testTenant });
 
-    expect(screen.getByText('Test Statistics Service')).toBeInTheDocument();
+    expect(screen.getByText('Test statistics')).toBeInTheDocument();
     expect(
       screen.queryByText('Explore education statistics'),
     ).not.toBeInTheDocument();

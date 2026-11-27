@@ -94,7 +94,6 @@ const ContactUsSection = ({
               <p className="govuk-!-margin-top-0">
                 {organisation.publicEnquiries.description}
               </p>
-              <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
               <p>{organisation.publicEnquiries.telephone}</p>
               <p>
                 Opening times: <br />

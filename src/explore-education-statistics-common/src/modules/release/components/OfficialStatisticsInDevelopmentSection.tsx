@@ -70,7 +70,7 @@ export default function OfficialStatisticsInDevelopmentSection({
               target="_blank"
             >
               Standards for official statistics published by{' '}
-              {organisation.acronym ?? organisation.nameWithArticle} guidance
+              {organisation.acronym || organisation.nameWithArticle} guidance
               (opens in new tab)
             </a>
             .

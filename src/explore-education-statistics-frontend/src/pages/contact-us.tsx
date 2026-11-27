@@ -36,7 +36,7 @@ function ContactPage() {
             {organisation.publicEnquiries && (
               <>
                 <h2 className="govuk-heading-m">Have a general enquiry?</h2>
-                <p>{organisation.publicEnquiries.description}</p>
+                <p>{organisation.publicEnquiries.question}</p>
                 <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
                 <InsetText>
                   {organisation.publicEnquiries.telephone}
@@ -47,24 +47,22 @@ function ContactPage() {
             )}
           </section>
 
-          <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-m">Statistical policy enquiries</h2>
-            <p>
-              If you have a question about statistical policies such as about
-              the Code of Practice, revisions and confidentiality contact:
-            </p>
-            {headOfProfession && (
-              <>
-                <h3 className="govuk-heading-s">{headOfProfession.title}</h3>
-                <p>
-                  Email:{' '}
-                  <a href={`mailto:${headOfProfession.email}`}>
-                    {headOfProfession.email}
-                  </a>
-                </p>
-              </>
-            )}
-          </section>
+          {headOfProfession && (
+            <section className="govuk-section-break--xl">
+              <h2 className="govuk-heading-m">Statistical policy enquiries</h2>
+              <p>
+                If you have a question about statistical policies such as about
+                the Code of Practice, revisions and confidentiality contact:
+              </p>
+              <h3 className="govuk-heading-s">{headOfProfession.title}</h3>
+              <p>
+                Email:{' '}
+                <a href={`mailto:${headOfProfession.email}`}>
+                  {headOfProfession.email}
+                </a>
+              </p>
+            </section>
+          )}
 
           {freedomOfInformationUrl && (
             <section className="govuk-section-break--xl">

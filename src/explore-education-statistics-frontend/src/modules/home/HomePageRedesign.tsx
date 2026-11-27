@@ -77,10 +77,14 @@ const HomePageRedesign = ({ latestReleases }: Props) => {
                 id: 'contact-us',
                 label: 'Contact us',
               },
-              {
-                id: 'related-services',
-                label: 'Related services',
-              },
+              ...(relatedServices && relatedServices.length > 0
+                ? [
+                    {
+                      id: 'related-services',
+                      label: 'Related services',
+                    },
+                  ]
+                : []),
             ]}
           />
 
@@ -214,7 +218,7 @@ const HomePageRedesign = ({ latestReleases }: Props) => {
               {organisation.publicEnquiries && (
                 <>
                   <h3>Have a general enquiry?</h3>
-                  <p>{organisation.publicEnquiries.description}</p>
+                  <p>{organisation.publicEnquiries.question}</p>
                   <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
                   <InsetText>
                     {organisation.publicEnquiries.telephone}

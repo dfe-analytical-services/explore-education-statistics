@@ -5,6 +5,8 @@ const eesTenant = {
   service: {
     nameStartSentence: 'Explore education statistics',
     nameMidSentence: 'explore education statistics',
+    subjectMidSentence: 'education',
+    productionUrl: 'https://explore-education-statistics.service.gov.uk',
   },
   organisation: {
     name: 'Department for Education',
@@ -13,9 +15,12 @@ const eesTenant = {
     url: 'https://www.gov.uk/government/organisations/department-for-education',
     description:
       'The Department for Education is responsible for children’s services and education, including early years, schools, higher and further education policy, apprenticeships and wider skills in England.',
+    rorUrl: 'https://ror.org/0320bge18',
     publicEnquiries: {
-      description:
+      question:
         'Have a general question about education or the Department for Education?',
+      description:
+        'If you have a general enquiry about the Department for Education (DfE) or education:',
       telephoneCallToAction: 'Call the DfE public enquiries line:',
       telephone: 'Phone: 0370 000 2288',
       openingHours:

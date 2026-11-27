@@ -106,7 +106,6 @@ const ReleaseContactUsSection = ({
               <p className="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
                 {organisation.publicEnquiries.description}
               </p>
-              <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
               <p>{organisation.publicEnquiries.telephone}</p>
               <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
                 Opening times

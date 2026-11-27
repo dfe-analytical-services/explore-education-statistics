@@ -15,6 +15,14 @@ export default function getDataSetFileMetaCSVW({
 }: Props): ScriptMetaItem {
   const { file, release, summary, title, id } = dataSetFile;
   const { service, organisation } = getCurrentTenant();
+  const dataSetUrl = `${service.productionUrl}/data-catalogue/data-set/${id}`;
+  const organisationMeta = {
+    '@type': 'Organization',
+    name: organisation.name,
+    description: organisation.description,
+    url: organisation.url,
+    ...(organisation.rorUrl && { sameAs: organisation.rorUrl }),
+  };
 
   const dataSetFileMeta = {
     '@context': ['https://schema.org', { csvw: 'https://www.w3.org/ns/csvw' }],
@@ -25,29 +33,23 @@ export default function getDataSetFileMetaCSVW({
       summary.length < 50
         ? `${
             summary.length ? `${summary} - ` : ''
-          }${service.nameMidSentence} data set ${title} from ${
+          }${service.nameStartSentence} data set ${title} from ${
             release.publication.title
           }`
         : sanitizeHtml(summary, { allowedTags: [] }),
-    url: `https://explore-education-statistics.service.gov.uk/data-catalogue/data-set/${id}`,
-    sameAs: `https://explore-education-statistics.service.gov.uk/data-catalogue/data-set/${id}`,
+    url: dataSetUrl,
+    sameAs: dataSetUrl,
     isAccessibleForFree: true,
     license:
       'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ ',
     includedInDataCatalog: {
       '@type': 'DataCatalog',
       name: `${service.nameStartSentence} datasets`,
-      description: `A http://GOV.UK  ${organisation.name} repository for education statistics`,
-      url: 'https://explore-education-statistics.service.gov.uk/data-catalogue ',
+      description: `A ${organisation.name} repository for ${service.subjectMidSentence} statistics`,
+      url: `${service.productionUrl}/data-catalogue`,
     },
     creator: [
-      {
-        '@type': 'Organization',
-        name: organisation.name,
-        description: organisation.description,
-        url: organisation.url,
-        sameAs: 'https://ror.org/0320bge18 ',
-      },
+      organisationMeta,
       //   {
       //     '@type': 'Person',
       //     name: release.publication.Contact.ContactName,
@@ -55,13 +57,7 @@ export default function getDataSetFileMetaCSVW({
       //     email: Publication.Contact.TeamEmail,
       //   },
     ],
-    publisher: {
-      '@type': 'Organization',
-      name: organisation.name,
-      description: organisation.description,
-      url: organisation.url,
-      sameAs: 'https://ror.org/0320bge18 ',
-    },
+    publisher: organisationMeta,
     temporalCoverage: `${file.meta.timePeriodRange.from}/${file.meta.timePeriodRange.to}`,
     mainEntity: !file.dataCsvPreview
       ? undefined
