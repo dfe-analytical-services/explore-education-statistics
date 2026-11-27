@@ -43,46 +43,22 @@ public class FootnoteRepository : IFootnoteRepository
         return footnote;
     }
 
-    public async Task<List<Footnote>> GetFilteredFootnotes(
+    public async Task<List<Footnote>> GetFootnotesForSelection(
         Guid releaseVersionId,
         Guid subjectId,
-        IEnumerable<Guid> filterItemIds,
-        IEnumerable<Guid> indicatorIds
+        IList<FilterItem> filterItems,
+        IReadOnlyCollection<Guid> indicatorIds
     )
     {
-        // Query the id's of the filter groups and filters corresponding with the filter item id's
-        // Sanitise all id's to make sure they belong to the subject
-        var filterItemIdsResult = await _context
-            .FilterItem.Where(filterItem =>
-                filterItemIds.Contains(filterItem.Id) && filterItem.FilterGroup.Filter.SubjectId == subjectId
-            )
-            .Select(filterItem => new
-            {
-                FilterItemId = filterItem.Id,
-                filterItem.FilterGroupId,
-                filterItem.FilterGroup.FilterId,
-            })
-            .ToListAsync();
-
-        var filterItemIdsSanitised = filterItemIdsResult.Select(filter => filter.FilterItemId).ToList();
-
-        var filterGroupsIdsSanitised = filterItemIdsResult.Select(filter => filter.FilterGroupId).Distinct().ToList();
-
-        var filterIdsSanitised = filterItemIdsResult.Select(filter => filter.FilterId).Distinct().ToList();
-
-        // Sanitise the indicator id's to make sure they belong to the subject
-        var indicatorIdsSanitised = await _context
-            .Indicator.Where(indicator =>
-                indicatorIds.Contains(indicator.Id) && indicator.IndicatorGroup.SubjectId == subjectId
-            )
-            .Select(indicator => indicator.Id)
-            .ToListAsync();
+        var filterItemIds = filterItems.Select(filterItem => filterItem.Id).ToList();
+        var filterGroupIds = filterItems.Select(filterItem => filterItem.FilterGroupId).Distinct().ToList();
+        var filterIds = filterItems.Select(filterItem => filterItem.FilterGroup.FilterId).Distinct().ToList();
 
         var footnotesQueryable = _context.Footnote.Where(footnote => footnote.ReleaseVersionId == releaseVersionId);
 
         // If the list of filter and indicator id's are empty,
         // return early with only footnotes that apply directly to this subject
-        if (!filterItemIdsResult.Any() && !indicatorIdsSanitised.Any())
+        if (filterItemIds.Count == 0 && indicatorIds.Count == 0)
         {
             return await footnotesQueryable
                 .Where(footnote =>
@@ -123,18 +99,22 @@ public class FootnoteRepository : IFootnoteRepository
                         && footnote.Filters.All(filterFootnote => filterFootnote.SubjectId != subjectId)
                     )
                     ||
-                    // or it's got a filter item applicable to one of the filter item id's
+                    // or it's got a filter item for this subject id applicable to one of the filter item id's
                     footnote.FilterItems.Any(filterItemFootnote =>
-                        filterItemIdsSanitised.Contains(filterItemFootnote.FilterItemId)
+                        filterItemFootnote.SubjectId == subjectId
+                        && filterItemIds.Contains(filterItemFootnote.FilterItemId)
                     )
                     ||
-                    // or it's got a filter group applicable to one of the filter group id's
+                    // or it's got a filter group for this subject id applicable to one of the filter group id's
                     footnote.FilterGroups.Any(filterGroupFootnote =>
-                        filterGroupsIdsSanitised.Contains(filterGroupFootnote.FilterGroupId)
+                        filterGroupFootnote.SubjectId == subjectId
+                        && filterGroupIds.Contains(filterGroupFootnote.FilterGroupId)
                     )
                     ||
-                    // or it's got a filter applicable to one of the filter id's.
-                    footnote.Filters.Any(filterFootnote => filterIdsSanitised.Contains(filterFootnote.FilterId))
+                    // or it's got a filter for this subject id applicable to one of the filter id's.
+                    footnote.Filters.Any(filterFootnote =>
+                        filterFootnote.SubjectId == subjectId && filterIds.Contains(filterFootnote.FilterId)
+                    )
                 )
                 &&
                 // and it must be applicable to one or more of the indicators if there are any.
@@ -142,9 +122,9 @@ public class FootnoteRepository : IFootnoteRepository
                     // It's either not got any applicable indicators for this subject id
                     footnote.Indicators.All(indicatorFootnote => indicatorFootnote.SubjectId != subjectId)
                     ||
-                    // or it's got an indicator applicable to one of the indicator id's.
+                    // or it's got an indicator for this subject id applicable to one of the indicator id's.
                     footnote.Indicators.Any(indicatorFootnote =>
-                        indicatorIdsSanitised.Contains(indicatorFootnote.IndicatorId)
+                        indicatorFootnote.SubjectId == subjectId && indicatorIds.Contains(indicatorFootnote.IndicatorId)
                     )
                 )
             )
