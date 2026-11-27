@@ -1,5 +1,6 @@
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 import { ScriptMetaItem } from '@frontend/components/PageMetaItem';
+import getCurrentTenant from '@frontend/utils/getCurrentTenant';
 import { DataSetFile } from '@frontend/services/dataSetFileService';
 
 interface Props {
@@ -13,6 +14,15 @@ export default function getDataSetFileMetaCSVW({
   dataSetFile,
 }: Props): ScriptMetaItem {
   const { file, release, summary, title, id } = dataSetFile;
+  const { service, organisation } = getCurrentTenant();
+  const dataSetUrl = `${service.productionUrl}/data-catalogue/data-set/${id}`;
+  const organisationMeta = {
+    '@type': 'Organization',
+    name: organisation.name,
+    description: organisation.description,
+    url: organisation.url,
+    ...(organisation.rorUrl && { sameAs: organisation.rorUrl }),
+  };
 
   const dataSetFileMeta = {
     '@context': ['https://schema.org', { csvw: 'https://www.w3.org/ns/csvw' }],
@@ -23,31 +33,23 @@ export default function getDataSetFileMetaCSVW({
       summary.length < 50
         ? `${
             summary.length ? `${summary} - ` : ''
-          }Explore Education Statistics data set ${title} from ${
+          }${service.nameStartSentence} data set ${title} from ${
             release.publication.title
           }`
         : sanitizeHtml(summary, { allowedTags: [] }),
-    url: `https://explore-education-statistics.service.gov.uk/data-catalogue/data-set/${id}`,
-    sameAs: `https://explore-education-statistics.service.gov.uk/data-catalogue/data-set/${id}`,
+    url: dataSetUrl,
+    sameAs: dataSetUrl,
     isAccessibleForFree: true,
     license:
       'https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ ',
     includedInDataCatalog: {
       '@type': 'DataCatalog',
-      name: 'Explore education statistics datasets',
-      description:
-        'A http://GOV.UK  Department for Education repository for education statistics',
-      url: 'https://explore-education-statistics.service.gov.uk/data-catalogue ',
+      name: `${service.nameStartSentence} datasets`,
+      description: `A ${organisation.name} repository for ${service.subjectMidSentence} statistics`,
+      url: `${service.productionUrl}/data-catalogue`,
     },
     creator: [
-      {
-        '@type': 'Organization',
-        name: 'Department for Education',
-        description:
-          'The Department for Education is responsible for children’s services and education, including early years, schools, higher and further education policy, apprenticeships and wider skills in England.',
-        url: 'https://www.gov.uk/government/organisations/department-for-education ',
-        sameAs: 'https://ror.org/0320bge18 ',
-      },
+      organisationMeta,
       //   {
       //     '@type': 'Person',
       //     name: release.publication.Contact.ContactName,
@@ -55,14 +57,7 @@ export default function getDataSetFileMetaCSVW({
       //     email: Publication.Contact.TeamEmail,
       //   },
     ],
-    publisher: {
-      '@type': 'Organization',
-      name: 'Department for Education',
-      description:
-        'The Department for Education is responsible for children’s services and education, including early years, schools, higher and further education policy, apprenticeships and wider skills in England.',
-      url: 'https://www.gov.uk/government/organisations/department-for-education ',
-      sameAs: 'https://ror.org/0320bge18 ',
-    },
+    publisher: organisationMeta,
     temporalCoverage: `${file.meta.timePeriodRange.from}/${file.meta.timePeriodRange.to}`,
     mainEntity: !file.dataCsvPreview
       ? undefined

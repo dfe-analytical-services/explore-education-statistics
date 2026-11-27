@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import Link from '@frontend/components/Link';
 import { PageWidth } from '@frontend/components/Page';
 import React, { useEffect, useState } from 'react';
@@ -13,6 +14,9 @@ interface Props {
 }
 
 function CookieBanner({ width }: Props) {
+  const {
+    service: { nameMidSentence },
+  } = useTenant();
   const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies();
   const isBannerSeen = getCookie('bannerSeen') === 'true';
   const [isVisible, setVisible] = useState(!isBannerSeen);
@@ -27,7 +31,7 @@ function CookieBanner({ width }: Props) {
       className={classNames('govuk-cookie-banner', styles.container)}
       data-nosnippet
       role="region"
-      aria-label="Cookies on Explore Education Statistics"
+      aria-label={`Cookies on ${nameMidSentence}`}
     >
       {typeof getCookie('disableGA') === 'undefined' ? (
         <div
@@ -42,7 +46,7 @@ function CookieBanner({ width }: Props) {
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
               <h2 className="govuk-cookie-banner__heading govuk-heading-m">
-                Cookies on Explore Education Statistics
+                Cookies on {nameMidSentence}
               </h2>
 
               <div className="govuk-cookie-banner__content">

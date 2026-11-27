@@ -1,10 +1,7 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import FeedbackSection from '@common/components/FeedbackSection';
 import InsetText from '@common/components/InsetText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import {
-  DfeOpeningHours,
-  DfeTelephoneLine,
-} from '@common/modules/find-statistics/components/ContactUsSection';
 import logger from '@common/services/logger';
 import { PublicationListSummary } from '@common/services/publicationService';
 import CookieBanner from '@frontend/components/CookieBanner';
@@ -27,6 +24,13 @@ interface Props {
 }
 
 const HomePageRedesign = ({ latestReleases }: Props) => {
+  const {
+    service: { nameMidSentence },
+    organisation,
+    contactEmail,
+    relatedServices,
+  } = useTenant();
+
   const logLinkClick = (label: string) =>
     logEvent({
       category: 'Homepage',
@@ -73,10 +77,14 @@ const HomePageRedesign = ({ latestReleases }: Props) => {
                 id: 'contact-us',
                 label: 'Contact us',
               },
-              {
-                id: 'related-services',
-                label: 'Related services',
-              },
+              ...(relatedServices && relatedServices.length > 0
+                ? [
+                    {
+                      id: 'related-services',
+                      label: 'Related services',
+                    },
+                  ]
+                : []),
             ]}
           />
 
@@ -182,8 +190,9 @@ const HomePageRedesign = ({ latestReleases }: Props) => {
           <div className="govuk-grid-row govuk-!-margin-bottom-3">
             <div className="govuk-grid-column-two-thirds">
               <p className="govuk-!-margin-top-1">
-                The Explore education statistics service is operated by the
-                Department for Education (DfE).
+                The {nameMidSentence} service is operated by{' '}
+                {organisation.nameWithArticle}
+                {organisation.acronym && ` (${organisation.acronym})`}.
               </p>
 
               <h3>
@@ -200,108 +209,61 @@ const HomePageRedesign = ({ latestReleases }: Props) => {
                 .
               </p>
               <p>
-                For any further queries, contact the Explore education
-                statistics team:
+                For any further queries, contact the {nameMidSentence} team:
               </p>
               <InsetText>
-                Email:{' '}
-                <a href="mailto:explore.statistics@education.gov.uk">
-                  explore.statistics@education.gov.uk
-                </a>
+                Email: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
               </InsetText>
 
-              <h3>
-                Have a general question about education or the Department for
-                Education?
-              </h3>
-              <p>Call the DfE public enquiries line:</p>
-              <InsetText>
-                {DfeTelephoneLine}
-                <br />
-                Opening hours: {DfeOpeningHours}
-              </InsetText>
+              {organisation.publicEnquiries && (
+                <>
+                  <h3>Have a general enquiry?</h3>
+                  <p>{organisation.publicEnquiries.question}</p>
+                  <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
+                  <InsetText>
+                    {organisation.publicEnquiries.telephone}
+                    <br />
+                    Opening hours: {organisation.publicEnquiries.openingHours}
+                  </InsetText>
+                </>
+              )}
 
               <h3 className="govuk-heading-m">Provide us with feedback</h3>
               <FeedbackSection />
             </div>
           </div>
 
-          <hr />
+          {relatedServices && relatedServices.length > 0 && (
+            <>
+              <hr />
 
-          <h2 className="govuk-!-margin-top-9" id="related-services">
-            Related services
-          </h2>
-          <div className="govuk-grid-row govuk-!-margin-bottom-3">
-            <div className="govuk-grid-column-two-thirds">
-              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                <a
-                  href="https://www.gov.uk/government/organisations/department-for-education/about/statistics"
-                  rel="noopener noreferrer nofollow"
-                  target="_blank"
-                  onClick={() => logLinkClick('Statistics at DfE')}
-                >
-                  Statistics at DfE{' '}
-                  <VisuallyHidden>(opens in new tab)</VisuallyHidden>
-                </a>
-              </h3>
-              <p className="govuk-caption-m govuk-!-margin-top-1">
-                Find out more about latest news, announcements, forthcoming
-                releases and ad hoc publications, as well as related education
-                statistics.
-              </p>
-              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                <a
-                  href="https://find-compare-schools-colleges.service.gov.uk/"
-                  rel="noopener noreferrer nofollow"
-                  target="_blank"
-                  onClick={() =>
-                    logLinkClick(
-                      'Find and compare school and college profiles service',
-                    )
-                  }
-                >
-                  Find and compare school and college profiles service{' '}
-                  <VisuallyHidden>(opens in new tab)</VisuallyHidden>
-                </a>
-              </h3>
-              <p className="govuk-caption-m govuk-!-margin-top-1">
-                Search for information about schools and colleges in England,
-                including performance data.
-              </p>
-              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                <a
-                  href="https://www.get-information-schools.service.gov.uk/"
-                  rel="noopener noreferrer nofollow"
-                  target="_blank"
-                  onClick={() => logLinkClick('Get information about schools')}
-                >
-                  Get information about schools{' '}
-                  <VisuallyHidden>(opens in new tab)</VisuallyHidden>
-                </a>
-              </h3>
-              <p className="govuk-caption-m govuk-!-margin-top-1">
-                Search to find and download information about schools, colleges,
-                educational organisations and governors in England.
-              </p>
-              <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                <a
-                  href="https://financial-benchmarking-and-insights-tool.education.gov.uk/"
-                  rel="noopener noreferrer nofollow"
-                  target="_blank"
-                  onClick={() =>
-                    logLinkClick('Financial Benchmarking and Insights Tool')
-                  }
-                >
-                  Financial Benchmarking and Insights Tool{' '}
-                  <VisuallyHidden>(opens in new tab)</VisuallyHidden>
-                </a>
-              </h3>
-              <p className="govuk-caption-m govuk-!-margin-top-1">
-                Compare your school&apos;s expenditure with other schools in
-                England.
-              </p>
-            </div>
-          </div>
+              <h2 className="govuk-!-margin-top-9" id="related-services">
+                Related services
+              </h2>
+              <div className="govuk-grid-row govuk-!-margin-bottom-3">
+                <div className="govuk-grid-column-two-thirds">
+                  {relatedServices.map(relatedService => (
+                    <div key={relatedService.url}>
+                      <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                        <a
+                          href={relatedService.url}
+                          rel="noopener noreferrer nofollow"
+                          target="_blank"
+                          onClick={() => logLinkClick(relatedService.title)}
+                        >
+                          {relatedService.title}{' '}
+                          <VisuallyHidden>(opens in new tab)</VisuallyHidden>
+                        </a>
+                      </h3>
+                      <p className="govuk-caption-m govuk-!-margin-top-1">
+                        {relatedService.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </main>
       <PageFeedback width="wide" />

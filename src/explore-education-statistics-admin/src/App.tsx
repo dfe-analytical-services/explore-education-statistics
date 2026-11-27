@@ -12,7 +12,9 @@ import {
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
 import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
+import { TenantContextProvider } from '@common/contexts/TenantContext';
 import composeProviders from '@common/hocs/composeProviders';
+import eesTenant from '@common/tenants/eesTenant';
 import {
   QueryClient,
   QueryClientProvider as BaseQueryClientProvider,
@@ -58,6 +60,7 @@ function ApplicationInsightsTracking() {
 
 const BaseProviders = composeProviders(
   ConfigContextProvider,
+  TenantProvider,
   ApplicationInsightsContextProvider,
   NetworkActivityContextProvider,
   UnheadProvider,
@@ -172,4 +175,10 @@ function QueryClientProvider({ children }: { children?: ReactNode }) {
 
 function UnheadProvider({ children }: { children?: ReactNode }) {
   return <BaseUnheadProvider head={head}>{children}</BaseUnheadProvider>;
+}
+
+function TenantProvider({ children }: { children?: ReactNode }) {
+  return (
+    <TenantContextProvider tenant={eesTenant}>{children}</TenantContextProvider>
+  );
 }

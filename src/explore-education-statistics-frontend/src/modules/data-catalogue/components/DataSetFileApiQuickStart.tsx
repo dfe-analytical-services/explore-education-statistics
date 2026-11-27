@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import getPublicEnv from '@frontend/utils/publicEnv';
 import ChevronCard from '@common/components/ChevronCard';
 import ChevronGrid from '@common/components/ChevronGrid';
@@ -15,6 +16,10 @@ interface Props {
 }
 
 export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
+  const {
+    service: { nameMidSentence },
+  } = useTenant();
+
   if (!id || !name || !version) {
     return (
       <WarningMessage>API data set is not currently available</WarningMessage>
@@ -26,7 +31,7 @@ export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
       <ChevronGrid>
         <ChevronCard
           cardSize="l"
-          description="This data set is available via an API, follow the link to get all the information to get started. 
+          description="This data set is available via an API, follow the link to get all the information to get started.
           The documentation provides full guidance and examples on how to make the most from our data sets."
           headingSize="m"
           link={
@@ -37,8 +42,7 @@ export default function DataSetFileApiQuickStart({ id, name, version }: Props) {
         />
         <ChevronCard
           cardSize="l"
-          description="To support building integrations on top of the explore education statistics API, software development 
-          kits (SDKs) are provided to streamline common tasks and communication with the API."
+          description={`To support building integrations on top of the ${nameMidSentence} API, software development kits (SDKs) are provided to streamline common tasks and communication with the API.`}
           headingSize="m"
           link={
             <Link

@@ -1,7 +1,9 @@
 import UserTestingBanner from '@frontend/components/UserTestingBanner';
 import * as _useCookies from '@frontend/hooks/useCookies';
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import render from '@common-test/render';
+import testTenant from '@common-test/testTenant';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 jest.mock('@frontend/hooks/useCookies');
@@ -21,7 +23,7 @@ describe('UserTestingBanner', () => {
     render(<UserTestingBanner />);
 
     expect(
-      screen.getByText('Shape the future of Explore education statistics'),
+      screen.getByText('Shape the future of explore education statistics'),
     ).toBeInTheDocument();
   });
 
@@ -38,7 +40,7 @@ describe('UserTestingBanner', () => {
     render(<UserTestingBanner />);
 
     expect(
-      screen.getByText('Shape the future of Explore education statistics'),
+      screen.getByText('Shape the future of explore education statistics'),
     ).toBeInTheDocument();
   });
 
@@ -55,7 +57,7 @@ describe('UserTestingBanner', () => {
     render(<UserTestingBanner />);
 
     expect(
-      screen.getByText('Shape the future of Explore education statistics'),
+      screen.getByText('Shape the future of explore education statistics'),
     ).toBeInTheDocument();
   });
 
@@ -94,7 +96,24 @@ describe('UserTestingBanner', () => {
     render(<UserTestingBanner />);
 
     expect(
-      screen.queryByText('Shape the future of Explore education statistics'),
+      screen.queryByText('Shape the future of explore education statistics'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render the banner for a tenant with no userResearchBanner', () => {
+    jest.spyOn(useCookies, 'useCookies').mockImplementation(() => ({
+      getCookie: () => {
+        return undefined;
+      },
+      setBannerSeenCookie: jest.fn(),
+      setUserTestingBannerSeenCookie: jest.fn(),
+      setGADisabledCookie: jest.fn(),
+    }));
+
+    render(<UserTestingBanner />, { tenant: testTenant });
+
+    expect(
+      screen.queryByText('Shape the future of explore education statistics'),
     ).not.toBeInTheDocument();
   });
 });

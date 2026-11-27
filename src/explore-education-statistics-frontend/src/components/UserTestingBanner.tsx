@@ -1,4 +1,5 @@
 import Banner from '@common/components/Banner';
+import { useTenant } from '@common/contexts/TenantContext';
 import useMounted from '@common/hooks/useMounted';
 import Link from '@frontend/components/Link';
 import { PageWidth } from '@frontend/components/Page';
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function UserTestingBanner({ width }: Props) {
+  const { userResearchBanner } = useTenant();
   const { isMounted } = useMounted();
   const { getCookie, setUserTestingBannerSeenCookie } = useCookies();
 
@@ -23,7 +25,7 @@ export default function UserTestingBanner({ width }: Props) {
     ? JSON.parse(userTestingCookieValue).version === userTestingBannerVersion
     : false;
 
-  if (isMounted && !isUserTestingBannerSeen) {
+  if (userResearchBanner && isMounted && !isUserTestingBannerSeen) {
     return (
       <Banner
         className={classNames({
@@ -34,16 +36,15 @@ export default function UserTestingBanner({ width }: Props) {
         onClose={() => setUserTestingBannerSeenCookie(userTestingBannerVersion)}
       >
         <p className="govuk-!-font-weight-bold govuk-!-margin-bottom-0">
-          Shape the future of Explore education statistics
+          {userResearchBanner.title}
         </p>
         <p className="govuk-!-margin-bottom-2">
           <Link
-            to="https://forms.office.com/e/QVWqCbbxCj"
+            to={userResearchBanner.url}
             target="_blank"
             rel="noopener noreferrer"
           >
-            Share your feedback to help us improve this service (opens in new
-            tab)
+            {userResearchBanner.linkText} (opens in new tab)
           </Link>
         </p>
       </Banner>

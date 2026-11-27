@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import React from 'react';
@@ -5,6 +6,10 @@ import React from 'react';
 const triggerText = 'What are API data sets?';
 
 export default function ApiDataSetsGuidanceModal() {
+  const {
+    service: { nameMidSentence },
+  } = useTenant();
+
   return (
     <Modal
       noJsFallbackSummary={triggerText}
@@ -15,9 +20,9 @@ export default function ApiDataSetsGuidanceModal() {
       <h3>API data sets</h3>
       <p>
         Select this option to filter for data sets that are specifically
-        compatible with the Explore Education Statistics API. These data sets
-        are structured with machine-readable identifiers and versioning to
-        support automated data feeds.
+        compatible with the {nameMidSentence} API. These data sets are
+        structured with machine-readable identifiers and versioning to support
+        automated data feeds.
       </p>
 
       <ul>

@@ -1,31 +1,38 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import InsetText from '@common/components/InsetText';
-import {
-  DfeOpeningHours,
-  DfeTelephoneLine,
-} from '@common/modules/find-statistics/components/ContactUsSection';
+import formatOrganisationPossessive from '@common/tenants/utils/formatOrganisationPossessive';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
 
 function HelpSupportPage() {
+  const {
+    service: { nameStartSentence, nameMidSentence },
+    organisation,
+    contactEmail,
+    officialStatisticsStandardsUrl,
+  } = useTenant();
+
   return (
     <Page title="Help and support">
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <p>
-            Find out more about Explore education statistics - including how to
-            use it services and get further help and support.
+            Find out more about {nameMidSentence} - including how to use its
+            services and get further help and support.
           </p>
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">About the service</h2>
             <p>
-              Explore education statistics has been built by{' '}
+              {nameStartSentence} has been built by{' '}
               <a
-                href="https://www.gov.uk/government/organisations/department-for-education"
+                href={organisation.url}
                 rel="noopener noreferrer nofollow"
                 target="_blank"
               >
-                the Department for Education (DfE) (opens in new tab)
+                {organisation.nameWithArticle}
+                {organisation.acronym && ` (${organisation.acronym})`} (opens in
+                new tab)
               </a>{' '}
               to make it easier for you to find, access, navigate and understand
               the range of education-related statistics and data it provides.
@@ -39,21 +46,28 @@ function HelpSupportPage() {
                 target="_blank"
               >
                 Code of Practice for Official Statistics (opens in new tab)
-              </a>{' '}
-              and DfE's{' '}
-              <a
-                href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
-                rel="noopener noreferrer nofollow"
-                target="_blank"
-              >
-                Standards for official statistics (opens in new tab)
               </a>
+              {officialStatisticsStandardsUrl && (
+                <>
+                  {' '}
+                  and {formatOrganisationPossessive(organisation)}{' '}
+                  <a
+                    href={officialStatisticsStandardsUrl}
+                    rel="noopener noreferrer nofollow"
+                    target="_blank"
+                  >
+                    Standards for official statistics (opens in new tab)
+                  </a>
+                </>
+              )}
               .
             </p>
           </section>
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Find statistics and data</h2>
-            The service contains all of DfE's published official statistics.
+            The service contains all of{' '}
+            {formatOrganisationPossessive(organisation)} published official
+            statistics.
             <p>
               To find specific sets of statistics currently published via the
               service, browse our{' '}
@@ -128,8 +142,9 @@ function HelpSupportPage() {
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Contact us for help and support</h2>
             <p className="govuk-!-margin-top-1">
-              The Explore education statistics service is operated by the
-              Department for Education (DfE).
+              The {nameMidSentence} service is operated by{' '}
+              {organisation.nameWithArticle}
+              {organisation.acronym && ` (${organisation.acronym})`}.
             </p>
 
             <h3 className="govuk-!-margin-top-8 govuk-heading-s">
@@ -141,27 +156,25 @@ function HelpSupportPage() {
               sections of the pages found under{' '}
               <Link to="/find-statistics">Find statistics and data</Link>.
             </p>
-            <p>
-              For any further queries, contact the Explore education statistics
-              team:
-            </p>
+            <p>For any further queries, contact the {nameMidSentence} team:</p>
             <InsetText>
-              Email:{' '}
-              <a href="mailto:explore.statistics@education.gov.uk">
-                explore.statistics@education.gov.uk
-              </a>
+              Email: <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
             </InsetText>
 
-            <h3 className="govuk-!-margin-top-8 govuk-heading-s">
-              Have a general question about education or the Department for
-              Education?
-            </h3>
-            <p>Call the DfE public enquiries line:</p>
-            <InsetText>
-              {DfeTelephoneLine}
-              <br />
-              Opening hours: {DfeOpeningHours}
-            </InsetText>
+            {organisation.publicEnquiries && (
+              <>
+                <h3 className="govuk-!-margin-top-8 govuk-heading-s">
+                  Have a general enquiry?
+                </h3>
+                <p>{organisation.publicEnquiries.question}</p>
+                <p>{organisation.publicEnquiries.telephoneCallToAction}</p>
+                <InsetText>
+                  {organisation.publicEnquiries.telephone}
+                  <br />
+                  Opening hours: {organisation.publicEnquiries.openingHours}
+                </InsetText>
+              </>
+            )}
           </section>
         </div>
       </div>

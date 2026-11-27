@@ -1,10 +1,7 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import { Contact } from '@common/services/publicationService';
 import { Organisation } from '@common/services/types/organisation';
 import React from 'react';
-
-export const DfeTelephoneLine = 'Phone: 0370 000 2288';
-export const DfeOpeningHours =
-  'Monday to Friday from 9.30am to 5.30pm (closed on bank holidays)';
 
 const ContactUsSection = ({
   publicationContact,
@@ -15,6 +12,7 @@ const ContactUsSection = ({
   publicationTitle: string;
   publishingOrganisations: Organisation[];
 }) => {
+  const { organisation, pressOffice } = useTenant();
   const isSkillsEngland = !!publishingOrganisations.find(
     org => org.title === 'Skills England',
   );
@@ -75,25 +73,34 @@ const ContactUsSection = ({
         </>
       ) : (
         <>
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Press office
-          </h4>
+          {pressOffice && (
+            <>
+              <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+                Press office
+              </h4>
 
-          <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
-          <p>Telephone: 020 7783 8300</p>
+              <p className="govuk-!-margin-top-0">
+                If you have a media enquiry:
+              </p>
+              <p>{pressOffice.telephone}</p>
+            </>
+          )}
 
-          <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-            Public enquiries
-          </h4>
-          <p className="govuk-!-margin-top-0">
-            If you have a general enquiry about the Department for Education
-            (DfE) or education:
-          </p>
-          <p>{DfeTelephoneLine}</p>
-          <p>
-            Opening times: <br />
-            {DfeOpeningHours}
-          </p>
+          {organisation.publicEnquiries && (
+            <>
+              <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
+                Public enquiries
+              </h4>
+              <p className="govuk-!-margin-top-0">
+                {organisation.publicEnquiries.description}
+              </p>
+              <p>{organisation.publicEnquiries.telephone}</p>
+              <p>
+                Opening times: <br />
+                {organisation.publicEnquiries.openingHours}
+              </p>
+            </>
+          )}
         </>
       )}
     </>

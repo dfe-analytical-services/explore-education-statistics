@@ -1,11 +1,19 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import Page from '@frontend/components/Page';
 import React from 'react';
 import Link from '@frontend/components/Link';
+import upperFirst from 'lodash/upperFirst';
 
 function AcccessibilityStatementPage() {
+  const {
+    service: { nameMidSentence },
+    organisation,
+    contactEmail,
+  } = useTenant();
+
   return (
     <Page
-      title="Accessibility statement for Explore education statistics"
+      title={`Accessibility statement for ${nameMidSentence}`}
       breadcrumbLabel="Accessibility statement"
     >
       <div className="govuk-grid-row">
@@ -13,16 +21,19 @@ function AcccessibilityStatementPage() {
           <p>
             This accessibility statement applies to the
             explore-education-statistics.service.gov.uk website. This website is
-            run by the{' '}
+            run by{' '}
             <a
               rel="noopener noreferrer nofollow"
               target="_blank"
-              href="https://www.gov.uk/government/organisations/department-for-education"
+              href={organisation.url}
             >
-              Department for Education (DfE) (opens in new tab)
+              {organisation.nameWithArticle}
+              {organisation.acronym && ` (${organisation.acronym})`} (opens in
+              new tab)
             </a>
-            . This statement does not cover any other services run by the
-            Department for Education (DfE) or GOV.UK.
+            . This statement does not cover any other services run by{' '}
+            {organisation.nameWithArticle}
+            {organisation.acronym && ` (${organisation.acronym})`} or GOV.UK.
           </p>
           <h2>How you should be able to use this website</h2>
           <p>
@@ -79,10 +90,7 @@ function AcccessibilityStatementPage() {
           </p>
           <ul>
             <li>
-              email{' '}
-              <a href="mailto:explore.statistics@education.gov.uk">
-                explore.statistics@education.gov.uk
-              </a>
+              email <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
             </li>
           </ul>
           <p>In your message, include:</p>
@@ -110,10 +118,11 @@ function AcccessibilityStatementPage() {
           </p>
           <h2>Technical information about this website's accessibility</h2>
           <p>
-            The Department for Education (DfE) is committed to making its
-            website accessible, in accordance with the Public Sector Bodies
-            (Websites and Mobile Applications) (No. 2) Accessibility Regulations
-            2018.
+            {upperFirst(organisation.nameWithArticle)}
+            {organisation.acronym && ` (${organisation.acronym})`} is committed
+            to making its website accessible, in accordance with the Public
+            Sector Bodies (Websites and Mobile Applications) (No. 2)
+            Accessibility Regulations 2018.
           </p>
           <h2>Compliance status</h2>
           <p>

@@ -1,3 +1,4 @@
+import { useTenant } from '@common/contexts/TenantContext';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { PageWidth } from '@frontend/components/Page';
 import styles from '@frontend/components/PageFeedback.module.scss';
@@ -29,6 +30,9 @@ interface FormValues {
 const feedbackLimit = 2000;
 
 export default function PageFeedback({ width }: Props) {
+  const {
+    service: { nameMidSentence },
+  } = useTenant();
   const [bannerState, setBannerState] = useState<BannerState>('initial');
   const [response, setResponse] = useState<PageFeedbackResponse | undefined>();
 
@@ -149,7 +153,7 @@ export default function PageFeedback({ width }: Props) {
         hidden={bannerState === 'initial' || bannerState === 'thanks'}
       >
         <h3 className="govuk-!-margin-top-5">
-          Help us improve Explore education statistics
+          Help us improve {nameMidSentence}
         </h3>
         <p>
           Don't include personal or financial information like your National

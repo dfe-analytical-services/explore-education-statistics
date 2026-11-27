@@ -7,10 +7,12 @@ import {
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
 import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
+import { TenantContextProvider } from '@common/contexts/TenantContext';
 import composeProviders from '@common/hocs/composeProviders';
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
 import { useCookies } from '@frontend/hooks/useCookies';
+import getCurrentTenant from '@frontend/utils/getCurrentTenant';
 import getPublicEnv from '@frontend/utils/publicEnv';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import Head from 'next/head';
@@ -94,10 +96,19 @@ App.getInitialProps = async (appContext: AppContext) => {
 };
 
 const Providers = composeProviders(
+  TenantProvider,
   ApplicationInsightsContextProvider,
   NetworkActivityContextProvider,
   QueryClientProvider,
 );
+
+function TenantProvider({ children }: { children?: ReactNode }) {
+  return (
+    <TenantContextProvider tenant={getCurrentTenant()}>
+      {children}
+    </TenantContextProvider>
+  );
+}
 
 function ApplicationInsightsContextProvider({
   children,

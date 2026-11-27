@@ -23,6 +23,7 @@ export default defineConfig([
     "**/.next/",
     "**/build/",
     "**/dist/",
+    "**/vendor/",
     "**/coverage/",
     "**/node_modules/",
     "**/*.min.js",

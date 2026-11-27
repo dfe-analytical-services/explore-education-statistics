@@ -1,6 +1,7 @@
 import MethodologyIndexPage from '@frontend/modules/methodologies/MethodologyIndexPage';
 import { MethodologyTheme } from '@common/services/themeService';
-import { render, screen, within } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, within } from '@testing-library/react';
 import React from 'react';
 
 const testThemes: MethodologyTheme[] = [
