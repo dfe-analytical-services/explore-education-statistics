@@ -9,9 +9,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfac
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,21 +22,21 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 {
     private readonly ILogger<PermalinkCsvMetaService> _logger;
     private readonly ContentDbContext _contentDbContext;
-    private readonly StatisticsDbContext _statisticsDbContext;
+    private readonly IStorageDataSetResolver _storageDataSetResolver;
     private readonly IReleaseSubjectService _releaseSubjectService;
     private readonly IReleaseFileBlobService _releaseFileBlobService;
 
     public PermalinkCsvMetaService(
         ILogger<PermalinkCsvMetaService> logger,
         ContentDbContext contentDbContext,
-        StatisticsDbContext statisticsDbContext,
+        IStorageDataSetResolver storageDataSetResolver,
         IReleaseSubjectService releaseSubjectService,
         IReleaseFileBlobService releaseFileBlobService
     )
     {
         _logger = logger;
         _contentDbContext = contentDbContext;
-        _statisticsDbContext = statisticsDbContext;
+        _storageDataSetResolver = storageDataSetResolver;
         _releaseSubjectService = releaseSubjectService;
         _releaseFileBlobService = releaseFileBlobService;
     }
@@ -51,7 +51,8 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var csvStream = releaseSubject is not null ? await GetCsvStream(releaseSubject, cancellationToken) : null;
 
-        var locations = await GetLocations(tableResultMeta.Locations);
+        var dataSet = await _storageDataSetResolver.TryResolve(subjectId, cancellationToken);
+        var locations = await GetLocations(dataSet, tableResultMeta.Locations, cancellationToken);
 
         var csvFilters = tableResultMeta.Filters.Values.ToDictionary(
             filter => filter.Name,
@@ -160,8 +161,10 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         return filteredHeaders;
     }
 
-    private async Task<Dictionary<Guid, Dictionary<string, string>>> GetLocations(
-        Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchy
+    private static async Task<Dictionary<Guid, Dictionary<string, string>>> GetLocations(
+        IStorageDataSet? dataSet,
+        Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchy,
+        CancellationToken cancellationToken
     )
     {
         var locationAttributePaths = locationsHierarchy
@@ -175,9 +178,15 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var locationIds = locationAttributePaths.Select(location => location.Id).ToHashSet();
 
-        return await _statisticsDbContext
-            .Location.Where(location => locationIds.Contains(location.Id))
-            .ToDictionaryAsync(location => location.Id, location => location.GetCsvValues());
+        if (dataSet is null)
+        {
+            return new Dictionary<Guid, Dictionary<string, string>>();
+        }
+
+        return (await dataSet.ListLocations(locationIds, cancellationToken)).ToDictionary(
+            location => location.Id,
+            location => location.GetCsvValues()
+        );
     }
 
     private static List<LocationAttributePath> GetLocationAttributePaths(

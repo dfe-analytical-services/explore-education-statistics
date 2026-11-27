@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.Extensions.Logging;
@@ -23,6 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Utils.StorageDataSetTestUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
@@ -237,6 +239,79 @@ public class PermalinkCsvMetaServiceTests
     }
 
     [Fact]
+    public async Task GetCsvMeta_SubjectNotFound_DataFileMissing()
+    {
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var filters = _fixture
+            .DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+            .WithSubject(subject)
+            .GenerateList(1);
+
+        var indicators = _fixture
+            .DefaultIndicator()
+            .ForInstance(i => i.SetIndicatorGroup(_fixture.DefaultIndicatorGroup().WithSubject(subject)))
+            .GenerateList(1);
+
+        var locations = _fixture
+            .DefaultLocation()
+            .ForIndex(0, l => l.SetPresetRegion().SetGeographicLevel(GeographicLevel.Region))
+            .ForIndex(1, l => l.SetPresetRegionAndLocalAuthority().SetGeographicLevel(GeographicLevel.LocalAuthority))
+            .GenerateArray();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        // The data set has been deleted, so there is no data file in the content database
+        // to resolve a storage data set from.
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var subjectId = Guid.NewGuid();
+
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+
+            releaseSubjectService
+                .Setup(s => s.FindForLatestPublishedVersion(subjectId))
+                .ReturnsAsync((ReleaseSubject?)null);
+
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                storageDataSetResolver: BuildStorageDataSetResolver(contentDbContext, statisticsDbContext),
+                releaseSubjectService: releaseSubjectService.Object
+            );
+
+            var tableResultMeta = new SubjectResultMetaViewModel
+            {
+                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                Locations = LocationViewModelBuilder
+                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                    .ToDictionary(level => level.Key.ToString().CamelCase(), level => level.Value),
+            };
+
+            var result = await service.GetCsvMeta(subjectId, tableResultMeta);
+
+            VerifyAllMocks(releaseSubjectService);
+
+            var viewModel = result.AssertRight();
+
+            Assert.Empty(viewModel.Locations);
+
+            var expectedHeaders = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                filters[0].Name,
+                indicators[0].Name,
+            };
+
+            Assert.Equal(expectedHeaders, viewModel.Headers);
+        }
+    }
+
+    [Fact]
     public async Task GetCsvMeta_SubjectExists_DataFileExists()
     {
         var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).GenerateList(2);
@@ -268,7 +343,12 @@ public class PermalinkCsvMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -429,7 +509,12 @@ public class PermalinkCsvMetaServiceTests
         var releaseDataFile = new ReleaseFile
         {
             ReleaseVersion = releaseVersion,
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         // Create a file for the subject and release which is not a data file
@@ -443,7 +528,12 @@ public class PermalinkCsvMetaServiceTests
         var releaseDataFileOtherRelease = new ReleaseFile
         {
             ReleaseVersion = new ReleaseVersion { Id = Guid.NewGuid() },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -665,7 +755,12 @@ public class PermalinkCsvMetaServiceTests
         var releaseFile = new ReleaseFile
         {
             ReleaseVersion = new ReleaseVersion { Id = releaseSubject.ReleaseVersion.Id },
-            File = new File { SubjectId = releaseSubject.Subject.Id, Type = FileType.Data },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data,
+                DataStorageVersion = DataStorageVersion.StatsDB,
+            },
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -775,6 +870,7 @@ public class PermalinkCsvMetaServiceTests
     private static PermalinkCsvMetaService BuildService(
         ContentDbContext contentDbContext,
         StatisticsDbContext statisticsDbContext,
+        IStorageDataSetResolver? storageDataSetResolver = null,
         IReleaseSubjectService? releaseSubjectService = null,
         IReleaseFileBlobService? releaseFileBlobService = null
     )
@@ -782,7 +878,7 @@ public class PermalinkCsvMetaServiceTests
         return new(
             logger: Mock.Of<ILogger<PermalinkCsvMetaService>>(),
             contentDbContext: contentDbContext,
-            statisticsDbContext: statisticsDbContext,
+            storageDataSetResolver: storageDataSetResolver ?? BuildStatisticsDbDataSetResolver(statisticsDbContext),
             releaseSubjectService: releaseSubjectService ?? Mock.Of<IReleaseSubjectService>(Strict),
             releaseFileBlobService: releaseFileBlobService ?? Mock.Of<IReleaseFileBlobService>(Strict)
         );
