@@ -10,8 +10,6 @@ public static class FilterOptionsTable
     {
         public const string Id = "id";
         public const string Label = "label";
-        public const string PublicId = "public_id";
-        public const string FilterId = "filter_id";
         public const string FilterColumn = "filter_column";
         public const string FilterItemId = "ees_filter_item_id";
         public const string FilterGroupId = "ees_filter_group_id";

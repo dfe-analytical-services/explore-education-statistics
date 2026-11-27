@@ -9,7 +9,6 @@ public static class FiltersTable
     public static class Cols
     {
         public const string Id = "id";
-        public const string PublicId = "public_id";
         public const string Column = "\"column\"";
         public const string Label = "label";
         public const string Hint = "hint";

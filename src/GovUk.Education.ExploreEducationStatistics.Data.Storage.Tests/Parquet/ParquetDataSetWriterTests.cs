@@ -3,7 +3,6 @@ using Dapper;
 using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Utils;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Parquet;
@@ -122,8 +121,6 @@ public abstract class ParquetDataSetWriterTests : IDisposable
                 SELECT
                     id AS Id,
                     label AS Label,
-                    public_id AS PublicId,
-                    filter_id AS FilterId,
                     filter_column AS FilterColumn,
                     ees_filter_item_id AS FilterItemId,
                     ees_filter_group_id AS FilterGroupId,
@@ -134,33 +131,16 @@ public abstract class ParquetDataSetWriterTests : IDisposable
                 """
             );
 
-            var ncYearPublicId = SqidEncoder.Encode(1);
-            var schoolTypePublicId = SqidEncoder.Encode(2);
-
             Assert.Equal(
                 [
-                    (1, "Total", SqidEncoder.Encode(1), ncYearPublicId, "ncyear", _testDataSet.KeyStage1Total.Id),
-                    (2, "Total", SqidEncoder.Encode(2), ncYearPublicId, "ncyear", _testDataSet.KeyStage2Total.Id),
-                    (3, "Year 1", SqidEncoder.Encode(3), ncYearPublicId, "ncyear", _testDataSet.Year1.Id),
-                    (4, "Year 2", SqidEncoder.Encode(4), ncYearPublicId, "ncyear", _testDataSet.Year2.Id),
-                    (
-                        5,
-                        "State-funded primary",
-                        SqidEncoder.Encode(5),
-                        schoolTypePublicId,
-                        "school_type",
-                        _testDataSet.Primary.Id
-                    ),
-                    (
-                        6,
-                        "State-funded secondary",
-                        SqidEncoder.Encode(6),
-                        schoolTypePublicId,
-                        "school_type",
-                        _testDataSet.Secondary.Id
-                    ),
+                    (1, "Total", "ncyear", _testDataSet.KeyStage1Total.Id),
+                    (2, "Total", "ncyear", _testDataSet.KeyStage2Total.Id),
+                    (3, "Year 1", "ncyear", _testDataSet.Year1.Id),
+                    (4, "Year 2", "ncyear", _testDataSet.Year2.Id),
+                    (5, "State-funded primary", "school_type", _testDataSet.Primary.Id),
+                    (6, "State-funded secondary", "school_type", _testDataSet.Secondary.Id),
                 ],
-                filterOptions.Select(o => (o.Id, o.Label, o.PublicId, o.FilterId, o.FilterColumn, o.FilterItemId))
+                filterOptions.Select(o => (o.Id, o.Label, o.FilterColumn, o.FilterItemId))
             );
 
             var keyStage2Total = filterOptions[1];
@@ -168,25 +148,23 @@ public abstract class ParquetDataSetWriterTests : IDisposable
             Assert.Equal("Key stage 2", keyStage2Total.FilterGroupLabel);
             Assert.Equal(_testDataSet.NcYear.Id, keyStage2Total.EesFilterId);
 
-            var filters = await Query<(Guid Id, string PublicId, string Column)>(
+            var filters = await Query<(Guid Id, string Column)>(
                 $"""
-                SELECT id, public_id, "column"
+                SELECT id, "column"
                 FROM '{PathResolver.FiltersPath(_testDataSet.SubjectId)}'
-                ORDER BY public_id
                 """
             );
 
-            Assert.Contains((_testDataSet.NcYear.Id, ncYearPublicId, "ncyear"), filters);
-            Assert.Contains((_testDataSet.SchoolType.Id, schoolTypePublicId, "school_type"), filters);
+            Assert.Contains((_testDataSet.NcYear.Id, "ncyear"), filters);
+            Assert.Contains((_testDataSet.SchoolType.Id, "school_type"), filters);
         }
 
         [Fact]
-        public async Task Indicators_WrittenWithPublicApiColumns()
+        public async Task Indicators_WrittenWithEesIds()
         {
             await _testDataSet.Write();
 
             var indicators = await Query<(
-                string Id,
                 string Column,
                 string Label,
                 string Unit,
@@ -196,7 +174,7 @@ public abstract class ParquetDataSetWriterTests : IDisposable
             )>(
                 $"""
                 SELECT
-                    id, "column", label, unit, CAST(decimal_places AS INTEGER),
+                    "column", label, unit, CAST(decimal_places AS INTEGER),
                     ees_indicator_id, ees_indicator_group_id
                 FROM '{PathResolver.IndicatorsPath(_testDataSet.SubjectId)}'
                 ORDER BY "column"
@@ -206,7 +184,6 @@ public abstract class ParquetDataSetWriterTests : IDisposable
             Assert.Equal(
                 [
                     (
-                        SqidEncoder.Encode(1),
                         "enrolments",
                         "Enrolments",
                         "",
@@ -214,17 +191,8 @@ public abstract class ParquetDataSetWriterTests : IDisposable
                         _testDataSet.Enrolments.Id,
                         _testDataSet.DefaultIndicatorGroup.Id
                     ),
+                    ("notes", "Notes", "string", null, _testDataSet.Notes.Id, _testDataSet.OtherIndicatorGroup.Id),
                     (
-                        SqidEncoder.Encode(2),
-                        "notes",
-                        "Notes",
-                        "string",
-                        null,
-                        _testDataSet.Notes.Id,
-                        _testDataSet.OtherIndicatorGroup.Id
-                    ),
-                    (
-                        SqidEncoder.Encode(3),
                         "sess_authorised_percent",
                         "Percentage of authorised sessions",
                         "%",
@@ -249,7 +217,6 @@ public abstract class ParquetDataSetWriterTests : IDisposable
                         id AS Id,
                         label AS Label,
                         level AS Level,
-                        public_id AS PublicId,
                         code AS Code,
                         old_code AS OldCode,
                         urn AS Urn,
@@ -258,14 +225,14 @@ public abstract class ParquetDataSetWriterTests : IDisposable
                     ORDER BY id
                     """
                 )
-            ).Select(o => (o.Id, o.Label, o.Level, o.PublicId, o.Code, o.OldCode, o.Urn, o.Ukprn));
+            ).Select(o => (o.Id, o.Label, o.Level, o.Code, o.OldCode, o.Urn, o.Ukprn));
 
             Assert.Equal(
                 [
-                    (1, "Newcastle upon Tyne", "LA", SqidEncoder.Encode(1), "E08000021", "391", null, null),
-                    (2, "England", "NAT", SqidEncoder.Encode(2), "E92000001", null, null, null),
-                    (3, "North East", "REG", SqidEncoder.Encode(3), "E12000001", null, null, null),
-                    (4, "Newcastle Primary School", "SCH", SqidEncoder.Encode(4), null, null, "100000", null),
+                    (1, "Newcastle upon Tyne", "LA", "E08000021", "391", null, null),
+                    (2, "England", "NAT", "E92000001", null, null, null),
+                    (3, "North East", "REG", "E12000001", null, null, null),
+                    (4, "Newcastle Primary School", "SCH", null, null, "100000", null),
                 ],
                 locationOptions
             );
@@ -474,8 +441,6 @@ public abstract class ParquetDataSetWriterTests : IDisposable
     {
         public int Id { get; init; }
         public string Label { get; init; } = "";
-        public string PublicId { get; init; } = "";
-        public string FilterId { get; init; } = "";
         public string FilterColumn { get; init; } = "";
         public Guid FilterItemId { get; init; }
         public Guid FilterGroupId { get; init; }
@@ -488,7 +453,6 @@ public abstract class ParquetDataSetWriterTests : IDisposable
         public int Id { get; init; }
         public string Label { get; init; } = "";
         public string Level { get; init; } = "";
-        public string PublicId { get; init; } = "";
         public string? Code { get; init; }
         public string? OldCode { get; init; }
         public string? Urn { get; init; }

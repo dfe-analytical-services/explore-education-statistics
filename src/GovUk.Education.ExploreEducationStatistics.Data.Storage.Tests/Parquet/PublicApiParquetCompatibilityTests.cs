@@ -31,23 +31,6 @@ public abstract class PublicApiParquetCompatibilityTests : IDisposable
 
     public class SchemaTests : PublicApiParquetCompatibilityTests
     {
-        [Theory]
-        [InlineData(FilterOptionsTable.ParquetFile)]
-        [InlineData(IndicatorsTable.ParquetFile)]
-        [InlineData(LocationOptionsTable.ParquetFile)]
-        [InlineData(TimePeriodsTable.ParquetFile)]
-        public async Task MetaTable_StartsWithPublicApiColumns(string parquetFile)
-        {
-            await _testDataSet.Write();
-
-            var publicApiColumns = await DescribeColumns(Path.Combine(PublicApiDataFilesPath, parquetFile));
-            var columns = await DescribeColumns(
-                Path.Combine(PathResolver.DirectoryPath(_testDataSet.SubjectId), parquetFile)
-            );
-
-            Assert.Equal(publicApiColumns, columns.Take(publicApiColumns.Count));
-        }
-
         [Fact]
         public async Task DataTable_HasPublicApiColumnsInPublicApiOrder()
         {
@@ -85,23 +68,6 @@ public abstract class PublicApiParquetCompatibilityTests : IDisposable
 
     public class QueryTests : PublicApiParquetCompatibilityTests
     {
-        [Fact]
-        public async Task FilterColumnsByPublicFilterId_AsQueriedByPublicApi()
-        {
-            await _testDataSet.Write();
-
-            var filterColumns = await Query<(string FilterId, string FilterColumn)>(
-                $"""
-                SELECT DISTINCT filter_id, filter_column
-                FROM '{PathResolver.FilterOptionsPath(_testDataSet.SubjectId)}'
-                ORDER BY filter_column
-                """
-            );
-
-            Assert.Equal(["ncyear", "school_type"], filterColumns.Select(column => column.FilterColumn));
-            Assert.Equal(2, filterColumns.Select(column => column.FilterId).Distinct().Count());
-        }
-
         [Fact]
         public async Task DataRowsByOptionIds_AsQueriedByPublicApi()
         {

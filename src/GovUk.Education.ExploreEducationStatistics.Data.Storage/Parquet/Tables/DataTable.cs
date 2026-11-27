@@ -19,6 +19,7 @@ public static class DataTable
         public const string LocationId = "ees_location_id";
         public const string CsvRow = "ees_csv_row";
 
+        // @MarkFix Written by ParquetDataSetWriter but never read by ParquetV1DataSet.
         public static string LocationOptionId(GeographicLevel geographicLevel) =>
             $"locations_{geographicLevel.GetEnumValue().ToLower()}_id";
     }

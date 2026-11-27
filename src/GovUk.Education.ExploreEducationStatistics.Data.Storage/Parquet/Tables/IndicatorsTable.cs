@@ -8,7 +8,6 @@ public static class IndicatorsTable
 
     public static class Cols
     {
-        public const string Id = "id";
         public const string Column = "\"column\"";
         public const string Label = "label";
         public const string Unit = "unit";

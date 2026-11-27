@@ -375,7 +375,6 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
                 $"""
                 CREATE OR REPLACE TABLE {FiltersTable.TableName:raw}(
                     {FiltersTable.Cols.Id:raw} UUID PRIMARY KEY,
-                    {FiltersTable.Cols.PublicId:raw} VARCHAR,
                     {FiltersTable.Cols.Column:raw} VARCHAR,
                     {FiltersTable.Cols.Label:raw} VARCHAR,
                     {FiltersTable.Cols.Hint:raw} VARCHAR,
@@ -394,8 +393,6 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
                 CREATE OR REPLACE TABLE {FilterOptionsTable.TableName:raw}(
                     {FilterOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
                     {FilterOptionsTable.Cols.Label:raw} VARCHAR,
-                    {FilterOptionsTable.Cols.PublicId:raw} VARCHAR,
-                    {FilterOptionsTable.Cols.FilterId:raw} VARCHAR,
                     {FilterOptionsTable.Cols.FilterColumn:raw} VARCHAR,
                     {FilterOptionsTable.Cols.FilterItemId:raw} UUID,
                     {FilterOptionsTable.Cols.FilterGroupId:raw} UUID,
@@ -409,17 +406,13 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
         using var filtersAppender = connection.CreateAppender(FiltersTable.TableName);
         using var filterOptionsAppender = connection.CreateAppender(FilterOptionsTable.TableName);
 
-        var filterOrdinal = 1;
         var optionId = 1;
 
         foreach (var filter in filters.OrderBy(filter => filter.Name))
         {
-            var filterPublicId = SqidEncoder.Encode(filterOrdinal++);
-
             filtersAppender
                 .CreateRow()
                 .AppendValue(filter.Id)
-                .AppendValue(filterPublicId)
                 .AppendValue(filter.Name)
                 .AppendValue(filter.Label)
                 .AppendValue(filter.Hint)
@@ -442,8 +435,6 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
                     .CreateRow()
                     .AppendValue(id)
                     .AppendValue(item.Label)
-                    .AppendValue(SqidEncoder.Encode(id))
-                    .AppendValue(filterPublicId)
                     .AppendValue(filter.Name)
                     .AppendValue(item.Id)
                     .AppendValue(group.Id)
@@ -464,7 +455,6 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
             .SqlBuilder(
                 $"""
                 CREATE OR REPLACE TABLE {IndicatorsTable.TableName:raw}(
-                    {IndicatorsTable.Cols.Id:raw} VARCHAR PRIMARY KEY,
                     {IndicatorsTable.Cols.Column:raw} VARCHAR,
                     {IndicatorsTable.Cols.Label:raw} VARCHAR,
                     {IndicatorsTable.Cols.Unit:raw} VARCHAR,
@@ -479,13 +469,10 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
 
         using var appender = connection.CreateAppender(IndicatorsTable.TableName);
 
-        var ordinal = 1;
-
         foreach (var indicator in indicators.OrderBy(indicator => indicator.Name))
         {
             appender
                 .CreateRow()
-                .AppendValue(SqidEncoder.Encode(ordinal++))
                 .AppendValue(indicator.Name)
                 .AppendValue(indicator.Label)
                 .AppendValue(indicator.Unit.GetEnumLabel())
@@ -556,7 +543,6 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
                     {LocationOptionsTable.Cols.Id:raw} INTEGER PRIMARY KEY,
                     {LocationOptionsTable.Cols.Label:raw} VARCHAR,
                     {LocationOptionsTable.Cols.Level:raw} VARCHAR,
-                    {LocationOptionsTable.Cols.PublicId:raw} VARCHAR,
                     {LocationOptionsTable.Cols.Code:raw} VARCHAR,
                     {LocationOptionsTable.Cols.OldCode:raw} VARCHAR,
                     {LocationOptionsTable.Cols.Urn:raw} VARCHAR,
@@ -578,7 +564,6 @@ public class ParquetDataSetWriter(IParquetDataSetPathResolver pathResolver, ILog
                     .AppendValue(id)
                     .AppendValue(option.Label)
                     .AppendValue(option.Level.GetEnumValue())
-                    .AppendValue(SqidEncoder.Encode(id))
                     .AppendValue(option.Code)
                     .AppendValue(option.OldCode)
                     .AppendValue(option.Urn)
