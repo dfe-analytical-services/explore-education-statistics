@@ -99,6 +99,7 @@ stages:
           environment: ${{ parameters.environment }}
           bicepParamFile: ${{ parameters.bicepParamFile }}
           basicAuthEnabled: ${{ parameters.publicSiteBasicAuthEnabled }}
+          slotSwappingBehaviour: ${{ parameters.slotSwappingBehaviour }}
           ${{ if eq(parameters.deployAdminFirst, true) }}:
             dependsOn:
               - DeployAdmin

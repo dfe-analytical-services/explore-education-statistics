@@ -31,11 +31,11 @@ jobs:
                 environment: ${{ parameters.environment }}
 
             - download: MainBuild
-              displayName: Download Publisher artifact
+              displayName: Publisher - downloading artifact
               artifact: publisher
 
             - task: AzureCLI@2
-              displayName: Publisher - Get new application-specific appsettings to deploy
+              displayName: Publisher - getting new application-specific app settings to deploy
               inputs:
                 azureSubscription: ${{ parameters.serviceConnection }}
                 scriptType: bash

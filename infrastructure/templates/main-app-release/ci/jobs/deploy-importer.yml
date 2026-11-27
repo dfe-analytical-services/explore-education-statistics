@@ -31,7 +31,7 @@ jobs:
                 environment: ${{ parameters.environment }}
 
             - download: MainBuild
-              displayName: Download Importer (Processor) artifact
+              displayName: Importer - downloading Processor artifact
               artifact: processor
 
             - template: ../tasks/get-new-appsettings.yml

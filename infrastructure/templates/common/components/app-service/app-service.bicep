@@ -377,3 +377,8 @@ module alertsModule 'alerts.bicep' = if (alerts != null) {
 
 output appServiceName string = appService.name
 output appServiceIdentityPrincipalId string = appServicePrincipalId
+
+@description('The principal id of the staging slot\'s own system-assigned identity, for granting it the same roles as the main slot. This is empty when there\'s no staging slot, or when the slot shares the main slot\'s user-assigned identity.')
+output stagingSlotSystemIdentityPrincipalId string = swapSlotEnabled && empty(userAssignedIdentityName)
+  ? stagingSlotModule!.outputs.slotIdentityPrincipalId
+  : ''

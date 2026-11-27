@@ -60,6 +60,7 @@ jobs:
                     stagingVariableName: dataApiStagingSlotAppSettings
                     prodVariableName: dataApiProdAppSettings
                   - appName: $(resourceNames.publicSite.appService)
+                    stagingVariableName: publicSiteStagingSlotAppSettings
                     prodVariableName: publicSiteProdAppSettings
 
             - template: ../../../../common/ci/tasks/get-current-appsettings.yml
@@ -91,6 +92,7 @@ jobs:
                 dataApiProdAppSettings: $(dataApiProdAppSettings)
                 dataApiStagingSlotAppSettings: $(dataApiStagingSlotAppSettings)
                 publicSiteProdAppSettings: $(publicSiteProdAppSettings)
+                publicSiteStagingSlotAppSettings: $(publicSiteStagingSlotAppSettings)
                 importerProdAppSettings: $(importerProdAppSettings)
                 publisherProdAppSettings: $(publisherProdAppSettings)
                 notifierProdAppSettings: $(notifierProdAppSettings)
