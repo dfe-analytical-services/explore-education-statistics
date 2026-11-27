@@ -1845,6 +1845,170 @@ public class DataBlockServiceTests
     }
 
     [Fact]
+    public async Task Update_OriginalDataSetIsPendingReplacement()
+    {
+        var originalSubjectId = Guid.NewGuid();
+
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var dataBlockVersion = _fixture
+            .DefaultDataBlockVersion()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubjectId(originalSubjectId)
+            .Generate();
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = originalSubjectId,
+            Filename = "original.csv",
+            Type = FileType.Data,
+        };
+
+        var replacementFile = new File
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = Guid.NewGuid(),
+            Filename = "replacement.csv",
+            Type = FileType.Data,
+            Replacing = originalFile,
+        };
+
+        originalFile.ReplacedBy = replacementFile;
+
+        var originalReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = originalFile };
+        var replacementReleaseFile = new ReleaseFile { ReleaseVersion = releaseVersion, File = replacementFile };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.AddRangeAsync(dataBlockVersion, originalReleaseFile, replacementReleaseFile);
+            await context.SaveChangesAsync();
+        }
+
+        var updateRequest = new DataBlockUpdateRequest
+        {
+            Heading = "New heading",
+            Name = "New name",
+            Query = new FullTableQueryRequest { SubjectId = originalSubjectId },
+        };
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var cacheKeyService = new Mock<ICacheKeyService>(Strict);
+
+            var dataBlockVersionCacheKey = new DataBlockVersionTableResultCacheKey(dataBlockVersion);
+
+            cacheKeyService
+                .Setup(s => s.CreateCacheKeyForDataBlock(releaseVersion.Id, dataBlockVersion.Id))
+                .ReturnsAsync(new Either<ActionResult, DataBlockVersionTableResultCacheKey>(dataBlockVersionCacheKey));
+
+            var privateCacheService = new Mock<IPrivateBlobCacheService>(Strict);
+
+            privateCacheService.Setup(s => s.DeleteItemAsync(dataBlockVersionCacheKey)).Returns(Task.CompletedTask);
+
+            var service = BuildDataBlockService(
+                context,
+                cacheKeyService: cacheKeyService.Object,
+                privateCacheService: privateCacheService.Object
+            );
+
+            var result = await service.Update(dataBlockVersion.Id, updateRequest);
+
+            VerifyAllMocks(cacheKeyService, privateCacheService);
+
+            result.AssertRight();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var savedDataBlockVersion = await context.DataBlockVersions.SingleAsync(dbv =>
+                dbv.Id == dataBlockVersion.Id
+            );
+
+            Assert.Equal(updateRequest.Heading, savedDataBlockVersion.Heading);
+            Assert.Equal(originalSubjectId, savedDataBlockVersion.Query.SubjectId);
+        }
+    }
+
+    [Fact]
+    public async Task Update_DataSetReplacedInAmendment()
+    {
+        var originalSubjectId = Guid.NewGuid();
+        var replacementSubjectId = Guid.NewGuid();
+
+        Release release = _fixture.DefaultRelease(publishedVersions: 1, draftVersion: true);
+
+        var previousReleaseVersion = release.Versions[0];
+        var amendmentReleaseVersion = release.Versions[1];
+
+        var dataBlockVersion = _fixture
+            .DefaultDataBlockVersion()
+            .WithReleaseVersion(amendmentReleaseVersion)
+            .WithSubjectId(replacementSubjectId)
+            .Generate();
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = previousReleaseVersion,
+            File = new File
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = originalSubjectId,
+                Filename = "original.csv",
+                Type = FileType.Data,
+            },
+        };
+
+        var replacementReleaseFile = new ReleaseFile
+        {
+            ReleaseVersion = amendmentReleaseVersion,
+            File = new File
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = replacementSubjectId,
+                Filename = "replacement.csv",
+                Type = FileType.Data,
+            },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.AddRangeAsync(dataBlockVersion, originalReleaseFile, replacementReleaseFile);
+            await context.SaveChangesAsync();
+        }
+
+        var updateRequest = new DataBlockUpdateRequest
+        {
+            Heading = "New heading",
+            Name = "New name",
+            Query = new FullTableQueryRequest { SubjectId = originalSubjectId },
+        };
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var service = BuildDataBlockService(context);
+
+            var result = await service.Update(dataBlockVersion.Id, updateRequest);
+
+            result.AssertBadRequest(DataBlockDataSetNotAttachedToRelease);
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var savedDataBlockVersion = await context.DataBlockVersions.SingleAsync(dbv =>
+                dbv.Id == dataBlockVersion.Id
+            );
+
+            Assert.Equal(dataBlockVersion.Heading, savedDataBlockVersion.Heading);
+            Assert.Equal(replacementSubjectId, savedDataBlockVersion.Query.SubjectId);
+        }
+    }
+
+    [Fact]
     public async Task Update_NotFound()
     {
         var contextId = Guid.NewGuid().ToString();
