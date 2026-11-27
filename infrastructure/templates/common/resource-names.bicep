@@ -266,6 +266,7 @@ type ResourceNames = {
       publicApi: {
         apiAppRegistrationClientId: string
         dataProcessorAppRegistrationClientId: string
+        appGatewayFauapiHeaders: string
       }
       publicSite: {
         basicAuthUsername: string
@@ -586,6 +587,7 @@ func getResourceNames(
       publicApi: {
         apiAppRegistrationClientId: 'ees-public-api-app-registration-client-id'
         dataProcessorAppRegistrationClientId: 'ees-public-api-data-processor-app-registration-client-id'
+        appGatewayFauapiHeaders: 'ees-publicapi-app-gateway-fauapi-headers'
       }
       publicSite: {
         basicAuthUsername: 'ees-public-site-basic-auth-username'
@@ -911,6 +913,7 @@ func getElzResourceNames(env string) ResourceNames => {
       publicApi: {
         apiAppRegistrationClientId: 'papi-app-registration-client-id'
         dataProcessorAppRegistrationClientId: 'papiprocessor-app-registration-client-id'
+        appGatewayFauapiHeaders: 'papi-agw-fauapi-headers'
       }
       publicSite: {
         basicAuthUsername: 'publicsite-basic-auth-username'
