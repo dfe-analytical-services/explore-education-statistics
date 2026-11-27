@@ -5,53 +5,36 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 
 /// <summary>
-/// Class responsible for up-front calculation of the column indexes to look up particular
-/// pieces of information from a given data file. This includes column indexes like the
-/// various pieces of information to read filter grouping and filter item columns
-/// for each Filter, and measurements for indicators.
+/// Class responsible for up-front calculation of the column indexes to read the filter grouping
+/// and filter item columns for each Filter from a given data file.
 ///
 /// This class also keeps an efficient lookup cache for Filter Items based upon its owning Filter
 /// and FilterGroup labels and its own label.
 /// </summary>
-public class FilterAndIndicatorValuesReader
+public class FilterValuesReader
 {
     private const string NotSpecifiedFilterItemLabel = "Not specified";
 
-    private readonly Dictionary<Guid, int> _indicatorColumnIndexes;
     private readonly Dictionary<Guid, int> _filterColumnIndexes;
     private readonly Dictionary<Guid, int> _filterGroupColumnIndexes;
     private readonly Dictionary<string, FilterItem> _filterItemCache;
 
-    public FilterAndIndicatorValuesReader(List<string> csvHeaders, SubjectMeta subjectMeta)
+    public FilterValuesReader(List<string> csvHeaders, List<Filter> filters)
     {
-        _indicatorColumnIndexes = subjectMeta.Indicators.ToDictionary(
-            indicatorMeta => indicatorMeta.Indicator.Id,
-            indicatorMeta => csvHeaders.FindIndex(h => h.Equals(indicatorMeta.Column))
+        _filterColumnIndexes = filters.ToDictionary(
+            filter => filter.Id,
+            filter => csvHeaders.FindIndex(h => h.Equals(filter.Name))
         );
 
-        _filterColumnIndexes = subjectMeta.Filters.ToDictionary(
-            filterMeta => filterMeta.Filter.Id,
-            filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.Column))
+        _filterGroupColumnIndexes = filters.ToDictionary(
+            filter => filter.Id,
+            filter => csvHeaders.FindIndex(h => h.Equals(filter.GroupCsvColumn))
         );
 
-        _filterGroupColumnIndexes = subjectMeta.Filters.ToDictionary(
-            filterMeta => filterMeta.Filter.Id,
-            filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.Filter.GroupCsvColumn))
-        );
-
-        _filterItemCache = subjectMeta
-            .Filters.Select(meta => meta.Filter)
+        _filterItemCache = filters
             .SelectMany(f => f.FilterGroups)
             .SelectMany(fg => fg.FilterItems)
             .ToDictionary(fi => $"{fi.FilterGroup.Filter.Label}_{fi.FilterGroup.Label}_{fi.Label}".ToLower(), fi => fi);
-    }
-
-    public Dictionary<Guid, string?> GetMeasures(List<string> rowValues)
-    {
-        return _indicatorColumnIndexes.ToDictionary(
-            indicatorMeta => indicatorMeta.Key,
-            indicatorMeta => indicatorMeta.Value != -1 ? rowValues[indicatorMeta.Value] : null
-        );
     }
 
     public string GetFilterItemLabel(IReadOnlyList<string> rowValues, Guid filterId)

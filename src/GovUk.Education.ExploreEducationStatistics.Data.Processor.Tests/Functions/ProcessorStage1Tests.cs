@@ -109,35 +109,22 @@ public class ProcessorStage1Tests
 
         var transactionHelper = new InMemoryDatabaseHelper(dbContextSupplier);
 
-        var dataImportService = new DataImportService(
-            dbContextSupplier,
-            Mock.Of<IStorageDataSetResolver>(Strict),
-            Mock.Of<ILogger<DataImportService>>()
-        );
+        var dataImportService = new DataImportService(dbContextSupplier, Mock.Of<ILogger<DataImportService>>());
 
         var dataSetMappingService = new DataSetMappingService(
             dbContextSupplier,
             Mock.Of<IStorageDataSetResolver>(Strict)
         );
 
-        var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-
         var guidGenerator = new SequentialGuidGenerator();
 
-        var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
+        var importerMetaService = new ImporterMetaService(guidGenerator);
 
         var importerService = new ImporterService(
             new AppOptions().ToOptionsWrapper(),
             guidGenerator,
-            new ImporterLocationService(
-                guidGenerator,
-                importerLocationCache,
-                Mock.Of<ILogger<ImporterLocationCache>>()
-            ),
-            importerMetaService,
             dataImportService,
-            Mock.Of<ILogger<ImporterService>>(),
-            transactionHelper
+            Mock.Of<ILogger<ImporterService>>()
         );
 
         var fileImportService = new FileImportService(
@@ -156,10 +143,9 @@ public class ProcessorStage1Tests
         );
 
         var processorService = BuildProcessorService(
-            dbContextSupplier,
             dataImportService: dataImportService,
             privateBlobStorageService: privateBlobStorageService.Object,
-            importerService: importerService,
+            importerMetaService: importerMetaService,
             fileImportService: fileImportService,
             validatorService: validatorService
         );
@@ -190,10 +176,9 @@ public class ProcessorStage1Tests
     }
 
     private static ProcessorService BuildProcessorService(
-        IDbContextSupplier dbContextSupplier,
         IDataImportService? dataImportService = null,
         IPrivateBlobStorageService? privateBlobStorageService = null,
-        IImporterService? importerService = null,
+        IImporterMetaService? importerMetaService = null,
         IFileImportService? fileImportService = null,
         IValidatorService? validatorService = null
     )
@@ -202,10 +187,10 @@ public class ProcessorStage1Tests
             Mock.Of<ILogger<ProcessorService>>(),
             privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             fileImportService ?? Mock.Of<IFileImportService>(Strict),
-            importerService ?? Mock.Of<IImporterService>(Strict),
+            importerMetaService ?? Mock.Of<IImporterMetaService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             validatorService ?? Mock.Of<IValidatorService>(Strict),
-            dbContextSupplier
+            Mock.Of<IStorageDataSetWriterResolver>(Strict)
         );
     }
 

@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
@@ -13,7 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorageDataSetResolver storageDataSetResolver)
     : IDataSetMappingService
 {
-    public async Task CreateInitialDataSetMappingIfReplacement(Guid replacementFileId)
+    public async Task CreateInitialDataSetMappingIfReplacement(
+        Guid replacementFileId,
+        IStorageDataSet replacementDataSet
+    )
     {
         await using var contentDbContext = dbContextSupplier.CreateDbContext<ContentDbContext>();
 
@@ -29,7 +33,6 @@ public class DataSetMappingService(IDbContextSupplier dbContextSupplier, IStorag
         var originalFile = replacementFile.Replacing!;
 
         var originalDataSet = storageDataSetResolver.Resolve(originalFile);
-        var replacementDataSet = storageDataSetResolver.Resolve(replacementFile);
 
         var indicatorMappings = await GenerateInitialIndicatorMapping(originalDataSet, replacementDataSet);
 

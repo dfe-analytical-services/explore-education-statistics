@@ -1,11 +1,10 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
@@ -19,7 +18,7 @@ public class FileImportService(
     IImporterService importerService
 ) : IFileImportService
 {
-    public async Task ImportObservations(DataImport import, StatisticsDbContext context)
+    public async Task ImportObservations(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         logger.LogInformation("Importing Observations for {Filename}", import.File.Filename);
 
@@ -46,30 +45,25 @@ public class FileImportService(
             return;
         }
 
-        var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
-
         var datafileStreamProvider = privateBlobStorageService.GetDataFileStreamProvider(import);
-        var metaFileStreamProvider = privateBlobStorageService.GetMetadataFileStreamProvider(import);
 
-        await importerService.ImportObservations(
-            import,
-            datafileStreamProvider,
-            metaFileStreamProvider,
-            subject,
-            context
-        );
+        await importerService.ImportObservations(import, datafileStreamProvider, dataSetWriter);
     }
 
-    public async Task ImportFiltersAndLocations(Guid importId, SubjectMeta subjectMeta, StatisticsDbContext context)
+    public async Task ImportFiltersAndLocations(
+        Guid importId,
+        List<Filter> filters,
+        IStorageDataSetWriter dataSetWriter
+    )
     {
         var import = await dataImportService.GetImport(importId);
 
         var datafileStreamProvider = privateBlobStorageService.GetDataFileStreamProvider(import);
 
-        await importerService.ImportFiltersAndLocations(import, datafileStreamProvider, subjectMeta, context);
+        await importerService.ImportFiltersAndLocations(import, datafileStreamProvider, filters, dataSetWriter);
     }
 
-    public async Task CompleteImport(DataImport import, StatisticsDbContext context)
+    public async Task CompleteImport(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         if (import.Status.IsFinished())
         {
@@ -97,7 +91,7 @@ public class FileImportService(
             return;
         }
 
-        var observationCount = await context.Observation.CountAsync(o => o.SubjectId.Equals(import.SubjectId));
+        var observationCount = await dataSetWriter.CountObservations();
         if (observationCount != import.ExpectedImportedRows)
         {
             await dataImportService.FailImport(
@@ -114,16 +108,16 @@ public class FileImportService(
             return;
         }
 
-        await FinalImportTasks(import);
+        await FinalImportTasks(import, dataSetWriter);
         await dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
     }
 
-    private async Task FinalImportTasks(DataImport import)
+    private async Task FinalImportTasks(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         try
         {
-            await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId);
-            await dataImportService.WriteDataSetFileMeta(import);
+            await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId, dataSetWriter.DataSet);
+            await dataImportService.WriteDataSetFileMeta(import, dataSetWriter);
         }
         catch (Exception e)
         {

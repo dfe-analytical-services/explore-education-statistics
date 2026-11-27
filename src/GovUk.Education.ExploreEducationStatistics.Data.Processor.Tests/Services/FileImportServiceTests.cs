@@ -2,16 +2,15 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
@@ -47,38 +46,28 @@ public class FileImportServiceTests
             GeographicLevels = [GeographicLevel.Country, GeographicLevel.School],
         };
 
+        var dataSet = Mock.Of<IStorageDataSet>(Strict);
+
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
+        dataSetWriter.SetupGet(s => s.DataSet).Returns(dataSet);
+
         var dataImportService = new Mock<IDataImportService>(Strict);
         dataImportService.Setup(s => s.UpdateStatus(import.Id, COMPLETE, 100)).Returns(Task.CompletedTask);
-        dataImportService.Setup(s => s.WriteDataSetFileMeta(import)).Returns(Task.CompletedTask);
+        dataImportService.Setup(s => s.WriteDataSetFileMeta(import, dataSetWriter.Object)).Returns(Task.CompletedTask);
 
         var dataSetMappingService = new Mock<IDataSetMappingService>(Strict);
         dataSetMappingService
-            .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId))
+            .Setup(s => s.CreateInitialDataSetMappingIfReplacement(import.FileId, dataSet))
             .Returns(Task.CompletedTask);
 
-        var statisticsDbContextId = Guid.NewGuid().ToString();
+        var service = BuildFileImportService(
+            dataImportService: dataImportService.Object,
+            dataSetMappingService: dataSetMappingService.Object
+        );
+        await service.CompleteImport(import, dataSetWriter.Object);
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            await statisticsDbContext.Observation.AddRangeAsync(
-                new Observation { SubjectId = import.SubjectId },
-                new Observation { SubjectId = import.SubjectId },
-                new Observation { SubjectId = Guid.NewGuid() }
-            );
-
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var service = BuildFileImportService(
-                dataImportService: dataImportService.Object,
-                dataSetMappingService: dataSetMappingService.Object
-            );
-            await service.CompleteImport(import, statisticsDbContext);
-        }
-
-        VerifyAllMocks(dataImportService);
+        VerifyAllMocks(dataImportService, dataSetWriter);
     }
 
     [Fact]
@@ -101,25 +90,13 @@ public class FileImportServiceTests
 
         dataImportService.Setup(s => s.UpdateStatus(import.Id, FAILED, 100)).Returns(Task.CompletedTask);
 
-        var statisticsDbContextId = Guid.NewGuid().ToString();
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            await statisticsDbContext.Observation.AddRangeAsync(
-                new Observation { SubjectId = import.SubjectId },
-                new Observation { SubjectId = import.SubjectId }
-            );
+        var service = BuildFileImportService(dataImportService: dataImportService.Object);
+        await service.CompleteImport(import, dataSetWriter.Object);
 
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var service = BuildFileImportService(dataImportService: dataImportService.Object);
-            await service.CompleteImport(import, statisticsDbContext);
-        }
-
-        VerifyAllMocks(dataImportService);
+        VerifyAllMocks(dataImportService, dataSetWriter);
     }
 
     [Fact]
@@ -149,25 +126,13 @@ public class FileImportServiceTests
             )
             .Returns(Task.CompletedTask);
 
-        var statisticsDbContextId = Guid.NewGuid().ToString();
+        var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
+        dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
 
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            await statisticsDbContext.Observation.AddRangeAsync(
-                new Observation { SubjectId = import.SubjectId },
-                new Observation { SubjectId = import.SubjectId }
-            );
+        var service = BuildFileImportService(dataImportService: dataImportService.Object);
+        await service.CompleteImport(import, dataSetWriter.Object);
 
-            await statisticsDbContext.SaveChangesAsync();
-        }
-
-        await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-        {
-            var service = BuildFileImportService(dataImportService: dataImportService.Object);
-            await service.CompleteImport(import, statisticsDbContext);
-        }
-
-        VerifyAllMocks(dataImportService);
+        VerifyAllMocks(dataImportService, dataSetWriter);
     }
 
     [Fact]
@@ -193,12 +158,8 @@ public class FileImportServiceTests
                     TotalRows = 93,
                 };
 
-                var statisticsDbContextId = Guid.NewGuid().ToString();
-                await using var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId);
-                {
-                    var service = BuildFileImportService();
-                    await service.CompleteImport(import, statisticsDbContext);
-                }
+                var service = BuildFileImportService();
+                await service.CompleteImport(import, Mock.Of<IStorageDataSetWriter>(Strict));
             });
     }
 
@@ -231,13 +192,8 @@ public class FileImportServiceTests
                     .Setup(s => s.UpdateStatus(import.Id, abortingStatus.GetFinishingStateOfAbortProcess(), 100))
                     .Returns(Task.CompletedTask);
 
-                var statisticsDbContextId = Guid.NewGuid().ToString();
-
-                await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-                {
-                    var service = BuildFileImportService(dataImportService: dataImportService.Object);
-                    await service.CompleteImport(import, statisticsDbContext);
-                }
+                var service = BuildFileImportService(dataImportService: dataImportService.Object);
+                await service.CompleteImport(import, Mock.Of<IStorageDataSetWriter>(Strict));
 
                 VerifyAllMocks(dataImportService);
             });
