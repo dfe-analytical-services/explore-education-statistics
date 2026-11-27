@@ -27,7 +27,7 @@ var resourceNames = getResourceNamesForEnvironment({
   elz: elz
 })
 
-var dataFilesFileShareMountPath = '\\mounts\\data-files'
+var dataFilesFileShareMountPath = '/mounts/data-files'
 
 var keyVaultName = resourceNames.keyVault.keyVault
 

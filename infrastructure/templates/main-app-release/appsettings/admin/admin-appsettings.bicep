@@ -77,7 +77,7 @@ var resourceNames = getResourceNamesForEnvironment({
 
 var adminHostname = 'admin.${domain}'
 
-var dataFilesFileShareMountPath = '\\mounts\\data-files'
+var dataFilesFileShareMountPath = '/mounts/data-files'
 
 var keyVaultName = resourceNames.keyVault.keyVault
 

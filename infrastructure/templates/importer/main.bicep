@@ -85,7 +85,7 @@ resource dataFilesStoragePrivateEndpointSubnet 'Microsoft.Network/virtualNetwork
   parent: vNet
 }
 
-var dataFilesFileShareMountPath = '\\mounts\\data-files'
+var dataFilesFileShareMountPath = '/mounts/data-files'
 
 module dataFilesStorageAccountModule '../common/components/storage/storage-account.bicep' = {
   name: 'dataFilesStorageAccountModuleDeploy'

@@ -61,7 +61,7 @@ var publicSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.datab
 
 var analyticsFileShareMountPath string = '\\mounts\\analytics'
 
-var dataFilesFileShareMountPath string = '\\mounts\\data-files'
+var dataFilesFileShareMountPath string = '/mounts/data-files'
 
 resource dataFilesStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
   name: resourceNames.dataFiles.storage.storageAccountName

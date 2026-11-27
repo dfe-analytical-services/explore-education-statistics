@@ -61,7 +61,7 @@ param tagValues object
 
 var coreSqlServerFqdn = reference('Microsoft.Sql/servers/${resourceNames.databases.coreSqlServer}', '2025-02-01-preview').fullyQualifiedDomainName
 
-var dataFilesFileShareMountPath string = '\\mounts\\data-files'
+var dataFilesFileShareMountPath string = '/mounts/data-files'
 
 resource dataFilesStorageAccount 'Microsoft.Storage/storageAccounts@2026-04-01' existing = {
   name: resourceNames.dataFiles.storage.storageAccountName

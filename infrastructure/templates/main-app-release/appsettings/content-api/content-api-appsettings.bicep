@@ -35,7 +35,7 @@ var resourceNames = getResourceNamesForEnvironment({
 
 var analyticsFileShareMountPath = '\\mounts\\analytics'
 
-var dataFilesFileShareMountPath = '\\mounts\\data-files'
+var dataFilesFileShareMountPath = '/mounts/data-files'
 
 var keyVaultName = resourceNames.keyVault.keyVault
 
