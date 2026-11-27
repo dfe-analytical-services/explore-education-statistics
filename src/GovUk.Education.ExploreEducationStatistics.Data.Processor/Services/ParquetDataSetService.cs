@@ -154,6 +154,19 @@ public class ParquetDataSetService(
             await dataSetWriter.AppendObservations(batch);
         }
 
+        var statsDbCount = await statisticsDbContext.Observation.LongCountAsync(
+            observation => observation.SubjectId == subjectId,
+            cancellationToken
+        );
+        var stagedCount = await dataSetWriter.CountObservations(cancellationToken);
+
+        if (stagedCount != statsDbCount)
+        {
+            throw new InvalidOperationException(
+                $"Staged {stagedCount} observations for data file {fileId} but StatsDB has {statsDbCount}"
+            );
+        }
+
         await dataSetWriter.Complete(cancellationToken);
 
         // @MarkFix The file stays DataStorageVersion.StatsDB, so deleting or replacing it only runs

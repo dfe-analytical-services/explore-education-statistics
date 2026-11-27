@@ -72,8 +72,6 @@ public class BauParquetController(
         CancellationToken cancellationToken = default
     )
     {
-        // @MarkFix ParquetDataSetService.ExportStatsDbDataSet sets HasParquet without comparing the exported row count
-        // with StatsDB. Fail an export whose row counts differ.
         var fileIds = await contentDbContext
             .Files.Where(f =>
                 f.Type == FileType.Data

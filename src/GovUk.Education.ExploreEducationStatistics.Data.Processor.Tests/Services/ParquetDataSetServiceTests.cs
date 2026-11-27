@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Parquet;
@@ -126,6 +127,55 @@ public abstract class ParquetDataSetServiceTests : IDisposable
                 BuildService(Mock.Of<IParquetDataSetWriter>(Strict)).ExportStatsDbDataSet(file.Id)
             );
 
+            Assert.False(System.IO.File.Exists(ExportLockPath()));
+        }
+
+        [Fact]
+        public async Task StagedCountDiffersFromStatsDb_ThrowsWithoutSettingHasParquet()
+        {
+            var file = await SeedDataSet(hasParquet: false);
+
+            var realWriter = _testDataSet.BuildWriter();
+            var writer = new Mock<IParquetDataSetWriter>();
+            writer
+                .Setup(w =>
+                    w.WriteLocations(
+                        It.IsAny<Guid>(),
+                        It.IsAny<IReadOnlyList<Location>>(),
+                        It.IsAny<CancellationToken>()
+                    )
+                )
+                .Returns(
+                    (Guid subjectId, IReadOnlyList<Location> locations, CancellationToken cancellationToken) =>
+                        realWriter.WriteLocations(subjectId, locations, cancellationToken)
+                );
+            writer
+                .Setup(w => w.CountStagedObservations(_testDataSet.SubjectId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(_testDataSet.Observations.Count - 1);
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                BuildService(writer.Object).ExportStatsDbDataSet(file.Id)
+            );
+            Assert.Equal(
+                $"Staged {_testDataSet.Observations.Count - 1} observations for data file {file.Id} "
+                    + $"but StatsDB has {_testDataSet.Observations.Count}",
+                exception.Message
+            );
+
+            writer.Verify(
+                w =>
+                    w.WriteTimePeriodsAndData(
+                        It.IsAny<Guid>(),
+                        It.IsAny<IReadOnlyList<Filter>>(),
+                        It.IsAny<IReadOnlyList<Indicator>>(),
+                        It.IsAny<IReadOnlyList<Location>>(),
+                        It.IsAny<CancellationToken>()
+                    ),
+                Times.Never
+            );
+
+            await using var contentDbContext = InMemoryContentDbContext(_contentDbContextId);
+            Assert.False(contentDbContext.Files.Single(f => f.Id == file.Id).HasParquet);
             Assert.False(System.IO.File.Exists(ExportLockPath()));
         }
 
