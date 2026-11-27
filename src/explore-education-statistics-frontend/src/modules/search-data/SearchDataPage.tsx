@@ -848,10 +848,9 @@ const SearchDataPage: NextPage = () => {
             )}
           </LoadingSpinner>
 
-          {(isPublicationsSearch && publications.length > 0) ||
-            (!isPublicationsSearch && dataSets.length > 0 && (
-              <BackToTopLink className="govuk-!-margin-top-7" />
-            ))}
+          {totalResults > 0 && (
+            <BackToTopLink className="govuk-!-margin-top-7" />
+          )}
         </div>
       </div>
     </Page>
