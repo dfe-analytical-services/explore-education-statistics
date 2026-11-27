@@ -8,6 +8,7 @@ const eesTenant = {
   },
   organisation: {
     name: 'Department for Education',
+    nameWithArticle: 'the Department for Education',
     acronym: 'DfE',
     url: 'https://www.gov.uk/government/organisations/department-for-education',
     description:

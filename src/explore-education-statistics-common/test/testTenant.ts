@@ -14,6 +14,7 @@ const testTenant: Tenant = {
   },
   organisation: {
     name: 'Test Organisation',
+    nameWithArticle: 'the Test Organisation',
     acronym: 'TO',
     url: 'https://test-organisation.example.com',
     description: 'Test Organisation is responsible for testing things.',

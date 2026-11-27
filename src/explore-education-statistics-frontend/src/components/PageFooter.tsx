@@ -107,14 +107,14 @@ const PageFooter = ({ width }: Props) => {
                 </li>
               </ul>
               <div className="govuk-footer__meta-custom">
-                This service is maintained by the{' '}
+                This service is maintained by{' '}
                 <Link
                   className="govuk-footer__link"
                   to={organisation.url}
                   rel="noopener noreferrer nofollow"
                   target="_blank"
                 >
-                  {organisation.name}{' '}
+                  {organisation.nameWithArticle}{' '}
                   <VisuallyHidden>(opens in new tab)</VisuallyHidden>
                 </Link>
               </div>

@@ -35,8 +35,8 @@ export default function AdHocStatisticsSection({
             target="_blank"
           >
             Standards for official statistics published by{' '}
-            {organisation.acronym ?? `the ${organisation.name}`} guidance (opens
-            in new tab)
+            {organisation.acronym ?? organisation.nameWithArticle} guidance
+            (opens in new tab)
           </a>
           .
         </p>
