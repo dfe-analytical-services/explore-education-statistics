@@ -1,9 +1,6 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Tables;
 
-/// <summary>
-/// Mirrors the Public API's filter options table, with one row per StatsDB filter item.
-/// </summary>
 public static class FilterOptionsTable
 {
     public const string TableName = "filter_options";

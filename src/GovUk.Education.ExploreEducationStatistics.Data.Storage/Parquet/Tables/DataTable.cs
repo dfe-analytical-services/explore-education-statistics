@@ -5,10 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Tables;
 
-/// <summary>
-/// Mirrors the Public API's data table. The Public API columns come first and are followed by the EES columns
-/// needed to rebuild StatsDB-equivalent observations.
-/// </summary>
 public static class DataTable
 {
     public const string TableName = "data";
@@ -27,9 +23,6 @@ public static class DataTable
             $"locations_{geographicLevel.GetEnumValue().ToLower()}_id";
     }
 
-    /// <summary>
-    /// DuckDB identifiers are case-insensitive, so reserved column names are compared case-insensitively.
-    /// </summary>
     public static bool IsReservedColumn(string column) =>
         column.ToLowerInvariant()
             is Cols.Id

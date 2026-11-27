@@ -5,9 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Tables;
 
-/// <summary>
-/// The full StatsDB location rows used by a data set, which the Public API's location options can't represent.
-/// </summary>
 public static partial class LocationsTable
 {
     public const string TableName = "locations";
@@ -19,10 +16,6 @@ public static partial class LocationsTable
         public const string GeographicLevel = "geographic_level";
     }
 
-    /// <summary>
-    /// One column per <see cref="Location" /> attribute property, e.g. <c>LocalAuthority_OldCode</c> is stored
-    /// as <c>local_authority_old_code</c>.
-    /// </summary>
     public static readonly IReadOnlyList<AttributeColumn> AttributeColumns = typeof(Location)
         .GetProperties(BindingFlags.Public | BindingFlags.Instance)
         .Where(property => property.PropertyType == typeof(string) && property.CanWrite)

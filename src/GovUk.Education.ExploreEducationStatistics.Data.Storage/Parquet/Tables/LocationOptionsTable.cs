@@ -1,9 +1,6 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Tables;
 
-/// <summary>
-/// Mirrors the Public API's location options table, with one row per distinct location at each geographic level.
-/// </summary>
 public static class LocationOptionsTable
 {
     public const string TableName = "location_options";

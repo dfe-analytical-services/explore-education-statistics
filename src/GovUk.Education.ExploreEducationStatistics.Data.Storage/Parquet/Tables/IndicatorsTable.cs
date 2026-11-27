@@ -1,9 +1,6 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Tables;
 
-/// <summary>
-/// Mirrors the Public API's indicators table.
-/// </summary>
 public static class IndicatorsTable
 {
     public const string TableName = "indicators";

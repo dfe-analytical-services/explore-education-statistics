@@ -1,9 +1,6 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Tables;
 
-/// <summary>
-/// Mirrors the Public API's time periods table.
-/// </summary>
 public static class TimePeriodsTable
 {
     public const string TableName = "time_periods";

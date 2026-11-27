@@ -1,9 +1,6 @@
 #nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Tables;
 
-/// <summary>
-/// Filter level meta which the Public API holds in its database rather than in parquet files.
-/// </summary>
 public static class FiltersTable
 {
     public const string TableName = "filters";
