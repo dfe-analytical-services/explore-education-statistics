@@ -140,7 +140,14 @@ public class ReleaseVersionsController(
         await using var metaFile = new ManagedStreamFormFile(request.MetaFile);
 
         return await releaseDataFileService
-            .Upload(request.ReleaseVersionId, dataFile, metaFile, request.Title, cancellationToken)
+            .Upload(
+                request.ReleaseVersionId,
+                dataFile,
+                metaFile,
+                request.Title,
+                request.DataStorageVersion,
+                cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -155,7 +162,13 @@ public class ReleaseVersionsController(
         await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
 
         return await releaseDataFileService
-            .UploadFromZip(request.ReleaseVersionId, zipFile, request.Title, cancellationToken)
+            .UploadFromZip(
+                request.ReleaseVersionId,
+                zipFile,
+                request.Title,
+                request.DataStorageVersion,
+                cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -178,17 +191,11 @@ public class ReleaseVersionsController(
     public async Task<ActionResult> ImportDataSetsFromTempStorage(
         Guid releaseVersionId,
         List<Guid> dataSetUploadIds,
-        CancellationToken cancellationToken,
-        [FromQuery] DataStorageVersion dataStorageVersion = DataStorageVersion.StatsDB
+        CancellationToken cancellationToken
     )
     {
         return await releaseDataFileService
-            .SaveDataSetsFromTemporaryBlobStorage(
-                releaseVersionId,
-                dataSetUploadIds,
-                dataStorageVersion,
-                cancellationToken
-            )
+            .SaveDataSetsFromTemporaryBlobStorage(releaseVersionId, dataSetUploadIds, cancellationToken)
             .HandleFailuresOrNoContent(convertNotFoundToNoContent: false);
     }
 

@@ -1,8 +1,10 @@
+import { useAuthContext } from '@admin/contexts/AuthContext';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 import dataFileTitleMaxLength from '@admin/pages/release/data/utils/dataFileTitleMaxLength';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
+import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
@@ -29,6 +31,7 @@ export interface DataFileUploadFormValues {
   uploadType: FileType;
   zipFile?: File | null;
   bulkZipFile?: File | null;
+  importAsParquet?: boolean;
 }
 
 const MAX_FILENAME_SIZE = 150;
@@ -70,6 +73,14 @@ const fileErrorMappings = {
   DataSetImportInProgress: 'DataSetImportInProgress',
 };
 
+const parquetErrorMapping = mapFieldErrors<DataFileUploadFormValues>({
+  target: 'importAsParquet',
+  messages: {
+    DataStorageVersionNotSupportedForReplacement:
+      'Data replacements cannot be imported as parquet',
+  },
+});
+
 function baseErrorMappings(
   fileType: FileType,
 ): FieldMessageMapper<DataFileUploadFormValues>[] {
@@ -107,6 +118,7 @@ function baseErrorMappings(
           MustBeZipFile: 'MustBeZipFile',
         },
       }),
+      parquetErrorMapping,
     ];
   }
 
@@ -119,6 +131,7 @@ function baseErrorMappings(
       target: 'metadataFile' as FieldName<DataFileUploadFormValues>,
       messages: fileErrorMappings,
     }),
+    parquetErrorMapping,
   ];
 }
 
@@ -145,6 +158,10 @@ export default function DataFileUploadForm({
   const [showReplacementWarning, toggleReplacementWarning] = useToggle(false);
   const [showCompletionStatus, toggleCompletionStatus] = useToggle(false);
 
+  const { user } = useAuthContext();
+  const canImportAsParquet =
+    (user?.permissions.isBauUser ?? false) && !isDataReplacement;
+
   const getErrorMappings = () => {
     return isDataReplacement
       ? baseErrorMappings(selectedFileType)
@@ -153,6 +170,10 @@ export default function DataFileUploadForm({
 
   const handleSubmit = useCallback(
     async (values: DataFileUploadFormValues) => {
+      const dataStorageVersion = values.importAsParquet
+        ? 'ParquetV1'
+        : 'StatsDB';
+
       switch (values.uploadType) {
         case 'csv': {
           if (!values.title) {
@@ -163,6 +184,7 @@ export default function DataFileUploadForm({
             title: values.title,
             dataFile: values.dataFile as File,
             metadataFile: values.metadataFile as File,
+            dataStorageVersion,
           });
           break;
         }
@@ -175,6 +197,7 @@ export default function DataFileUploadForm({
             {
               title: values.title,
               zipFile: values.zipFile as File,
+              dataStorageVersion,
             },
           );
           break;
@@ -250,6 +273,7 @@ export default function DataFileUploadForm({
             .minSize(0, 'Choose a ZIP file that is not empty'),
         otherwise: s => s.nullable(),
       }),
+      importAsParquet: Yup.boolean(),
     });
 
     return schema;
@@ -261,6 +285,7 @@ export default function DataFileUploadForm({
     metadataFile: null,
     title: dataFileTitle ?? '',
     zipFile: null,
+    importAsParquet: false,
   };
 
   return (
@@ -382,6 +407,15 @@ export default function DataFileUploadForm({
                     }}
                     disabled={hideFormFields}
                   />
+
+                  {canImportAsParquet && uploadType !== 'bulkZip' && (
+                    <FormFieldCheckbox<DataFileUploadFormValues>
+                      name="importAsParquet"
+                      label="Import as parquet"
+                      hint="Only available to BAU users. Stores the data set in parquet files instead of StatsDB."
+                      disabled={hideFormFields}
+                    />
+                  )}
                 </>
               )}
 

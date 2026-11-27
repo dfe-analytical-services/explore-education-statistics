@@ -42,6 +42,7 @@ public interface IReleaseDataFileService
         IManagedStreamFile dataFile,
         IManagedStreamFile metaFile,
         string dataSetTitle,
+        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     );
 
@@ -49,6 +50,7 @@ public interface IReleaseDataFileService
         Guid releaseVersionId,
         IManagedStreamZipFile zipFile,
         string dataSetTitle,
+        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     );
 
@@ -61,7 +63,6 @@ public interface IReleaseDataFileService
     Task<Either<ActionResult, Unit>> SaveDataSetsFromTemporaryBlobStorage(
         Guid releaseVersionId,
         List<Guid> dataSetUploadIds,
-        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     );
 }

@@ -209,7 +209,6 @@ public class DataSetFileStorage(
     public async Task<List<ReleaseFile>> MoveDataSetsToPermanentStorage(
         Guid releaseVersionId,
         List<DataSetUpload> dataSetUploads,
-        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     )
     {
@@ -248,7 +247,7 @@ public class DataSetFileStorage(
                 name: dataSetUpload.DataSetTitle,
                 replacingDataFile: replacingFile,
                 order: releaseDataFileOrder,
-                dataStorageVersion: dataStorageVersion
+                dataStorageVersion: dataSetUpload.DataStorageVersion
             );
 
             var sourceDataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, dataSetUpload.DataFileId);

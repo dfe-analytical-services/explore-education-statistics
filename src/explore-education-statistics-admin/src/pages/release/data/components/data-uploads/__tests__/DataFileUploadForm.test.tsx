@@ -1,4 +1,6 @@
+import { AuthContextTestProvider, User } from '@admin/contexts/AuthContext';
 import DataFileUploadForm from '@admin/pages/release/data/components/data-uploads/DataFileUploadForm';
+import { GlobalPermissions } from '@admin/services/authService';
 import _releaseDataFileService from '@admin/services/releaseDataFileService';
 import { screen, waitFor } from '@testing-library/react';
 import React from 'react';
@@ -15,6 +17,22 @@ describe('DataFileUploadForm', () => {
   beforeEach(() => {
     document.body.className = 'govuk-frontend-supported';
   });
+
+  const testBauUser: User = {
+    id: 'user-id-1',
+    name: 'BAU user',
+    permissions: {
+      isBauUser: true,
+    } as GlobalPermissions,
+  };
+
+  const testAnalystUser: User = {
+    id: 'user-id-2',
+    name: 'Analyst user',
+    permissions: {
+      isBauUser: false,
+    } as GlobalPermissions,
+  };
 
   test('shows validation message when no data file selected', async () => {
     const { user } = render(
@@ -249,6 +267,7 @@ describe('DataFileUploadForm', () => {
         title: 'Test title',
         dataFile: file,
         metadataFile: metaFile,
+        dataStorageVersion: 'StatsDB',
       },
     );
 
@@ -304,6 +323,7 @@ describe('DataFileUploadForm', () => {
     ).toHaveBeenCalledWith('release-version-id', {
       title: 'Test title',
       zipFile: file,
+      dataStorageVersion: 'StatsDB',
     });
     expect(onSubmit).toHaveBeenCalledTimes(1);
 
@@ -538,6 +558,7 @@ describe('DataFileUploadForm', () => {
     ).toHaveBeenCalledWith('release-version-id', {
       title: 'Test title',
       zipFile: file,
+      dataStorageVersion: 'StatsDB',
     });
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -558,5 +579,140 @@ describe('DataFileUploadForm', () => {
         /Using this title will trigger a data replacement on the matching file/,
       ),
     ).toBeInTheDocument();
+  });
+
+  describe('importing as parquet', () => {
+    test('shows the option to BAU users for CSV files and ZIP files, but not bulk ZIP files', async () => {
+      const { user } = render(
+        <AuthContextTestProvider user={testBauUser}>
+          <DataFileUploadForm
+            releaseVersionId="release-version-id"
+            onSubmit={noop}
+          />
+        </AuthContextTestProvider>,
+      );
+
+      expect(screen.getByLabelText('Import as parquet')).toBeInTheDocument();
+
+      await user.click(screen.getByLabelText('ZIP file'));
+      expect(screen.getByLabelText('Import as parquet')).toBeInTheDocument();
+
+      await user.click(screen.getByLabelText('Bulk ZIP upload'));
+      expect(
+        screen.queryByLabelText('Import as parquet'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('does not show the option to non-BAU users', () => {
+      render(
+        <AuthContextTestProvider user={testAnalystUser}>
+          <DataFileUploadForm
+            releaseVersionId="release-version-id"
+            onSubmit={noop}
+          />
+        </AuthContextTestProvider>,
+      );
+
+      expect(
+        screen.queryByLabelText('Import as parquet'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('does not show the option for data replacements', () => {
+      render(
+        <AuthContextTestProvider user={testBauUser}>
+          <DataFileUploadForm
+            isDataReplacement
+            releaseVersionId="release-version-id"
+            dataFileTitle="Test title"
+            onSubmit={noop}
+          />
+        </AuthContextTestProvider>,
+      );
+
+      expect(
+        screen.queryByLabelText('Import as parquet'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('uploads CSV files as parquet when the option is checked', async () => {
+      const { user } = render(
+        <AuthContextTestProvider user={testBauUser}>
+          <DataFileUploadForm
+            releaseVersionId="release-version-id"
+            onSubmit={noop}
+          />
+        </AuthContextTestProvider>,
+      );
+
+      const file = new File(['hello, world!'], 'test.csv', {
+        type: 'application/csv',
+      });
+      const metaFile = new File(['hello, world!'], 'test.meta.csv', {
+        type: 'application/csv',
+      });
+
+      await user.type(screen.getByLabelText('Data file title'), 'Test title');
+      await user.upload(
+        screen.getByTestId('file-input-dataFileUploadForm-dataFile'),
+        file,
+      );
+      await user.upload(
+        screen.getByTestId('file-input-dataFileUploadForm-metadataFile'),
+        metaFile,
+      );
+      await user.click(screen.getByLabelText('Import as parquet'));
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Upload data files',
+        }),
+      );
+
+      expect(releaseDataFileService.uploadDataSetFilePair).toHaveBeenCalledWith(
+        'release-version-id',
+        {
+          title: 'Test title',
+          dataFile: file,
+          metadataFile: metaFile,
+          dataStorageVersion: 'ParquetV1',
+        },
+      );
+    });
+
+    test('uploads a ZIP file as parquet when the option is checked', async () => {
+      const { user } = render(
+        <AuthContextTestProvider user={testBauUser}>
+          <DataFileUploadForm
+            releaseVersionId="release-version-id"
+            onSubmit={noop}
+          />
+        </AuthContextTestProvider>,
+      );
+
+      const file = new File(['hello, world!'], 'test.zip', {
+        type: 'application/zip',
+      });
+
+      await user.type(screen.getByLabelText('Data file title'), 'Test title');
+      await user.click(screen.getByLabelText('ZIP file'));
+      await user.upload(
+        screen.getByTestId('file-input-dataFileUploadForm-zipFile'),
+        file,
+      );
+      await user.click(screen.getByLabelText('Import as parquet'));
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Upload data files',
+        }),
+      );
+
+      expect(
+        releaseDataFileService.uploadZippedDataSetFilePair,
+      ).toHaveBeenCalledWith('release-version-id', {
+        title: 'Test title',
+        zipFile: file,
+        dataStorageVersion: 'ParquetV1',
+      });
+    });
   });
 });

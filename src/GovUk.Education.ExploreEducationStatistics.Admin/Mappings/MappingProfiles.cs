@@ -122,6 +122,7 @@ public class MappingProfiles : Profile
 
         CreateMap<DataSetUpload, DataSetUploadViewModel>()
             .ForMember(dest => dest.ScreeningStatus, m => m.MapFrom(upload => upload.ScreeningStatus))
+            .ForMember(dest => dest.DataStorageVersion, m => m.MapFrom(upload => upload.DataStorageVersion))
             .ForMember(
                 dest => dest.PublicApiCompatible,
                 m => m.MapFrom(upload => upload.ScreenerResult != null && upload.ScreenerResult.PublicApiCompatible)

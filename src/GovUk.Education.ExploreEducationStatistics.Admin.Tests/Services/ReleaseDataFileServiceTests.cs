@@ -1,10 +1,13 @@
 #nullable enable
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Screener;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.MockBuilders;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -29,6 +32,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 using static Moq.MockBehavior;
+using DataSet = GovUk.Education.ExploreEducationStatistics.Admin.Models.DataSet;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 
@@ -2023,7 +2027,6 @@ public class ReleaseDataFileServiceTests
                 mock.MoveDataSetsToPermanentStorage(
                     It.IsAny<Guid>(),
                     It.IsAny<List<DataSetUpload>>(),
-                    DataStorageVersion.StatsDB,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -2039,7 +2042,6 @@ public class ReleaseDataFileServiceTests
         var result = await service.SaveDataSetsFromTemporaryBlobStorage(
             releaseVersion.Id,
             [dataSetUpload.Id],
-            dataStorageVersion: DataStorageVersion.StatsDB,
             cancellationToken: CancellationToken.None
         );
 
@@ -2110,7 +2112,6 @@ public class ReleaseDataFileServiceTests
         var result = await service.SaveDataSetsFromTemporaryBlobStorage(
             releaseVersion.Id,
             [dataSetUpload.Id],
-            dataStorageVersion: DataStorageVersion.StatsDB,
             cancellationToken: CancellationToken.None
         );
 
@@ -2168,7 +2169,6 @@ public class ReleaseDataFileServiceTests
                 mock.MoveDataSetsToPermanentStorage(
                     It.IsAny<Guid>(),
                     It.IsAny<List<DataSetUpload>>(),
-                    DataStorageVersion.StatsDB,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -2184,7 +2184,6 @@ public class ReleaseDataFileServiceTests
         var result = await service.SaveDataSetsFromTemporaryBlobStorage(
             releaseVersion.Id,
             [dataSetUpload.Id],
-            dataStorageVersion: DataStorageVersion.StatsDB,
             cancellationToken: CancellationToken.None
         );
 
@@ -2193,6 +2192,148 @@ public class ReleaseDataFileServiceTests
 
         result.AssertRight();
         Assert.Empty(contentDbContext.DataSetUploads);
+    }
+
+    [Fact]
+    public async Task Upload_ParquetV1_SavesDataStorageVersionOnUpload()
+    {
+        // Arrange
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+
+        await using var contentDbContext = InMemoryApplicationDbContext();
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
+        await contentDbContext.SaveChangesAsync();
+
+        var dataSet = new DataSet
+        {
+            Title = "Test Data Set",
+            DataFile = await new DataSetFileBuilder().Build(FileType.Data),
+            MetaFile = await new DataSetFileBuilder().Build(Metadata),
+        };
+
+        var dataSetUpload = new DataSetUploadMockBuilder().WithReleaseVersionId(releaseVersion.Id).BuildInitialEntity();
+
+        var dataSetValidator = new Mock<IDataSetValidator>(Strict);
+        dataSetValidator.Setup(mock => mock.ValidateDataSet(It.IsAny<DataSetDto>())).ReturnsAsync(dataSet);
+
+        var dataSetFileStorage = new Mock<IDataSetFileStorage>(Strict);
+        dataSetFileStorage
+            .Setup(mock =>
+                mock.UploadDataSetsToTemporaryStorage(
+                    releaseVersion.Id,
+                    new List<DataSet> { dataSet },
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync([dataSetUpload]);
+        dataSetFileStorage
+            .Setup(mock =>
+                mock.CreateOrReplaceExistingDataSetUpload(
+                    releaseVersion.Id,
+                    It.Is<DataSetUpload>(upload =>
+                        upload.Id == dataSetUpload.Id && upload.DataStorageVersion == DataStorageVersion.ParquetV1
+                    ),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync((Guid _, DataSetUpload upload, CancellationToken _) => upload);
+
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+        privateBlobStorageService
+            .Setup(mock =>
+                mock.GetBlobDownloadToken(
+                    PrivateReleaseTempFiles,
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<CancellationToken>(),
+                    It.IsAny<TimeSpan?>()
+                )
+            )
+            .ReturnsAsync(new BlobDownloadToken("token", "container", "path", "filename", "text/csv"));
+
+        var dataSetScreenerService = new Mock<IDataSetScreenerService>(Strict);
+        dataSetScreenerService
+            .Setup(mock => mock.StartScreening(It.IsAny<DataSetStartScreeningRequest>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var service = SetupReleaseDataFileService(
+            contentDbContext: contentDbContext,
+            privateBlobStorageService: privateBlobStorageService.Object,
+            dataSetValidator: dataSetValidator.Object,
+            dataSetFileStorage: dataSetFileStorage.Object,
+            dataSetScreenerService: dataSetScreenerService.Object,
+            mapper: MapperUtils.AdminMapper()
+        );
+
+        // Act
+        var result = await service.Upload(
+            releaseVersion.Id,
+            dataFile: Mock.Of<IManagedStreamFile>(),
+            metaFile: Mock.Of<IManagedStreamFile>(),
+            dataSetTitle: dataSet.Title,
+            dataStorageVersion: DataStorageVersion.ParquetV1,
+            cancellationToken: CancellationToken.None
+        );
+
+        // Assert
+        MockUtils.VerifyAllMocks(
+            dataSetValidator,
+            dataSetFileStorage,
+            privateBlobStorageService,
+            dataSetScreenerService
+        );
+
+        var viewModel = Assert.Single(result.AssertRight());
+        Assert.Equal(nameof(DataStorageVersion.ParquetV1), viewModel.DataStorageVersion);
+    }
+
+    [Fact]
+    public async Task Upload_ParquetV1ForReplacement_ReturnsValidationError()
+    {
+        // Arrange
+        ReleaseVersion releaseVersion = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
+
+        await using var contentDbContext = InMemoryApplicationDbContext();
+        contentDbContext.ReleaseVersions.Add(releaseVersion);
+        await contentDbContext.SaveChangesAsync();
+
+        var dataSet = new DataSet
+        {
+            Title = "Test Data Set",
+            DataFile = await new DataSetFileBuilder().Build(FileType.Data),
+            MetaFile = await new DataSetFileBuilder().Build(Metadata),
+            ReplacingFile = _fixture.DefaultFile().WithType(FileType.Data).Generate(),
+        };
+
+        var dataSetValidator = new Mock<IDataSetValidator>(Strict);
+        dataSetValidator.Setup(mock => mock.ValidateDataSet(It.IsAny<DataSetDto>())).ReturnsAsync(dataSet);
+
+        var service = SetupReleaseDataFileService(
+            contentDbContext: contentDbContext,
+            dataSetValidator: dataSetValidator.Object
+        );
+
+        // Act
+        var result = await service.Upload(
+            releaseVersion.Id,
+            dataFile: Mock.Of<IManagedStreamFile>(),
+            metaFile: Mock.Of<IManagedStreamFile>(),
+            dataSetTitle: dataSet.Title,
+            dataStorageVersion: DataStorageVersion.ParquetV1,
+            cancellationToken: CancellationToken.None
+        );
+
+        // Assert
+        MockUtils.VerifyAllMocks(dataSetValidator);
+
+        var validationProblem = result.AssertBadRequestWithValidationProblem();
+        validationProblem.AssertHasErrors([
+            ValidationMessages.GenerateErrorDataStorageVersionNotSupportedForReplacement(dataSet.Title),
+        ]);
     }
 
     private ReleaseDataFileService SetupReleaseDataFileService(

@@ -426,6 +426,20 @@ public static class ValidationMessages
         };
     }
 
+    public static readonly LocalizableMessage DataStorageVersionNotSupportedForReplacement = new(
+        Code: nameof(DataStorageVersionNotSupportedForReplacement),
+        Message: "Data set with title '{0}' would replace an existing data set, so cannot be imported as parquet. Data replacements are only supported for data sets stored in StatsDB."
+    );
+
+    public static ErrorViewModel GenerateErrorDataStorageVersionNotSupportedForReplacement(string title)
+    {
+        return new ErrorViewModel
+        {
+            Code = DataStorageVersionNotSupportedForReplacement.Code,
+            Message = string.Format(DataStorageVersionNotSupportedForReplacement.Message, title),
+        };
+    }
+
     public static readonly LocalizableMessage CannotCreateMultipleDraftApiDataSet = new(
         Code: nameof(CannotCreateMultipleDraftApiDataSet),
         Message: "Data set with title '{0}' cannot be replaced as this would result in creating a new patch draft API data set."

@@ -62,6 +62,7 @@ public class ReleaseVersionsControllerUnitTests
                     ItIsFileMatch(dataFile),
                     ItIsFileMatch(metaFile),
                     "Data set title",
+                    DataStorageVersion.StatsDB,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -104,6 +105,7 @@ public class ReleaseVersionsControllerUnitTests
                     ItIsFileMatch(dataFile),
                     ItIsFileMatch(metaFile),
                     "Data set title",
+                    DataStorageVersion.StatsDB,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -130,6 +132,50 @@ public class ReleaseVersionsControllerUnitTests
     }
 
     [Fact]
+    public async Task UploadDataSet_ParquetV1_PassesDataStorageVersionToService()
+    {
+        // Arrange
+        var dataFile = MockFile("datafile.csv");
+        var metaFile = MockFile("metafile.csv");
+
+        var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
+
+        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+        releaseDataFileService
+            .Setup(service =>
+                service.Upload(
+                    _releaseVersionId,
+                    ItIsFileMatch(dataFile),
+                    ItIsFileMatch(metaFile),
+                    "Data set title",
+                    DataStorageVersion.ParquetV1,
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
+
+        // Act
+        var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+        var response = await controller.UploadDataSet(
+            new()
+            {
+                ReleaseVersionId = _releaseVersionId,
+                Title = "Data set title",
+                DataFile = dataFile,
+                MetaFile = metaFile,
+                DataStorageVersion = DataStorageVersion.ParquetV1,
+            },
+            cancellationToken: CancellationToken.None
+        );
+
+        // Assert
+        VerifyAllMocks(releaseDataFileService);
+
+        response.AssertOkResult();
+    }
+
+    [Fact]
     public async Task UploadDataSetAsZip_Success_ReturnsOkResult()
     {
         // Arrange
@@ -144,6 +190,7 @@ public class ReleaseVersionsControllerUnitTests
                     _releaseVersionId,
                     It.IsAny<IManagedStreamZipFile>(),
                     "Data set title",
+                    DataStorageVersion.StatsDB,
                     It.IsAny<CancellationToken>()
                 )
             )
@@ -168,6 +215,47 @@ public class ReleaseVersionsControllerUnitTests
         var responseVms = response.AssertOkResult();
         var responseVm = Assert.Single(responseVms);
         Assert.Equivalent(expectedVm, responseVm);
+    }
+
+    [Fact]
+    public async Task UploadDataSetAsZip_ParquetV1_PassesDataStorageVersionToService()
+    {
+        // Arrange
+        var dataSetZipFile = MockFile("dataSetZip.zip", isZip: true);
+
+        var expectedVm = DataSetUploadMockBuilder.BuildViewModel();
+
+        var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+        releaseDataFileService
+            .Setup(service =>
+                service.UploadFromZip(
+                    _releaseVersionId,
+                    It.IsAny<IManagedStreamZipFile>(),
+                    "Data set title",
+                    DataStorageVersion.ParquetV1,
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(new List<DataSetUploadViewModel> { expectedVm });
+
+        // Act
+        var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+
+        var response = await controller.UploadDataSetAsZip(
+            new()
+            {
+                ReleaseVersionId = _releaseVersionId,
+                Title = "Data set title",
+                ZipFile = dataSetZipFile,
+                DataStorageVersion = DataStorageVersion.ParquetV1,
+            },
+            cancellationToken: CancellationToken.None
+        );
+
+        // Assert
+        VerifyAllMocks(releaseDataFileService);
+
+        response.AssertOkResult();
     }
 
     [Fact]
@@ -268,7 +356,6 @@ public class ReleaseVersionsControllerUnitTests
                 service.SaveDataSetsFromTemporaryBlobStorage(
                     _releaseVersionId,
                     new List<Guid> { expectedVm1.Id, expectedVm2.Id, expectedVm3.Id },
-                    DataStorageVersion.StatsDB,
                     It.IsAny<CancellationToken>()
                 )
             )

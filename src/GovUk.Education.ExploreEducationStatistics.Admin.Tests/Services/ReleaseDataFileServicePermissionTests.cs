@@ -246,6 +246,34 @@ public class ReleaseDataFileServicePermissionTests
                     dataFile: new Mock<IManagedStreamFile>().Object,
                     metaFile: new Mock<IManagedStreamFile>().Object,
                     dataSetTitle: "",
+                    dataStorageVersion: DataStorageVersion.StatsDB,
+                    cancellationToken: CancellationToken.None
+                );
+            });
+    }
+
+    [Fact]
+    public async Task Upload_ParquetV1_RequiresBauUser()
+    {
+        await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
+        contentDbContext.ReleaseVersions.Add(_releaseVersion);
+        await contentDbContext.SaveChangesAsync();
+
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheck(_releaseVersion, CanUpdateSpecificReleaseVersion)
+            .ExpectCheckToFail(IsBauUser)
+            .AssertForbidden(userService =>
+            {
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    userService: userService.Object
+                );
+                return service.Upload(
+                    releaseVersionId: _releaseVersion.Id,
+                    dataFile: new Mock<IManagedStreamFile>().Object,
+                    metaFile: new Mock<IManagedStreamFile>().Object,
+                    dataSetTitle: "",
+                    dataStorageVersion: DataStorageVersion.ParquetV1,
                     cancellationToken: CancellationToken.None
                 );
             });
@@ -270,6 +298,33 @@ public class ReleaseDataFileServicePermissionTests
                     releaseVersionId: _releaseVersion.Id,
                     zipFile: new Mock<IManagedStreamZipFile>().Object,
                     dataSetTitle: "",
+                    dataStorageVersion: DataStorageVersion.StatsDB,
+                    cancellationToken: CancellationToken.None
+                );
+            });
+    }
+
+    [Fact]
+    public async Task UploadAsZip_ParquetV1_RequiresBauUser()
+    {
+        await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
+        contentDbContext.ReleaseVersions.Add(_releaseVersion);
+        await contentDbContext.SaveChangesAsync();
+
+        await PolicyCheckBuilder<SecurityPolicies>()
+            .SetupResourceCheck(_releaseVersion, CanUpdateSpecificReleaseVersion)
+            .ExpectCheckToFail(IsBauUser)
+            .AssertForbidden(userService =>
+            {
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    userService: userService.Object
+                );
+                return service.UploadFromZip(
+                    releaseVersionId: _releaseVersion.Id,
+                    zipFile: new Mock<IManagedStreamZipFile>().Object,
+                    dataSetTitle: "",
+                    dataStorageVersion: DataStorageVersion.ParquetV1,
                     cancellationToken: CancellationToken.None
                 );
             });
@@ -316,32 +371,6 @@ public class ReleaseDataFileServicePermissionTests
                 return service.SaveDataSetsFromTemporaryBlobStorage(
                     releaseVersionId: _releaseVersion.Id,
                     dataSetUploadIds: [],
-                    dataStorageVersion: DataStorageVersion.StatsDB,
-                    cancellationToken: CancellationToken.None
-                );
-            });
-    }
-
-    [Fact]
-    public async Task SaveDataSetsFromTemporaryBlobStorage_ParquetV1_RequiresBauUser()
-    {
-        await using var contentDbContext = DbUtils.InMemoryApplicationDbContext();
-        contentDbContext.ReleaseVersions.Add(_releaseVersion);
-        await contentDbContext.SaveChangesAsync();
-
-        await PolicyCheckBuilder<SecurityPolicies>()
-            .SetupResourceCheck(_releaseVersion, CanUpdateSpecificReleaseVersion)
-            .ExpectCheckToFail(IsBauUser)
-            .AssertForbidden(userService =>
-            {
-                var service = SetupReleaseDataFileService(
-                    contentDbContext: contentDbContext,
-                    userService: userService.Object
-                );
-                return service.SaveDataSetsFromTemporaryBlobStorage(
-                    releaseVersionId: _releaseVersion.Id,
-                    dataSetUploadIds: [],
-                    dataStorageVersion: DataStorageVersion.ParquetV1,
                     cancellationToken: CancellationToken.None
                 );
             });

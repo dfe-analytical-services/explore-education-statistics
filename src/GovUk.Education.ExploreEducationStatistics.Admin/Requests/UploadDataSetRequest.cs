@@ -3,6 +3,7 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
@@ -17,6 +18,8 @@ public record UploadDataSetRequest
     public IFormFile DataFile { get; init; } = null!;
 
     public IFormFile MetaFile { get; init; } = null!;
+
+    public DataStorageVersion DataStorageVersion { get; init; } = DataStorageVersion.StatsDB;
 
     public class Validator : AbstractValidator<UploadDataSetRequest>
     {
@@ -77,6 +80,8 @@ public record UploadDataSetAsZipRequest
     public string Title { get; init; } = string.Empty;
 
     public IFormFile ZipFile { get; init; } = null!;
+
+    public DataStorageVersion DataStorageVersion { get; init; } = DataStorageVersion.StatsDB;
 
     public class Validator : AbstractValidator<UploadDataSetAsZipRequest>
     {
