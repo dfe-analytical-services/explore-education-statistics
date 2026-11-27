@@ -733,6 +733,12 @@ func getElzResourceNames(env string) ResourceNames => {
     appInsights: elzName(env, elzAbbreviations.insightsComponents, 'dataapi')
   }
   dataFactory: elzName(env, elzAbbreviations.dataFactoryFactories, 'ees')
+  dataFiles: {
+    storage: {
+      storageAccountName: elzStorageAccountName(env, 'datafiles')
+      fileShareName: elzLocalName(elzAbbreviations.fileShare, 'datafiles')
+    }
+  }
   frontDoor: {
     frontDoorName: elzName(env, elzAbbreviations.frontDoorProfiles, 'ees')
     defaultEndpoint: {
@@ -847,6 +853,7 @@ func getElzResourceNames(env string) ResourceNames => {
       admin: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'admin')
       contentApi: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'contentapi')
       dataApi: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'dataapi')
+      dataFilesStoragePrivateEndpoints: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'datafilesstpep')
       importer: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'importer')
       notifier: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'notifier')
       publisher: elzLocalName(elzAbbreviations.networkVirtualNetworksSubnets, 'publisher')
