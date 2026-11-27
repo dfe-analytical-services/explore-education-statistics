@@ -5,6 +5,7 @@ export const searchDataFilters = [
   'organisationId',
   'publicationId',
   'releaseType',
+  'releaseVersionId',
   'search',
   'themeId',
 ] as const;

@@ -31,6 +31,7 @@ export function createDataSetSuggestRequest(
     organisationIds,
     publicationIds,
     releaseTypes,
+    releaseVersionId,
     sortBy,
     themeIds,
   } = getParamsFromQuery(query);
@@ -44,6 +45,7 @@ export function createDataSetSuggestRequest(
     organisationIds,
     publicationIds,
     releaseTypes,
+    releaseVersionId,
     themeIds,
   });
 
@@ -68,6 +70,7 @@ export default function createDataSetListRequest(
     organisationIds,
     publicationIds,
     releaseTypes,
+    releaseVersionId,
     search: searchParam,
     sortBy,
     themeIds,
@@ -82,6 +85,7 @@ export default function createDataSetListRequest(
     organisationIds,
     publicationIds,
     releaseTypes,
+    releaseVersionId,
     themeIds,
   });
 
@@ -107,12 +111,21 @@ interface SearchFilters {
   organisationIds?: string[];
   publicationIds?: string[];
   releaseTypes?: string[];
+  releaseVersionId?: string;
   themeIds?: string[];
 }
 
 function buildODataFilter(filters: SearchFilters): string | undefined {
   const conditions: string[] = [];
   const themeAndPubConditions: string[] = [];
+
+  // Filtering by a specific release version should return its data sets
+  // even if it isn't the latest release or its publication has been superseded.
+  const isFilteredByRelease = !!filters.releaseVersionId;
+
+  if (filters.releaseVersionId) {
+    conditions.push(odata`releaseVersionId eq ${filters.releaseVersionId}`);
+  }
 
   if (filters.themeIds?.length) {
     const joined = filters.themeIds.join('|');
@@ -133,7 +146,7 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
         : themeAndPubConditions[0];
 
     conditions.push(combinedGroup);
-  } else {
+  } else if (!isFilteredByRelease) {
     // If no publication or theme ids are provided, only include non-superseded data sets.
     conditions.push(odata`isSuperseded eq false`);
   }
@@ -157,7 +170,7 @@ function buildODataFilter(filters: SearchFilters): string | undefined {
     );
   }
 
-  if (filters.latestDataOnly) {
+  if (filters.latestDataOnly && !isFilteredByRelease) {
     conditions.push(odata`latestData eq true`);
   }
 
@@ -209,6 +222,7 @@ export function getParamsFromQuery(query: SearchDataPageQuery) {
     page: getFirst(query.page),
     publicationIds: getAsArray(query.publicationId),
     releaseTypes: validReleaseTypes.length > 0 ? validReleaseTypes : undefined,
+    releaseVersionId: getFirst(query.releaseVersionId),
     search: getFirst(query.search),
     sortBy:
       query.sortBy && isOneOf(query.sortBy, publicationSortOptions)

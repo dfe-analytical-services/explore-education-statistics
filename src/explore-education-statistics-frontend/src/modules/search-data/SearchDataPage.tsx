@@ -71,6 +71,11 @@ export interface SearchDataPageQuery {
   page?: number;
   publicationId?: string | string[];
   releaseType?: ReleaseType | ReleaseType[];
+  /**
+   * Not exposed as a user-selectable filter. Set by links to the data sets
+   * of a specific release version, e.g. from a release's explore data page.
+   */
+  releaseVersionId?: string;
   search?: string;
   sortBy?: PublicationSortOption;
   themeId?: string | string[];
@@ -181,6 +186,7 @@ const SearchDataPage: NextPage = () => {
     organisationIds,
     publicationIds,
     releaseTypes,
+    releaseVersionId,
     search,
     sortBy,
     themeIds,
@@ -238,9 +244,16 @@ const SearchDataPage: NextPage = () => {
     publicationIds?.includes(publication.id),
   );
 
+  const isFilteredByRelease = !isPublicationsSearch && !!releaseVersionId;
+  // The release title isn't known without an extra request,
+  // so take it from the results when there are any or use the ID.
+  const selectedReleaseTitle = dataSets[0]?.release.title ?? releaseVersionId;
+
   const isFilteredByDataSetType =
     !isPublicationsSearch && dataSetType === 'api';
-  const isFilteredAllReleases = !isPublicationsSearch && !latestDataOnly;
+  // Filtering by a release ignores the latest data only filter.
+  const isFilteredAllReleases =
+    !isPublicationsSearch && !latestDataOnly && !isFilteredByRelease;
   const isFilteredByGeographicLevel =
     !isPublicationsSearch && selectedGeographicLevels.length > 0;
   const isFilteredByPublicationId =
@@ -254,7 +267,8 @@ const SearchDataPage: NextPage = () => {
     isFilteredByDataSetType ||
     isFilteredAllReleases ||
     isFilteredByGeographicLevel ||
-    isFilteredByPublicationId;
+    isFilteredByPublicationId ||
+    isFilteredByRelease;
 
   const filteredByString = compact(
     [
@@ -268,6 +282,7 @@ const SearchDataPage: NextPage = () => {
       isFilteredByPublicationId
         ? [...selectedPublications.map(p => p.title)]
         : undefined,
+      isFilteredByRelease ? selectedReleaseTitle : undefined,
       isFilteredByDataSetType ? 'API data sets only' : undefined,
       isFilteredAllReleases ? 'All releases' : undefined,
     ].flat(),
@@ -401,6 +416,12 @@ const SearchDataPage: NextPage = () => {
     } else {
       // Set the specific single string value
       newQuery[filterType] = nextValue;
+    }
+
+    // Latest data only can't apply to a specific release version,
+    // so switching to it removes the release filter.
+    if (filterType === 'latestDataOnly' && nextValue === 'true') {
+      newQuery = omit(newQuery, 'releaseVersionId');
     }
 
     await updateQueryParams(newQuery as SearchDataPageQuery);
@@ -553,7 +574,7 @@ const SearchDataPage: NextPage = () => {
               geographicLevels={geographicLevels}
               geographicLevelOptions={geographicLevelOptions}
               includeDataFilters={!isPublicationsSearch}
-              latestDataOnly={latestDataOnly}
+              latestDataOnly={latestDataOnly && !isFilteredByRelease}
               organisationIds={organisationIds}
               organisationOptions={organisationOptions}
               publicationIds={publicationIds}
@@ -579,7 +600,7 @@ const SearchDataPage: NextPage = () => {
                 geographicLevels={geographicLevels}
                 geographicLevelOptions={geographicLevelOptions}
                 includeDataFilters={!isPublicationsSearch}
-                latestDataOnly={latestDataOnly}
+                latestDataOnly={latestDataOnly && !isFilteredByRelease}
                 organisationIds={organisationIds}
                 organisationOptions={organisationOptions}
                 publicationIds={publicationIds}
@@ -679,6 +700,16 @@ const SearchDataPage: NextPage = () => {
                     }
                   />
                 ))}
+
+              {isFilteredByRelease && (
+                <FilterResetButton
+                  filterType="Release"
+                  name={selectedReleaseTitle}
+                  onClick={() =>
+                    handleResetFilter({ filterType: 'releaseVersionId' })
+                  }
+                />
+              )}
 
               {selectedReleaseTypes.map(rt => (
                 <FilterResetButton

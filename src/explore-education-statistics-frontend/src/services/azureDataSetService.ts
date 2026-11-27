@@ -27,6 +27,7 @@ export interface AzureDataSetIndexItem {
   releaseId: string;
   releaseTitle: string;
   releaseSlug: string;
+  releaseVersionId: string;
   latestData: boolean;
   isSuperseded: boolean;
   published: string;

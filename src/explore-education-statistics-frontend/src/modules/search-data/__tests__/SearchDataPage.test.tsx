@@ -376,6 +376,154 @@ describe('SearchDataPage', () => {
       const resetButtons = screen.getAllByTestId('filter-reset');
       expect(resetButtons).toHaveLength(1);
     });
+
+    describe('by release', () => {
+      test('renders a release reset button using the title from the results', async () => {
+        mockRouter.query = { releaseVersionId: 'release-version-1' };
+
+        render(<SearchDataPage />);
+
+        expect(await screen.findByText('2 results')).toBeInTheDocument();
+        expect(screen.getByText(/filtered by:/)).toBeInTheDocument();
+
+        const resetButtons = screen.getAllByTestId('filter-reset');
+        expect(resetButtons).toHaveLength(1);
+        expect(resetButtons[0]).toHaveTextContent('Release:Release 1');
+        expect(
+          screen.getByRole('button', { name: 'Clear all filters' }),
+        ).toBeInTheDocument();
+      });
+
+      test('renders the release version id in the release reset button when there are no results', async () => {
+        azureDataSetService.listDataSets.mockResolvedValue({
+          results: [],
+          paging: { page: 1, pageSize: 10, totalPages: 0, totalResults: 0 },
+        });
+        mockRouter.query = { releaseVersionId: 'release-version-1' };
+
+        render(<SearchDataPage />);
+
+        expect(await screen.findByText('0 results')).toBeInTheDocument();
+
+        const resetButtons = screen.getAllByTestId('filter-reset');
+        expect(resetButtons).toHaveLength(1);
+        expect(resetButtons[0]).toHaveTextContent('Release:release-version-1');
+      });
+
+      test('renders show all releases as selected and no all releases reset button when filtered by release version', async () => {
+        mockRouter.query = {
+          releaseVersionId: 'release-version-1',
+        };
+
+        render(<SearchDataPage />);
+
+        expect(await screen.findByText('2 results')).toBeInTheDocument();
+
+        expect(
+          screen.getByRole('group', { name: 'Show latest or all releases' }),
+        ).toBeInTheDocument();
+        expect(screen.getByLabelText('Show all releases')).toBeChecked();
+        expect(
+          screen.getByLabelText('Show latest releases only'),
+        ).not.toBeChecked();
+
+        const resetButtons = screen.getAllByTestId('filter-reset');
+        expect(resetButtons).toHaveLength(1);
+        expect(resetButtons[0]).toHaveTextContent('Release:Release 1');
+      });
+
+      test('does not render the all releases reset button when filtered by release version and latestDataOnly is false', async () => {
+        mockRouter.query = {
+          releaseVersionId: 'release-version-1',
+          latestDataOnly: 'false',
+        };
+
+        render(<SearchDataPage />);
+
+        expect(await screen.findByText('2 results')).toBeInTheDocument();
+
+        const resetButtons = screen.getAllByTestId('filter-reset');
+        expect(resetButtons).toHaveLength(1);
+        expect(resetButtons[0]).toHaveTextContent('Release:Release 1');
+      });
+
+      test('removes the release version param when show latest releases only is selected', async () => {
+        mockRouter.query = {
+          releaseVersionId: 'release-version-1',
+        };
+
+        const { user } = render(<SearchDataPage />);
+
+        await user.click(
+          await screen.findByLabelText('Show latest releases only'),
+        );
+
+        await waitFor(() => {
+          expect(mockRouter.push).toHaveBeenCalledWith(
+            { query: { latestDataOnly: 'true', sortBy: 'newest' } },
+            undefined,
+            { shallow: true },
+          );
+        });
+      });
+
+      test('removes the release version param when the release reset button is clicked', async () => {
+        mockRouter.query = {
+          dataSetType: 'api',
+          releaseVersionId: 'release-version-1',
+        };
+
+        const { user } = render(<SearchDataPage />);
+
+        await waitFor(() => {
+          expect(screen.getAllByTestId('filter-reset')[0]).toHaveTextContent(
+            'Release:Release 1',
+          );
+        });
+
+        await user.click(screen.getAllByTestId('filter-reset')[0]);
+
+        await waitFor(() => {
+          expect(mockRouter.push).toHaveBeenCalledWith(
+            {
+              query: { dataSetType: 'api', sortBy: 'newest' },
+            },
+            undefined,
+            { shallow: true },
+          );
+        });
+      });
+
+      test('removes the release version param when clear all filters is clicked', async () => {
+        mockRouter.query = { releaseVersionId: 'release-version-1' };
+
+        const { user } = render(<SearchDataPage />);
+
+        await user.click(
+          await screen.findByRole('button', { name: 'Clear all filters' }),
+        );
+
+        await waitFor(() => {
+          expect(mockRouter.push).toHaveBeenCalledWith(
+            { query: { sortBy: 'newest' } },
+            undefined,
+            { shallow: true },
+          );
+        });
+      });
+
+      test('does not render the release reset button on the release search page', async () => {
+        mockRouter.pathname = '/search-releases';
+        mockRouter.query = { releaseVersionId: 'release-version-1' };
+
+        render(<SearchDataPage />);
+
+        expect(
+          await screen.findByText(/sorted by newest/i),
+        ).toBeInTheDocument();
+        expect(screen.queryByTestId('filter-reset')).not.toBeInTheDocument();
+      });
+    });
   });
 
   describe('releases search page', () => {
