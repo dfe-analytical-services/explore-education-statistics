@@ -116,6 +116,9 @@ public enum ValidationErrorMessages
     // Footnotes
     FootnotesDifferFromReleaseFootnotes,
 
+    // Data blocks
+    DataBlockDataSetNotAttachedToRelease,
+
     // Key statistics
     DataBlockShouldBeUnattached,
     ProvidedKeyStatIdsDifferFromReleaseKeyStatIds,

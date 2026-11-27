@@ -17,6 +17,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using ReleaseVersion = GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseVersion;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -59,6 +61,12 @@ public class DataBlockService : IDataBlockService
         return await _persistenceHelper
             .CheckEntityExists<ReleaseVersion>(releaseVersionId, query => query.Include(rv => rv.Release))
             .OnSuccess(_userService.CheckCanUpdateReleaseVersion)
+            .OnSuccessDo(_ =>
+                CheckDataSetAttachedToRelease(
+                    releaseVersionId: releaseVersionId,
+                    subjectId: createRequest.Query.SubjectId
+                )
+            )
             .OnSuccess(async _ =>
             {
                 var dataBlockVersion = _mapper.Map<DataBlockVersion>(createRequest);
@@ -236,6 +244,12 @@ public class DataBlockService : IDataBlockService
     {
         return await GetDataBlockVersion(dataBlockVersionId)
             .OnSuccessDo(dataBlockVersion => _userService.CheckCanUpdateReleaseVersion(dataBlockVersion.ReleaseVersion))
+            .OnSuccessDo(dataBlockVersion =>
+                CheckDataSetAttachedToRelease(
+                    releaseVersionId: dataBlockVersion.ReleaseVersionId,
+                    subjectId: updateRequest.Query.SubjectId
+                )
+            )
             .OnSuccessDo(async dataBlockVersion =>
             {
                 // Remove old infographic file if using a new file
@@ -457,6 +471,18 @@ public class DataBlockService : IDataBlockService
             .ToList()
             .Where(dataBlockVersion => subjectId == null || dataBlockVersion.Query.SubjectId == subjectId)
             .ToList();
+    }
+
+    private async Task<Either<ActionResult, Unit>> CheckDataSetAttachedToRelease(Guid releaseVersionId, Guid subjectId)
+    {
+        var dataSetAttached = await _context.ReleaseFiles.AnyAsync(rf =>
+            rf.ReleaseVersionId == releaseVersionId
+            && rf.File.SubjectId == subjectId
+            && rf.File.Type == FileType.Data
+            && rf.File.ReplacingId == null
+        );
+
+        return dataSetAttached ? Unit.Instance : ValidationActionResult(DataBlockDataSetNotAttachedToRelease);
     }
 
     private async Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersion(Guid dataBlockVersionId)
