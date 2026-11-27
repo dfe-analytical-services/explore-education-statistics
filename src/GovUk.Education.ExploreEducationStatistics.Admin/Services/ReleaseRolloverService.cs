@@ -72,7 +72,10 @@ public class ReleaseRolloverService(
                         publication: publication,
                         releaseCreateRequest: request,
                         publishingOrganisations: publishingOrganisations,
-                        rolloverSourceReleaseId: sourceReleaseVersion.ReleaseId
+                        // Only a copy WITH DATA is a rollover. A copy WITHOUT DATA is an ordinary release.
+                        rolloverSourceReleaseId: request.Mode == RolloverMode.WithData
+                            ? sourceReleaseVersion.ReleaseId
+                            : null
                     );
 
                     var (templateSections, destinationSectionsByTemplateSectionId) = await InitialiseContentSections(

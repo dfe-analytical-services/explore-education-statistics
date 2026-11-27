@@ -9,7 +9,7 @@ param subnetName string
 @description('The location to create resources in')
 param location string
 
-@description('Name of the Key Vault holding the Application Gateway\'s certificates and the FUAPI header secret.')
+@description('Name of the Key Vault holding the Application Gateway\'s certificates and the FaUAPI header secret.')
 param keyVaultName string
 
 @description('Name of the VNet that the Application Gateway\'s subnet belongs to.')
@@ -72,7 +72,7 @@ module publicApiWafPolicyModule 'publicApiWafPolicy.bicep' = {
   params: {
     location: location
     policyName: resourceNames.applicationGateway.sites.publicApi.wafPolicy
-    fuapiSecretValue: keyVault.getSecret('ees-publicapi-app-gateway-fuapi-header')
+    fauapiSecretValues: keyVault.getSecret(resourceNames.keyVault.secrets.publicApi.appGatewayFauapiHeaders)
     tagValues: tagValues
   }
 }

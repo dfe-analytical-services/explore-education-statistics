@@ -1,43 +1,33 @@
 import FormattedDate from '@common/components/FormattedDate';
-import VisuallyHidden from '@common/components/VisuallyHidden';
+import { PublicationListSummary } from '@common/services/publicationService';
 import { releaseTypes } from '@common/services/types/releaseType';
 import Link from '@frontend/components/Link';
 import styles from '@frontend/modules/home/components/HomeReleaseLink.module.scss';
-import { HomeRelease } from '@frontend/modules/home/data/prototypeHomeReleasesData';
 import React from 'react';
 
 interface Props {
-  release: HomeRelease;
+  release: PublicationListSummary;
   onClick?: (label: string) => void;
 }
 
 const HomeReleaseLink = ({ release, onClick }: Props) => {
-  const {
-    publicationSlug,
-    publicationSummary,
-    publicationTitle,
-    publishedDate,
-    releaseSlug,
-    releaseTitle,
-    theme,
-    type,
-  } = release;
+  const { slug, summary, title, published, latestReleaseSlug, theme, type } =
+    release;
 
   return (
     <div className={styles.linkWrapper}>
       <p className="dfe-colour--dark-grey govuk-!-font-size-16 govuk-!-margin-bottom-0">
-        <FormattedDate>{publishedDate}</FormattedDate>, {releaseTypes[type]}
+        <FormattedDate>{published}</FormattedDate>, {releaseTypes[type]}
       </p>
       <h3 className="govuk-heading-m govuk-!-margin-bottom-2 govuk-!-padding-top-0">
         <Link
-          to={`/find-statistics/${publicationSlug}/${releaseSlug}`}
-          onClick={() => onClick?.(publicationTitle)}
+          to={`/find-statistics/${slug}/${latestReleaseSlug}`}
+          onClick={() => onClick?.(title)}
         >
-          {publicationTitle}
-          <VisuallyHidden>, {releaseTitle}</VisuallyHidden>
+          {title}
         </Link>
       </h3>
-      <p className="govuk-!-margin-bottom-2">{publicationSummary}</p>
+      {summary && <p className="govuk-!-margin-bottom-2">{summary}</p>}
       <p className="govuk-caption-m">{theme}</p>
     </div>
   );

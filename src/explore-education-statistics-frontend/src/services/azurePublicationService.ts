@@ -66,7 +66,7 @@ const azurePublicationService = {
   },
   // Used for the 'search data' prototype
   async listStatisticalReleases(
-    params: AzurePublicationListRequest,
+    params: AzurePublicationListRequest & { latestReleases?: boolean },
   ): Promise<PaginatedList<PublicationListSummary>> {
     return frontendApi.post(`/search-statistical-releases`, {
       searchOptions: params,

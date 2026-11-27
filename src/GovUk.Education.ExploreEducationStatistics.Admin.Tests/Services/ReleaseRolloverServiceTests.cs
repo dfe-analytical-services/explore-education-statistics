@@ -113,8 +113,18 @@ public abstract class ReleaseRolloverServiceTests
 
                 Assert.Equal(publication.Id, actualReleaseVersion.PublicationId);
 
-                Assert.Equal(sourceRelease.Id, actualRelease.RolloverSourceReleaseId);
-                Assert.NotEqual(sourceReleaseVersion.Id, actualRelease.RolloverSourceReleaseId);
+                switch (mode)
+                {
+                    case RolloverMode.WithData:
+                        Assert.Equal(sourceRelease.Id, actualRelease.RolloverSourceReleaseId);
+                        Assert.NotEqual(sourceReleaseVersion.Id, actualRelease.RolloverSourceReleaseId);
+                        Assert.True(actualReleaseVersion.Rollover);
+                        break;
+                    case RolloverMode.StructureOnly:
+                        Assert.Null(actualRelease.RolloverSourceReleaseId);
+                        Assert.False(actualReleaseVersion.Rollover);
+                        break;
+                }
 
                 Assert.Equal(2024, actualRelease.Year);
                 Assert.Equal(TimeIdentifier.AcademicYear, actualRelease.TimePeriodCoverage);
@@ -126,7 +136,6 @@ public abstract class ReleaseRolloverServiceTests
                 Assert.Equal(ReleaseType.OfficialStatistics, actualReleaseVersion.Type);
                 Assert.Equal(ReleaseApprovalStatus.Draft, actualReleaseVersion.ApprovalStatus);
                 Assert.Equal(0, actualReleaseVersion.Version);
-                Assert.True(actualReleaseVersion.Rollover);
                 Assert.Equal(UserId, actualReleaseVersion.CreatedById);
 
                 Assert.Equal(2, actualReleaseVersion.PublishingOrganisations.Count);
