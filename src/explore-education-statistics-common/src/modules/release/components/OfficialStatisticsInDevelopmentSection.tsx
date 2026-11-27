@@ -6,7 +6,7 @@ export default function OfficialStatisticsInDevelopmentSection({
   publishingOrganisations,
   showHeading = true,
 }: ReleaseTypeSectionProps) {
-  const { officialStatisticsStandardsUrl } = useTenant();
+  const { organisation, officialStatisticsStandardsUrl } = useTenant();
   const isSkillsEngland = !!publishingOrganisations.find(
     org => org.title === 'Skills England',
   );
@@ -69,8 +69,9 @@ export default function OfficialStatisticsInDevelopmentSection({
               rel="noopener noreferrer nofollow"
               target="_blank"
             >
-              Standards for official statistics published by DfE guidance (opens
-              in new tab)
+              Standards for official statistics published by{' '}
+              {organisation.acronym ?? `the ${organisation.name}`} guidance
+              (opens in new tab)
             </a>
             .
           </p>

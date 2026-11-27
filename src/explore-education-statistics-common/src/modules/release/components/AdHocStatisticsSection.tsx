@@ -5,7 +5,7 @@ import React from 'react';
 export default function AdHocStatisticsSection({
   showHeading = true,
 }: ReleaseTypeSectionProps) {
-  const { officialStatisticsStandardsUrl } = useTenant();
+  const { organisation, officialStatisticsStandardsUrl } = useTenant();
 
   return (
     <>
@@ -34,7 +34,8 @@ export default function AdHocStatisticsSection({
             rel="noopener noreferrer nofollow"
             target="_blank"
           >
-            Standards for official statistics published by DfE guidance (opens
+            Standards for official statistics published by{' '}
+            {organisation.acronym ?? `the ${organisation.name}`} guidance (opens
             in new tab)
           </a>
           .
