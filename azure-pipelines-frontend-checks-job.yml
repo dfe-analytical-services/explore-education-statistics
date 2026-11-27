@@ -1,0 +1,76 @@
+# A job that runs the type checking, linting, formatting checks and tests for one area of the
+# frontend code in the pnpm monorepo.
+parameters:
+  - name: jobName
+    type: string
+  - name: pool
+    type: string
+    default: ees-ubuntu2604-xlarge-v2
+  - name: includeFormattingAndLinting
+    type: boolean
+  - name: includeTests
+    type: boolean
+  - name: typeCheckScript
+    type: string
+  - name: lintScript
+    type: string
+  - name: formatCheckScript
+    type: string
+  - name: testScript
+    type: string
+  # Test results files to publish, relative to the "src" folder.
+  - name: testResultsFiles
+    type: string
+  - name: testRunTitle
+    type: string
+
+jobs:
+  - job: ${{ parameters.jobName }}
+    pool: ${{ parameters.pool }}
+    workspace:
+      clean: all
+    steps:
+      - checkout: self
+        fetchDepth: 1
+        fetchTags: false
+
+      - template: azure-pipelines-install-node-dependencies.yml
+
+      - task: Bash@3
+        displayName: Type check
+        inputs:
+          workingDir: .
+          targetType: inline
+          script: ${{ parameters.typeCheckScript }}
+
+      - ${{ if eq(parameters.includeFormattingAndLinting, true) }}:
+          - task: Bash@3
+            displayName: Lint
+            inputs:
+              workingDir: .
+              targetType: inline
+              script: ${{ parameters.lintScript }}
+
+          - task: Bash@3
+            displayName: Format check
+            inputs:
+              workingDir: .
+              targetType: inline
+              script: ${{ parameters.formatCheckScript }}
+
+      - ${{ if eq(parameters.includeTests, true) }}:
+          - task: Bash@3
+            displayName: Test
+            inputs:
+              workingDir: .
+              targetType: inline
+              script: ${{ parameters.testScript }}
+
+          - task: PublishTestResults@2
+            displayName: Publish test results
+            inputs:
+              testResultsFormat: JUnit
+              testResultsFiles: ${{ parameters.testResultsFiles }}
+              searchFolder: ./src
+              testRunTitle: ${{ parameters.testRunTitle }}
+              mergeTestResults: true
