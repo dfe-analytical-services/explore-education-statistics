@@ -36,6 +36,7 @@ export interface DataSetUpload {
   uploadedBy: string;
   publicApiCompatible?: boolean;
   replacingFileId?: string;
+  dataStorageVersion: DataStorageVersion;
 }
 
 export interface ScreenerResult {
@@ -94,15 +95,19 @@ export interface DataSetAccoutrements {
   footnotes: { id: string; content: string }[];
 }
 
+export type DataStorageVersion = 'StatsDB' | 'ParquetV1';
+
 export type UploadDataFilesRequest = {
   title: string;
   dataFile: File;
   metadataFile: File;
+  dataStorageVersion: DataStorageVersion;
 };
 
 export type UploadZipDataFileRequest = {
   title: string;
   zipFile: File;
+  dataStorageVersion: DataStorageVersion;
 };
 
 export type FileType = 'data' | 'metadata';
@@ -193,13 +198,14 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadDataFilesRequest,
   ): Promise<void> {
-    const { dataFile, metadataFile, title } = request;
+    const { dataFile, metadataFile, title, dataStorageVersion } = request;
 
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
     data.append('title', title);
     data.append('dataFile', dataFile);
     data.append('metaFile', metadataFile);
+    data.append('dataStorageVersion', dataStorageVersion);
 
     return client.post('/releaseVersions/data', data);
   },
@@ -207,12 +213,13 @@ const releaseDataFileService = {
     releaseId: string,
     request: UploadZipDataFileRequest,
   ): Promise<void> {
-    const { zipFile, title } = request;
+    const { zipFile, title, dataStorageVersion } = request;
 
     const data = new FormData();
     data.append('releaseVersionId', releaseId);
     data.append('title', title);
     data.append('zipFile', zipFile);
+    data.append('dataStorageVersion', dataStorageVersion);
 
     return client.post('/releaseVersions/zip-data', data);
   },

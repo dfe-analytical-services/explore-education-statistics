@@ -414,6 +414,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("DataStorageVersion")
+                        .IsRequired()
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
+
                     b.Property<Guid>("MetaFileId")
                         .HasColumnType("uniqueidentifier");
 
@@ -728,6 +733,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("FilterHierarchies")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("HasParquet")
+                        .HasColumnType("bit");
 
                     b.Property<Guid?>("ReplacedById")
                         .HasColumnType("uniqueidentifier");

@@ -140,7 +140,14 @@ public class ReleaseVersionsController(
         await using var metaFile = new ManagedStreamFormFile(request.MetaFile);
 
         return await releaseDataFileService
-            .Upload(request.ReleaseVersionId, dataFile, metaFile, request.Title, cancellationToken)
+            .Upload(
+                request.ReleaseVersionId,
+                dataFile,
+                metaFile,
+                request.Title,
+                request.DataStorageVersion,
+                cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 
@@ -155,7 +162,13 @@ public class ReleaseVersionsController(
         await using var zipFile = new ManagedStreamZipFormFile(request.ZipFile);
 
         return await releaseDataFileService
-            .UploadFromZip(request.ReleaseVersionId, zipFile, request.Title, cancellationToken)
+            .UploadFromZip(
+                request.ReleaseVersionId,
+                zipFile,
+                request.Title,
+                request.DataStorageVersion,
+                cancellationToken
+            )
             .HandleFailuresOrOk();
     }
 

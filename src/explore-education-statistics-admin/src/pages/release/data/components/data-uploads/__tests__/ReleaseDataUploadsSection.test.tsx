@@ -131,6 +131,7 @@ describe('ReleaseDataUploadsSection', () => {
     screeningStatus: 'PendingReview',
     created: new Date(),
     uploadedBy: 'test@test.com',
+    dataStorageVersion: 'StatsDB',
   };
 
   const testQueuedImportStatus: DataFileImportStatus = {
@@ -1759,6 +1760,7 @@ describe('ReleaseDataUploadsSection', () => {
         ).toHaveBeenCalledWith('release-1', {
           title: 'Test data 2',
           zipFile,
+          dataStorageVersion: 'StatsDB',
         } as UploadZipDataFileRequest),
       );
 
@@ -2048,6 +2050,7 @@ describe('ReleaseDataUploadsSection', () => {
           title: 'Test title',
           dataFile,
           metadataFile,
+          dataStorageVersion: 'StatsDB',
         } as UploadDataFilesRequest);
 
         expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
@@ -2096,6 +2099,7 @@ describe('ReleaseDataUploadsSection', () => {
         ).toHaveBeenCalledWith('release-1', {
           title: 'Test zip title',
           zipFile,
+          dataStorageVersion: 'StatsDB',
         } as UploadZipDataFileRequest);
 
         expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
@@ -2197,6 +2201,7 @@ describe('ReleaseDataUploadsSection', () => {
           title: 'Test title',
           dataFile,
           metadataFile,
+          dataStorageVersion: 'StatsDB',
         } as UploadDataFilesRequest);
 
         expect(releaseDataFileService.getDataFiles).toHaveBeenCalledWith(
@@ -2272,6 +2277,7 @@ describe('ReleaseDataUploadsSection', () => {
         ).toHaveBeenCalledWith('release-1', {
           title: 'Test title',
           zipFile,
+          dataStorageVersion: 'StatsDB',
         } as UploadZipDataFileRequest),
       );
 

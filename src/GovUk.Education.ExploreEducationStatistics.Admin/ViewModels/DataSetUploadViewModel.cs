@@ -30,4 +30,6 @@ public record DataSetUploadViewModel
     public bool? PublicApiCompatible { get; set; }
 
     public Guid? ReplacingFileId { get; init; }
+
+    public required string DataStorageVersion { get; init; }
 }

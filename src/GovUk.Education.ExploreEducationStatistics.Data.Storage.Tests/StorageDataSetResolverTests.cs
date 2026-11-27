@@ -1,6 +1,7 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet;
 using GovUk.Education.ExploreEducationStatistics.Data.Storage.StatsDb;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -29,6 +30,24 @@ public abstract class StorageDataSetResolverTests
             var result = await resolver.Resolve(subjectId);
 
             var dataSet = Assert.IsType<StatisticsDbDataSet>(result);
+            Assert.Equal(subjectId, dataSet.SubjectId);
+        }
+
+        [Fact]
+        public async Task DataFileIsParquetV1_ReturnsParquetV1DataSet()
+        {
+            var subjectId = Guid.NewGuid();
+
+            var contentDbContextId = await SeedDataAndMetadataFiles(subjectId, DataStorageVersion.ParquetV1);
+
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
+
+            var resolver = BuildStorageDataSetResolver(contentDbContext, statisticsDbContext);
+
+            var result = await resolver.Resolve(subjectId);
+
+            var dataSet = Assert.IsType<ParquetV1DataSet>(result);
             Assert.Equal(subjectId, dataSet.SubjectId);
         }
 
@@ -63,6 +82,23 @@ public abstract class StorageDataSetResolverTests
             var result = resolver.Resolve(dataFile);
 
             var dataSet = Assert.IsType<StatisticsDbDataSet>(result);
+            Assert.Equal(dataFile.SubjectId, dataSet.SubjectId);
+        }
+
+        [Fact]
+        public async Task DataFileIsParquetV1_ReturnsParquetV1DataSetWithoutQueryingFiles()
+        {
+            var dataFile = BuildDataFile(Guid.NewGuid(), DataStorageVersion.ParquetV1);
+
+            // Nothing is seeded, so a Files lookup would find no data file
+            await using var contentDbContext = InMemoryContentDbContext();
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
+
+            var resolver = BuildStorageDataSetResolver(contentDbContext, statisticsDbContext);
+
+            var result = resolver.Resolve(dataFile);
+
+            var dataSet = Assert.IsType<ParquetV1DataSet>(result);
             Assert.Equal(dataFile.SubjectId, dataSet.SubjectId);
         }
 
@@ -132,6 +168,24 @@ public abstract class StorageDataSetResolverTests
         }
 
         [Fact]
+        public async Task DataFileIsParquetV1_ReturnsParquetV1DataSet()
+        {
+            var subjectId = Guid.NewGuid();
+
+            var contentDbContextId = await SeedDataAndMetadataFiles(subjectId, DataStorageVersion.ParquetV1);
+
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
+
+            var resolver = BuildStorageDataSetResolver(contentDbContext, statisticsDbContext);
+
+            var result = await resolver.TryResolve(subjectId);
+
+            var dataSet = Assert.IsType<ParquetV1DataSet>(result);
+            Assert.Equal(subjectId, dataSet.SubjectId);
+        }
+
+        [Fact]
         public async Task NoDataFile_ReturnsNull()
         {
             var subjectId = Guid.NewGuid();
@@ -147,14 +201,17 @@ public abstract class StorageDataSetResolverTests
         }
     }
 
-    private static async Task<string> SeedDataAndMetadataFiles(Guid subjectId)
+    private static async Task<string> SeedDataAndMetadataFiles(
+        Guid subjectId,
+        DataStorageVersion dataStorageVersion = DataStorageVersion.StatsDB
+    )
     {
         var contentDbContextId = Guid.NewGuid().ToString();
 
         await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
         contentDbContext.Files.AddRange(
-            BuildDataFile(subjectId),
+            BuildDataFile(subjectId, dataStorageVersion),
             new File
             {
                 Id = Guid.NewGuid(),
@@ -169,7 +226,10 @@ public abstract class StorageDataSetResolverTests
         return contentDbContextId;
     }
 
-    private static File BuildDataFile(Guid subjectId)
+    private static File BuildDataFile(
+        Guid subjectId,
+        DataStorageVersion dataStorageVersion = DataStorageVersion.StatsDB
+    )
     {
         return new File
         {
@@ -178,7 +238,7 @@ public abstract class StorageDataSetResolverTests
             Filename = "data.csv",
             SubjectId = subjectId,
             Type = FileType.Data,
-            DataStorageVersion = DataStorageVersion.StatsDB,
+            DataStorageVersion = dataStorageVersion,
         };
     }
 }

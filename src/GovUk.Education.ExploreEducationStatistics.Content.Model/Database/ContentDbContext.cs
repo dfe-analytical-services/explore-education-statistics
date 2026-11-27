@@ -182,6 +182,12 @@ public class ContentDbContext : DbContext
             .Entity<DataSetUpload>()
             .Property(import => import.ScreeningStatus)
             .HasConversion(new EnumToStringConverter<DataSetUploadScreeningStatus>());
+
+        modelBuilder
+            .Entity<DataSetUpload>()
+            .Property(upload => upload.DataStorageVersion)
+            .HasConversion(new EnumToStringConverter<DataStorageVersion>())
+            .HasMaxLength(25);
     }
 
     private static void ConfigureDataImport(ModelBuilder modelBuilder)

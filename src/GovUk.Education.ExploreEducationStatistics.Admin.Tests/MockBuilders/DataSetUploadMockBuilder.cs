@@ -119,6 +119,7 @@ public class DataSetUploadMockBuilder(TimeProvider? timeProvider = null)
             MetaFileName = "data.meta.csv",
             MetaFileSize = "123 B",
             ReplacingFileId = null,
+            DataStorageVersion = nameof(DataStorageVersion.StatsDB),
             Created = DateTime.UtcNow,
             ScreenerResult = new()
             {

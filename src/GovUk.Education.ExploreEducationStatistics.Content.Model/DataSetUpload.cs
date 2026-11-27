@@ -36,6 +36,8 @@ public record DataSetUpload : ICreatedTimestamp<DateTime>
 
     public Guid? ReplacingFileId { get; init; }
 
+    public DataStorageVersion DataStorageVersion { get; init; } = DataStorageVersion.StatsDB;
+
     [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataSetUploadScreeningStatus>))]
     public required DataSetUploadScreeningStatus ScreeningStatus { get; set; }
 

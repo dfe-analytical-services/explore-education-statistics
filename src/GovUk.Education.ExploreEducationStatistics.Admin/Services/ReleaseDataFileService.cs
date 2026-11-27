@@ -329,10 +329,11 @@ public class ReleaseDataFileService(
         IManagedStreamFile dataFile,
         IManagedStreamFile metaFile,
         string dataSetTitle,
+        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     )
     {
-        return await DoUpload(releaseVersionId, dataFile, metaFile, dataSetTitle, cancellationToken)
+        return await DoUpload(releaseVersionId, dataFile, metaFile, dataSetTitle, dataStorageVersion, cancellationToken)
             .OnSuccess(dataSetUploads => StartDataSetUploadScreening([.. dataSetUploads], cancellationToken));
     }
 
@@ -341,6 +342,7 @@ public class ReleaseDataFileService(
         IManagedStreamFile dataFile,
         IManagedStreamFile metaFile,
         string dataSetTitle,
+        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     )
     {
@@ -348,6 +350,7 @@ public class ReleaseDataFileService(
             .ReleaseVersions.Include(rv => rv.Release)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccessDo(_ => CheckCanUploadWithDataStorageVersion(dataStorageVersion))
             .OnSuccess(async _ =>
                 await ValidateDataSetCsvPair(releaseVersionId, dataFile, metaFile, dataSetTitle)
                     .OnSuccess(async dataSet =>
@@ -361,7 +364,10 @@ public class ReleaseDataFileService(
                         dataSetUploads.SelectAsync(dataSetUpload =>
                             dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(
                                 releaseVersionId,
-                                dataSetUpload,
+                                dataSetUpload with
+                                {
+                                    DataStorageVersion = dataStorageVersion,
+                                },
                                 cancellationToken
                             )
                         )
@@ -374,6 +380,7 @@ public class ReleaseDataFileService(
         Guid releaseVersionId,
         IManagedStreamZipFile zipFile,
         string dataSetTitle,
+        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     )
     {
@@ -381,6 +388,7 @@ public class ReleaseDataFileService(
             .ReleaseVersions.Include(rv => rv.Release)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
             .OnSuccess(userService.CheckCanUpdateReleaseVersion)
+            .OnSuccessDo(_ => CheckCanUploadWithDataStorageVersion(dataStorageVersion))
             .OnSuccess(async _ =>
             {
                 return await ValidateDataSetZip(releaseVersionId, zipFile, dataSetTitle)
@@ -395,7 +403,10 @@ public class ReleaseDataFileService(
                         dataSetUploads.SelectAsync(dataSetUpload =>
                             dataSetFileStorage.CreateOrReplaceExistingDataSetUpload(
                                 releaseVersionId,
-                                dataSetUpload,
+                                dataSetUpload with
+                                {
+                                    DataStorageVersion = dataStorageVersion,
+                                },
                                 cancellationToken
                             )
                         )
@@ -410,6 +421,8 @@ public class ReleaseDataFileService(
         CancellationToken cancellationToken
     )
     {
+        // @MarkFix Check bulk zip imports still work end to end. They don't take a DataStorageVersion, so each
+        // DataSetUpload keeps the StatsDB default and should import into StatsDB as before.
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
@@ -646,6 +659,16 @@ public class ReleaseDataFileService(
                 await contentDbContext.SaveChangesAsync(cancellationToken);
             })
             .OnSuccessVoid();
+    }
+
+    /// <summary>
+    /// Storage other than StatsDB is still being trialled, so is restricted to BAU users.
+    /// </summary>
+    private async Task<Either<ActionResult, Unit>> CheckCanUploadWithDataStorageVersion(
+        DataStorageVersion dataStorageVersion
+    )
+    {
+        return dataStorageVersion == DataStorageVersion.StatsDB ? Unit.Instance : await userService.CheckIsBauUser();
     }
 
     private async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetUploadExistence(

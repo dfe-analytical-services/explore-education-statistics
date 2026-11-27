@@ -1,0 +1,494 @@
+#nullable enable
+using Dapper;
+using GovUk.Education.ExploreEducationStatistics.Common.DuckDb;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Storage.Parquet.Interfaces;
+using Xunit;
+
+namespace GovUk.Education.ExploreEducationStatistics.Data.Storage.Tests.Parquet;
+
+public abstract class ParquetDataSetWriterTests : IDisposable
+{
+    private readonly ParquetTestDataSet _testDataSet = new();
+
+    private IParquetDataSetPathResolver PathResolver => _testDataSet.PathResolver;
+
+    public void Dispose() => _testDataSet.Dispose();
+
+    public class WriteTests : ParquetDataSetWriterTests
+    {
+        [Fact]
+        public async Task WritesParquetFilesAndKeepsStagingDb()
+        {
+            await _testDataSet.Write();
+
+            var subjectId = _testDataSet.SubjectId;
+
+            Assert.True(File.Exists(PathResolver.DataPath(subjectId)));
+            Assert.True(File.Exists(PathResolver.FilterOptionsPath(subjectId)));
+            Assert.True(File.Exists(PathResolver.FiltersPath(subjectId)));
+            Assert.True(File.Exists(PathResolver.IndicatorsPath(subjectId)));
+            Assert.True(File.Exists(PathResolver.LocationOptionsPath(subjectId)));
+            Assert.True(File.Exists(PathResolver.LocationsPath(subjectId)));
+            Assert.True(File.Exists(PathResolver.TimePeriodsPath(subjectId)));
+
+            Assert.True(File.Exists(PathResolver.StagingDbPath(subjectId)));
+            Assert.Empty(Directory.GetFiles(PathResolver.DirectoryPath(subjectId), "*.tmp"));
+        }
+
+        [Fact]
+        public async Task HasIndicatorsAndFilters_TrueOnceWritten()
+        {
+            var writer = _testDataSet.BuildWriter();
+            var subjectId = _testDataSet.SubjectId;
+
+            Assert.False(writer.HasIndicators(subjectId));
+            Assert.False(writer.HasFilters(subjectId));
+
+            await writer.WriteIndicators(subjectId, _testDataSet.Indicators);
+
+            Assert.True(writer.HasIndicators(subjectId));
+            Assert.False(writer.HasFilters(subjectId));
+
+            await writer.WriteFilters(subjectId, _testDataSet.Filters);
+
+            Assert.True(writer.HasFilters(subjectId));
+        }
+
+        [Fact]
+        public async Task TimePeriodsAndDataWrittenAgain_ReplacesParquetFiles()
+        {
+            await _testDataSet.Write();
+
+            await _testDataSet
+                .BuildWriter()
+                .WriteTimePeriodsAndData(
+                    _testDataSet.SubjectId,
+                    _testDataSet.Filters,
+                    _testDataSet.Indicators,
+                    _testDataSet.Locations
+                );
+
+            var observations = await _testDataSet.BuildDataSet().ListObservations([], [], null);
+
+            Assert.Equal(_testDataSet.Observations.Count, observations.Count);
+            Assert.Empty(Directory.GetFiles(PathResolver.DirectoryPath(_testDataSet.SubjectId), "*.tmp"));
+        }
+
+        [Fact]
+        public async Task DeleteStagingDb_RemovesStagingDb()
+        {
+            await _testDataSet.Write();
+
+            var subjectId = _testDataSet.SubjectId;
+
+            _testDataSet.BuildWriter().DeleteStagingDb(subjectId);
+
+            Assert.False(File.Exists(PathResolver.StagingDbPath(subjectId)));
+            Assert.True(File.Exists(PathResolver.DataPath(subjectId)));
+        }
+
+        [Fact]
+        public async Task TimePeriods_OrderedAndFormattedAsPublicApi()
+        {
+            await _testDataSet.Write();
+
+            var timePeriods = await Query<(int Id, string Period, string Identifier, int Year, string TimeIdentifier)>(
+                $"""
+                SELECT id, period, identifier, ees_year, ees_time_identifier
+                FROM '{PathResolver.TimePeriodsPath(_testDataSet.SubjectId)}'
+                ORDER BY id
+                """
+            );
+
+            Assert.Equal(
+                [
+                    (1, "202122", "Academic year", 2021, "AY"),
+                    (2, "2022", "Calendar year", 2022, "CY"),
+                    (3, "202223", "Academic year", 2022, "AY"),
+                ],
+                timePeriods
+            );
+        }
+
+        [Fact]
+        public async Task FilterOptions_OnePerFilterItemOrderedByLabelWithinFilter()
+        {
+            await _testDataSet.Write();
+
+            var filterOptions = await Query<FilterOptionRow>(
+                $"""
+                SELECT
+                    id AS Id,
+                    label AS Label,
+                    filter_column AS FilterColumn,
+                    ees_filter_item_id AS FilterItemId,
+                    ees_filter_group_id AS FilterGroupId,
+                    ees_filter_group_label AS FilterGroupLabel,
+                    ees_filter_id AS EesFilterId
+                FROM '{PathResolver.FilterOptionsPath(_testDataSet.SubjectId)}'
+                ORDER BY id
+                """
+            );
+
+            Assert.Equal(
+                [
+                    (1, "Total", "ncyear", _testDataSet.KeyStage1Total.Id),
+                    (2, "Total", "ncyear", _testDataSet.KeyStage2Total.Id),
+                    (3, "Year 1", "ncyear", _testDataSet.Year1.Id),
+                    (4, "Year 2", "ncyear", _testDataSet.Year2.Id),
+                    (5, "State-funded primary", "school_type", _testDataSet.Primary.Id),
+                    (6, "State-funded secondary", "school_type", _testDataSet.Secondary.Id),
+                ],
+                filterOptions.Select(o => (o.Id, o.Label, o.FilterColumn, o.FilterItemId))
+            );
+
+            var keyStage2Total = filterOptions[1];
+            Assert.Equal(_testDataSet.KeyStage2.Id, keyStage2Total.FilterGroupId);
+            Assert.Equal("Key stage 2", keyStage2Total.FilterGroupLabel);
+            Assert.Equal(_testDataSet.NcYear.Id, keyStage2Total.EesFilterId);
+
+            var filters = await Query<(Guid Id, string Column)>(
+                $"""
+                SELECT id, "column"
+                FROM '{PathResolver.FiltersPath(_testDataSet.SubjectId)}'
+                """
+            );
+
+            Assert.Contains((_testDataSet.NcYear.Id, "ncyear"), filters);
+            Assert.Contains((_testDataSet.SchoolType.Id, "school_type"), filters);
+        }
+
+        [Fact]
+        public async Task Indicators_WrittenWithEesIds()
+        {
+            await _testDataSet.Write();
+
+            var indicators = await Query<(
+                string Column,
+                string Label,
+                string Unit,
+                int? DecimalPlaces,
+                Guid IndicatorId,
+                Guid IndicatorGroupId
+            )>(
+                $"""
+                SELECT
+                    "column", label, unit, CAST(decimal_places AS INTEGER),
+                    ees_indicator_id, ees_indicator_group_id
+                FROM '{PathResolver.IndicatorsPath(_testDataSet.SubjectId)}'
+                ORDER BY "column"
+                """
+            );
+
+            Assert.Equal(
+                [
+                    (
+                        "enrolments",
+                        "Enrolments",
+                        "",
+                        null,
+                        _testDataSet.Enrolments.Id,
+                        _testDataSet.DefaultIndicatorGroup.Id
+                    ),
+                    ("notes", "Notes", "string", null, _testDataSet.Notes.Id, _testDataSet.OtherIndicatorGroup.Id),
+                    (
+                        "sess_authorised_percent",
+                        "Percentage of authorised sessions",
+                        "%",
+                        2,
+                        _testDataSet.AuthorisedPercent.Id,
+                        _testDataSet.DefaultIndicatorGroup.Id
+                    ),
+                ],
+                indicators
+            );
+        }
+
+        [Fact]
+        public async Task LocationOptions_OnePerLocationAtEachLevel()
+        {
+            await _testDataSet.Write();
+
+            var locationOptions = (
+                await Query<LocationOptionRow>(
+                    $"""
+                    SELECT
+                        id AS Id,
+                        label AS Label,
+                        level AS Level,
+                        code AS Code,
+                        old_code AS OldCode,
+                        urn AS Urn,
+                        ukprn AS Ukprn
+                    FROM '{PathResolver.LocationOptionsPath(_testDataSet.SubjectId)}'
+                    ORDER BY id
+                    """
+                )
+            ).Select(o => (o.Id, o.Label, o.Level, o.Code, o.OldCode, o.Urn, o.Ukprn));
+
+            Assert.Equal(
+                [
+                    (1, "Newcastle upon Tyne", "LA", "E08000021", "391", null, null),
+                    (2, "England", "NAT", "E92000001", null, null, null),
+                    (3, "North East", "REG", "E12000001", null, null, null),
+                    (4, "Newcastle Primary School", "SCH", null, null, "100000", null),
+                ],
+                locationOptions
+            );
+        }
+
+        [Fact]
+        public async Task Data_OrderedAsPublicApiWithOptionIdsAndEesColumns()
+        {
+            await _testDataSet.Write();
+
+            var rows = await Query<DataRow>(
+                $"""
+                SELECT
+                    CAST(id AS BIGINT) AS Id,
+                    time_period_id AS TimePeriodId,
+                    geographic_level AS GeographicLevel,
+                    locations_la_id AS La,
+                    locations_nat_id AS Nat,
+                    locations_reg_id AS Reg,
+                    locations_sch_id AS Sch,
+                    ncyear AS NcYear,
+                    school_type AS SchoolType,
+                    enrolments AS Enrolments,
+                    notes AS Notes,
+                    sess_authorised_percent AS Percent,
+                    ees_observation_id AS ObservationId,
+                    ees_location_id AS LocationId,
+                    ees_csv_row AS CsvRow
+                FROM '{PathResolver.DataPath(_testDataSet.SubjectId)}'
+                ORDER BY id
+                """
+            );
+
+            Assert.Equal(
+                [
+                    (1L, 3, "Local authority", (1, 2, 3, 0), (3, 5)),
+                    (2L, 3, "National", (0, 2, 0, 0), (4, 5)),
+                    (3L, 3, "National", (0, 2, 0, 0), (2, 6)),
+                    (4L, 1, "National", (0, 2, 0, 0), (3, 5)),
+                    (5L, 1, "Regional", (0, 2, 3, 0), (1, 6)),
+                    (6L, 2, "School", (1, 2, 3, 4), (3, 5)),
+                ],
+                rows.Select(r =>
+                    (r.Id, r.TimePeriodId, r.GeographicLevel, (r.La, r.Nat, r.Reg, r.Sch), (r.NcYear, r.SchoolType))
+                )
+            );
+
+            Assert.Equal(
+                [
+                    ("5", "n", "5.5", Observation(4).Id, _testDataSet.Newcastle.Id, 6L),
+                    ("200", null, "2.50", Observation(1).Id, _testDataSet.England.Id, 3L),
+                    ("300", "c", "x", Observation(2).Id, _testDataSet.England.Id, 4L),
+                    ("100", "note 1", "1.50", Observation(0).Id, _testDataSet.England.Id, 2L),
+                    ("40", "", "4", Observation(3).Id, _testDataSet.NorthEast.Id, 5L),
+                    ("6", "n", "6", Observation(5).Id, _testDataSet.School.Id, 7L),
+                ],
+                rows.Select(r => (r.Enrolments, r.Notes, r.Percent, r.ObservationId, r.LocationId, r.CsvRow))
+            );
+        }
+
+        [Fact]
+        public async Task ObservationWithoutFilterItem_WrittenWithZeroOptionId()
+        {
+            var observation = _testDataSet.Observations[0];
+            observation.FilterItems.RemoveAll(item => item.FilterId == _testDataSet.NcYear.Id);
+
+            await _testDataSet.Write();
+
+            var ncYearOptionId = await QuerySingle<int>(
+                $"""
+                SELECT ncyear FROM '{PathResolver.DataPath(_testDataSet.SubjectId)}'
+                WHERE ees_observation_id = '{observation.Id}'
+                """
+            );
+
+            Assert.Equal(0, ncYearOptionId);
+        }
+
+        [Fact]
+        public async Task FilterColumnIsReserved_Throws()
+        {
+            _testDataSet.NcYear.Name = "time_period_id";
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _testDataSet.Write());
+            Assert.Contains("time_period_id", exception.Message);
+        }
+
+        [Fact]
+        public async Task FilterColumnIsReservedWithDifferentCase_Throws()
+        {
+            _testDataSet.NcYear.Name = "Time_Period_Id";
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => _testDataSet.Write());
+            Assert.Contains("Time_Period_Id", exception.Message);
+        }
+
+        [Fact]
+        public async Task ColumnsDifferOnlyByCase_ThrowsWhenStartingStaging()
+        {
+            _testDataSet.NcYear.Name = _testDataSet
+                .Filters.First(filter => filter != _testDataSet.NcYear)
+                .Name.ToUpper();
+
+            var writer = _testDataSet.BuildWriter();
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                writer.StartStaging(
+                    _testDataSet.SubjectId,
+                    _testDataSet.Filters,
+                    _testDataSet.Indicators,
+                    resumeFromCsvRow: null
+                )
+            );
+        }
+
+        [Fact]
+        public async Task StagedObservationLocationNotWritten_Throws()
+        {
+            var writer = _testDataSet.BuildWriter();
+            var subjectId = _testDataSet.SubjectId;
+
+            await _testDataSet.WriteMeta(writer, locations: [_testDataSet.England]);
+            await writer.StartStaging(subjectId, _testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: null);
+            await writer.AppendObservations(
+                subjectId,
+                _testDataSet.Filters,
+                _testDataSet.Indicators,
+                _testDataSet.Observations
+            );
+
+            await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                writer.WriteTimePeriodsAndData(
+                    subjectId,
+                    _testDataSet.Filters,
+                    _testDataSet.Indicators,
+                    [_testDataSet.England]
+                )
+            );
+
+            Assert.False(File.Exists(PathResolver.DataPath(subjectId)));
+        }
+
+        private Observation Observation(int index) => _testDataSet.Observations[index];
+    }
+
+    public class StagingTests : ParquetDataSetWriterTests
+    {
+        [Fact]
+        public async Task Count_ReturnsStagedObservations()
+        {
+            var writer = _testDataSet.BuildWriter();
+            var subjectId = _testDataSet.SubjectId;
+
+            await writer.StartStaging(subjectId, _testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: null);
+            await writer.AppendObservations(
+                subjectId,
+                _testDataSet.Filters,
+                _testDataSet.Indicators,
+                _testDataSet.Observations
+            );
+
+            Assert.Equal(6, await writer.CountStagedObservations(subjectId));
+        }
+
+        [Fact]
+        public async Task Resume_RemovesObservationsStagedFromCsvRow()
+        {
+            var writer = _testDataSet.BuildWriter();
+            var subjectId = _testDataSet.SubjectId;
+
+            await writer.StartStaging(subjectId, _testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: null);
+            await writer.AppendObservations(
+                subjectId,
+                _testDataSet.Filters,
+                _testDataSet.Indicators,
+                _testDataSet.Observations
+            );
+
+            // Observations are staged from CSV rows 2 to 7.
+            await writer.StartStaging(subjectId, _testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: 5);
+
+            Assert.Equal(3, await writer.CountStagedObservations(subjectId));
+        }
+
+        [Fact]
+        public async Task StartWithoutResume_DiscardsExistingStagedObservations()
+        {
+            var writer = _testDataSet.BuildWriter();
+            var subjectId = _testDataSet.SubjectId;
+
+            await writer.StartStaging(subjectId, _testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: null);
+            await writer.AppendObservations(
+                subjectId,
+                _testDataSet.Filters,
+                _testDataSet.Indicators,
+                _testDataSet.Observations
+            );
+
+            await writer.StartStaging(subjectId, _testDataSet.Filters, _testDataSet.Indicators, resumeFromCsvRow: null);
+
+            Assert.Equal(0, await writer.CountStagedObservations(subjectId));
+        }
+    }
+
+    private class FilterOptionRow
+    {
+        public int Id { get; init; }
+        public string Label { get; init; } = "";
+        public string FilterColumn { get; init; } = "";
+        public Guid FilterItemId { get; init; }
+        public Guid FilterGroupId { get; init; }
+        public string FilterGroupLabel { get; init; } = "";
+        public Guid EesFilterId { get; init; }
+    }
+
+    private class LocationOptionRow
+    {
+        public int Id { get; init; }
+        public string Label { get; init; } = "";
+        public string Level { get; init; } = "";
+        public string? Code { get; init; }
+        public string? OldCode { get; init; }
+        public string? Urn { get; init; }
+        public string? Ukprn { get; init; }
+    }
+
+    private class DataRow
+    {
+        public long Id { get; init; }
+        public int TimePeriodId { get; init; }
+        public string GeographicLevel { get; init; } = "";
+        public int La { get; init; }
+        public int Nat { get; init; }
+        public int Reg { get; init; }
+        public int Sch { get; init; }
+        public int NcYear { get; init; }
+        public int SchoolType { get; init; }
+        public string Enrolments { get; init; } = "";
+        public string? Notes { get; init; }
+        public string Percent { get; init; } = "";
+        public Guid ObservationId { get; init; }
+        public Guid LocationId { get; init; }
+        public long CsvRow { get; init; }
+    }
+
+    private static async Task<List<T>> Query<T>(string sql)
+    {
+        await using var connection = new DuckDbConnection();
+        connection.Open();
+        return (await connection.QueryAsync<T>(sql)).AsList();
+    }
+
+    private static async Task<T> QuerySingle<T>(string sql)
+    {
+        await using var connection = new DuckDbConnection();
+        connection.Open();
+        return await connection.QuerySingleAsync<T>(sql);
+    }
+}

@@ -83,6 +83,9 @@ export default function DataSetUploadSummaryList({
           isCompatible={dataSetUpload?.publicApiCompatible}
         />
       </SummaryListItem>
+      {dataSetUpload.dataStorageVersion === 'ParquetV1' && (
+        <SummaryListItem term="Data storage">Parquet</SummaryListItem>
+      )}
     </SummaryList>
   );
 }

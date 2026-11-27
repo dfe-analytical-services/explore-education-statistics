@@ -51,6 +51,8 @@ public class FileImportServiceTests
         var dataSetWriter = new Mock<IStorageDataSetWriter>(Strict);
         dataSetWriter.Setup(s => s.CountObservations(It.IsAny<CancellationToken>())).ReturnsAsync(2);
         dataSetWriter.SetupGet(s => s.DataSet).Returns(dataSet);
+        dataSetWriter.Setup(s => s.Complete(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        dataSetWriter.Setup(s => s.CleanUp(It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
 
         var dataImportService = new Mock<IDataImportService>(Strict);
         dataImportService.Setup(s => s.UpdateStatus(import.Id, COMPLETE, 100)).Returns(Task.CompletedTask);

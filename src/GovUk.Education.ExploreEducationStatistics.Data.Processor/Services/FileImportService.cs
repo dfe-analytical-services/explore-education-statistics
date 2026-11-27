@@ -110,12 +110,14 @@ public class FileImportService(
 
         await FinalImportTasks(import, dataSetWriter);
         await dataImportService.UpdateStatus(import.Id, COMPLETE, 100);
+        await dataSetWriter.CleanUp();
     }
 
     private async Task FinalImportTasks(DataImport import, IStorageDataSetWriter dataSetWriter)
     {
         try
         {
+            await dataSetWriter.Complete();
             await dataSetMappingService.CreateInitialDataSetMappingIfReplacement(import.FileId, dataSetWriter.DataSet);
             await dataImportService.WriteDataSetFileMeta(import, dataSetWriter);
         }

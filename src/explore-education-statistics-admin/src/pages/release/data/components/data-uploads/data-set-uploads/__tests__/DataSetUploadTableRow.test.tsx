@@ -62,6 +62,7 @@ describe('DataSetUploadTableRow', () => {
       },
       created: new Date('2025-06-23T13:23:08.6258337'),
       uploadedBy: 'ees-test.bau1@education.gov.uk',
+      dataStorageVersion: 'StatsDB',
     },
     passAndWarning: {
       id: 'b13b2247-ae76-41c7-b442-08ddafffd9e4',
@@ -100,6 +101,7 @@ describe('DataSetUploadTableRow', () => {
       },
       created: new Date('2025-06-23T13:23:08.6258337'),
       uploadedBy: 'ees-test.bau1@education.gov.uk',
+      dataStorageVersion: 'StatsDB',
     },
     fail: {
       id: 'acccf244-1a1b-450b-b441-08ddafffd9e4',
@@ -140,6 +142,7 @@ describe('DataSetUploadTableRow', () => {
       },
       created: new Date('2025-06-23T13:22:09.0753215'),
       uploadedBy: 'ees-test.bau1@education.gov.uk',
+      dataStorageVersion: 'StatsDB',
     },
     screening: {
       id: 'b13b2247-ae76-41c7-b442-08ddafffd9e4',
@@ -151,6 +154,7 @@ describe('DataSetUploadTableRow', () => {
       screeningStatus: 'Screening',
       created: new Date('2025-06-23T13:23:08.6258337'),
       uploadedBy: 'ees-test.bau1@education.gov.uk',
+      dataStorageVersion: 'StatsDB',
     },
   };
 

@@ -2,6 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -41,6 +42,7 @@ public interface IReleaseDataFileService
         IManagedStreamFile dataFile,
         IManagedStreamFile metaFile,
         string dataSetTitle,
+        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     );
 
@@ -48,6 +50,7 @@ public interface IReleaseDataFileService
         Guid releaseVersionId,
         IManagedStreamZipFile zipFile,
         string dataSetTitle,
+        DataStorageVersion dataStorageVersion,
         CancellationToken cancellationToken
     );
 

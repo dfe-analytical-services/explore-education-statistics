@@ -246,7 +246,8 @@ public class DataSetFileStorage(
                 createdById: userService.GetUserId(),
                 name: dataSetUpload.DataSetTitle,
                 replacingDataFile: replacingFile,
-                order: releaseDataFileOrder
+                order: releaseDataFileOrder,
+                dataStorageVersion: dataSetUpload.DataStorageVersion
             );
 
             var sourceDataFilePath = FileExtensions.Path(releaseVersionId, FileType.Data, dataSetUpload.DataFileId);
