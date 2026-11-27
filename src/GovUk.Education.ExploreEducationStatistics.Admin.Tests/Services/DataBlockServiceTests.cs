@@ -22,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -1420,6 +1421,143 @@ public class DataBlockServiceTests
     }
 
     [Fact]
+    public async Task Create_DataSetNotAttachedToReleaseVersion()
+    {
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            context.ReleaseVersions.Add(releaseVersion);
+            await context.SaveChangesAsync();
+        }
+
+        await AssertCreateFailsWithDataSetNotAttachedToRelease(
+            contextId: contextId,
+            releaseVersionId: releaseVersion.Id,
+            subjectId: Guid.NewGuid()
+        );
+    }
+
+    [Fact]
+    public async Task Create_DataSetAttachedToDifferentReleaseVersion()
+    {
+        var subjectId = Guid.NewGuid();
+
+        var (releaseVersion, otherReleaseVersion) = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .GenerateTuple2();
+
+        var otherReleaseFile = new ReleaseFile
+        {
+            Name = "test release file",
+            ReleaseVersion = otherReleaseVersion,
+            File = new File
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = subjectId,
+                Filename = "test filename",
+                Type = FileType.Data,
+            },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            context.ReleaseVersions.AddRange(releaseVersion, otherReleaseVersion);
+            context.ReleaseFiles.Add(otherReleaseFile);
+            await context.SaveChangesAsync();
+        }
+
+        await AssertCreateFailsWithDataSetNotAttachedToRelease(
+            contextId: contextId,
+            releaseVersionId: releaseVersion.Id,
+            subjectId: subjectId
+        );
+    }
+
+    [Fact]
+    public async Task Create_DataSetIsReplacement()
+    {
+        var subjectId = Guid.NewGuid();
+
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = Guid.NewGuid(),
+            Filename = "original filename",
+            Type = FileType.Data,
+        };
+
+        var replacementFile = new File
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = subjectId,
+            Filename = "replacement filename",
+            Type = FileType.Data,
+            Replacing = originalFile,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            context.ReleaseVersions.Add(releaseVersion);
+            context.ReleaseFiles.AddRange(
+                new ReleaseFile
+                {
+                    Name = "original",
+                    ReleaseVersion = releaseVersion,
+                    File = originalFile,
+                },
+                new ReleaseFile
+                {
+                    Name = "replacement",
+                    ReleaseVersion = releaseVersion,
+                    File = replacementFile,
+                }
+            );
+            await context.SaveChangesAsync();
+        }
+
+        await AssertCreateFailsWithDataSetNotAttachedToRelease(
+            contextId: contextId,
+            releaseVersionId: releaseVersion.Id,
+            subjectId: subjectId
+        );
+    }
+
+    private static async Task AssertCreateFailsWithDataSetNotAttachedToRelease(
+        string contextId,
+        Guid releaseVersionId,
+        Guid subjectId
+    )
+    {
+        var createRequest = new DataBlockCreateRequest
+        {
+            Heading = "Test heading",
+            Name = "Test name",
+            Query = new FullTableQueryRequest { SubjectId = subjectId },
+        };
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var service = BuildDataBlockService(context);
+            var result = await service.Create(releaseVersionId, createRequest);
+
+            result.AssertBadRequest(DataBlockDataSetNotAttachedToRelease);
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            Assert.Empty(context.DataBlocks.ToList());
+            Assert.Empty(context.DataBlockVersions.ToList());
+        }
+    }
+
+    [Fact]
     public async Task Update()
     {
         var subjectId = Guid.NewGuid();
@@ -1677,6 +1815,162 @@ public class DataBlockServiceTests
         );
 
         result.AssertNotFound();
+    }
+
+    [Fact]
+    public async Task Update_DataSetNotAttachedToReleaseVersion()
+    {
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        await AssertUpdateFailsWithDataSetNotAttachedToRelease(
+            releaseVersion: releaseVersion,
+            requestSubjectId: Guid.NewGuid()
+        );
+    }
+
+    [Fact]
+    public async Task Update_DataSetAttachedToDifferentReleaseVersion()
+    {
+        var requestSubjectId = Guid.NewGuid();
+
+        var (releaseVersion, otherReleaseVersion) = _fixture
+            .DefaultReleaseVersion()
+            .WithRelease(_fixture.DefaultRelease())
+            .GenerateTuple2();
+
+        var otherReleaseFile = new ReleaseFile
+        {
+            Name = "other release file",
+            ReleaseVersion = otherReleaseVersion,
+            File = new File
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = requestSubjectId,
+                Filename = "other filename",
+                Type = FileType.Data,
+            },
+        };
+
+        await AssertUpdateFailsWithDataSetNotAttachedToRelease(
+            releaseVersion: releaseVersion,
+            requestSubjectId: requestSubjectId,
+            otherReleaseVersion,
+            otherReleaseFile
+        );
+    }
+
+    [Fact]
+    public async Task Update_DataSetIsReplacement()
+    {
+        var requestSubjectId = Guid.NewGuid();
+
+        ReleaseVersion releaseVersion = _fixture.DefaultReleaseVersion().WithRelease(_fixture.DefaultRelease());
+
+        var originalFile = new File
+        {
+            Id = Guid.NewGuid(),
+            SubjectId = Guid.NewGuid(),
+            Filename = "original filename",
+            Type = FileType.Data,
+        };
+
+        var replacementReleaseFile = new ReleaseFile
+        {
+            Name = "replacement",
+            ReleaseVersion = releaseVersion,
+            File = new File
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = requestSubjectId,
+                Filename = "replacement filename",
+                Type = FileType.Data,
+                Replacing = originalFile,
+            },
+        };
+
+        var originalReleaseFile = new ReleaseFile
+        {
+            Name = "original",
+            ReleaseVersion = releaseVersion,
+            File = originalFile,
+        };
+
+        await AssertUpdateFailsWithDataSetNotAttachedToRelease(
+            releaseVersion: releaseVersion,
+            requestSubjectId: requestSubjectId,
+            originalReleaseFile,
+            replacementReleaseFile
+        );
+    }
+
+    private async Task AssertUpdateFailsWithDataSetNotAttachedToRelease(
+        ReleaseVersion releaseVersion,
+        Guid requestSubjectId,
+        params object[] additionalEntities
+    )
+    {
+        var subjectId = Guid.NewGuid();
+
+        var dataBlock = _fixture
+            .DefaultDataBlock()
+            .WithLatestPublishedVersion(
+                _fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseVersion(releaseVersion)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(ListOf<IChart>(new MapChart { Title = "Old chart", BoundaryLevel = 1 }))
+                    .Generate()
+            )
+            .Generate();
+
+        var dataBlockVersion = dataBlock.LatestPublishedVersion!;
+
+        var releaseFile = new ReleaseFile
+        {
+            Name = "test file",
+            ReleaseVersion = releaseVersion,
+            File = new File
+            {
+                Id = Guid.NewGuid(),
+                SubjectId = subjectId,
+                Filename = "test filename",
+                Type = FileType.Data,
+            },
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.AddRangeAsync(dataBlockVersion, releaseFile);
+            await context.AddRangeAsync(additionalEntities);
+            await context.SaveChangesAsync();
+        }
+
+        var updateRequest = new DataBlockUpdateRequest
+        {
+            Heading = "New heading",
+            Name = "New name",
+            Query = new FullTableQueryRequest { SubjectId = requestSubjectId },
+        };
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            // Strict mocks with no setups, so nothing should be removed from the cache or release files
+            var service = BuildDataBlockService(context);
+            var result = await service.Update(dataBlockVersion.Id, updateRequest);
+
+            result.AssertBadRequest(DataBlockDataSetNotAttachedToRelease);
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var unchangedDataBlockVersion = await context.DataBlockVersions.FindAsync(dataBlockVersion.Id);
+
+            Assert.NotNull(unchangedDataBlockVersion);
+            Assert.Equal(dataBlockVersion.Heading, unchangedDataBlockVersion.Heading);
+            Assert.Equal(dataBlockVersion.Name, unchangedDataBlockVersion.Name);
+            Assert.Equal(subjectId, unchangedDataBlockVersion.Query.SubjectId);
+        }
     }
 
     [Fact]

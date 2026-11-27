@@ -120,6 +120,9 @@ public enum ValidationErrorMessages
     DataBlockShouldBeUnattached,
     ProvidedKeyStatIdsDifferFromReleaseKeyStatIds,
 
+    // Data blocks
+    DataBlockDataSetNotAttachedToRelease,
+
     // Featured tables
     DataBlockAlreadyHasFeaturedTable,
     ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds,
