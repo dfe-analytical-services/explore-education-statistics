@@ -2194,8 +2194,10 @@ public class ReleaseDataFileServiceTests
         Assert.Empty(contentDbContext.DataSetUploads);
     }
 
-    [Fact]
-    public async Task Upload_ParquetV1_SavesDataStorageVersionOnUpload()
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Upload_ParquetV1_SavesDataStorageVersionOnUpload(bool isReplacement)
     {
         // Arrange
         ReleaseVersion releaseVersion = _fixture
@@ -2211,6 +2213,7 @@ public class ReleaseDataFileServiceTests
             Title = "Test Data Set",
             DataFile = await new DataSetFileBuilder().Build(FileType.Data),
             MetaFile = await new DataSetFileBuilder().Build(Metadata),
+            ReplacingFile = isReplacement ? _fixture.DefaultFile().WithType(FileType.Data).Generate() : null,
         };
 
         var dataSetUpload = new DataSetUploadMockBuilder().WithReleaseVersionId(releaseVersion.Id).BuildInitialEntity();
@@ -2287,53 +2290,6 @@ public class ReleaseDataFileServiceTests
 
         var viewModel = Assert.Single(result.AssertRight());
         Assert.Equal(nameof(DataStorageVersion.ParquetV1), viewModel.DataStorageVersion);
-    }
-
-    [Fact]
-    public async Task Upload_ParquetV1ForReplacement_ReturnsValidationError()
-    {
-        // Arrange
-        ReleaseVersion releaseVersion = _fixture
-            .DefaultReleaseVersion()
-            .WithRelease(_fixture.DefaultRelease().WithPublication(_fixture.DefaultPublication()));
-
-        await using var contentDbContext = InMemoryApplicationDbContext();
-        contentDbContext.ReleaseVersions.Add(releaseVersion);
-        await contentDbContext.SaveChangesAsync();
-
-        var dataSet = new DataSet
-        {
-            Title = "Test Data Set",
-            DataFile = await new DataSetFileBuilder().Build(FileType.Data),
-            MetaFile = await new DataSetFileBuilder().Build(Metadata),
-            ReplacingFile = _fixture.DefaultFile().WithType(FileType.Data).Generate(),
-        };
-
-        var dataSetValidator = new Mock<IDataSetValidator>(Strict);
-        dataSetValidator.Setup(mock => mock.ValidateDataSet(It.IsAny<DataSetDto>())).ReturnsAsync(dataSet);
-
-        var service = SetupReleaseDataFileService(
-            contentDbContext: contentDbContext,
-            dataSetValidator: dataSetValidator.Object
-        );
-
-        // Act
-        var result = await service.Upload(
-            releaseVersion.Id,
-            dataFile: Mock.Of<IManagedStreamFile>(),
-            metaFile: Mock.Of<IManagedStreamFile>(),
-            dataSetTitle: dataSet.Title,
-            dataStorageVersion: DataStorageVersion.ParquetV1,
-            cancellationToken: CancellationToken.None
-        );
-
-        // Assert
-        MockUtils.VerifyAllMocks(dataSetValidator);
-
-        var validationProblem = result.AssertBadRequestWithValidationProblem();
-        validationProblem.AssertHasErrors([
-            ValidationMessages.GenerateErrorDataStorageVersionNotSupportedForReplacement(dataSet.Title),
-        ]);
     }
 
     private ReleaseDataFileService SetupReleaseDataFileService(

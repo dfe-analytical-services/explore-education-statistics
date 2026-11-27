@@ -353,7 +353,6 @@ public class ReleaseDataFileService(
             .OnSuccessDo(_ => CheckCanUploadWithDataStorageVersion(dataStorageVersion))
             .OnSuccess(async _ =>
                 await ValidateDataSetCsvPair(releaseVersionId, dataFile, metaFile, dataSetTitle)
-                    .OnSuccessDo(dataSet => ValidateDataStorageVersionForDataSet(dataSet, dataStorageVersion))
                     .OnSuccess(async dataSet =>
                         await dataSetFileStorage.UploadDataSetsToTemporaryStorage(
                             releaseVersionId,
@@ -393,7 +392,6 @@ public class ReleaseDataFileService(
             .OnSuccess(async _ =>
             {
                 return await ValidateDataSetZip(releaseVersionId, zipFile, dataSetTitle)
-                    .OnSuccessDo(dataSet => ValidateDataStorageVersionForDataSet(dataSet, dataStorageVersion))
                     .OnSuccess(async dataSet =>
                         await dataSetFileStorage.UploadDataSetsToTemporaryStorage(
                             releaseVersionId,
@@ -423,6 +421,8 @@ public class ReleaseDataFileService(
         CancellationToken cancellationToken
     )
     {
+        // @MarkFix Check bulk zip imports still work end to end. They don't take a DataStorageVersion, so each
+        // DataSetUpload keeps the StatsDB default and should import into StatsDB as before.
         return await contentDbContext
             .ReleaseVersions.Include(rv => rv.Release)
             .SingleOrNotFoundAsync(rv => rv.Id == releaseVersionId, cancellationToken)
@@ -669,18 +669,6 @@ public class ReleaseDataFileService(
     )
     {
         return dataStorageVersion == DataStorageVersion.StatsDB ? Unit.Instance : await userService.CheckIsBauUser();
-    }
-
-    private static Either<ActionResult, Unit> ValidateDataStorageVersionForDataSet(
-        DataSet dataSet,
-        DataStorageVersion dataStorageVersion
-    )
-    {
-        return dataSet.ReplacingFile is not null && dataStorageVersion != DataStorageVersion.StatsDB
-            ? ValidationUtils.ValidationResult(
-                ValidationMessages.GenerateErrorDataStorageVersionNotSupportedForReplacement(dataSet.Title)
-            )
-            : Unit.Instance;
     }
 
     private async Task<Either<ActionResult, DataSetUpload>> ValidateDataSetUploadExistence(

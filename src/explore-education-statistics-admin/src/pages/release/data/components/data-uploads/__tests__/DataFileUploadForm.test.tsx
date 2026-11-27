@@ -618,8 +618,8 @@ describe('DataFileUploadForm', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('does not show the option for data replacements', () => {
-      render(
+    test('uploads a data replacement as parquet when the option is checked', async () => {
+      const { user } = render(
         <AuthContextTestProvider user={testBauUser}>
           <DataFileUploadForm
             isDataReplacement
@@ -630,9 +630,29 @@ describe('DataFileUploadForm', () => {
         </AuthContextTestProvider>,
       );
 
+      const file = new File(['hello, world!'], 'test.zip', {
+        type: 'application/zip',
+      });
+
+      await user.click(screen.getByLabelText('ZIP file'));
+      await user.upload(
+        screen.getByTestId('file-input-dataFileReplacementUploadForm-zipFile'),
+        file,
+      );
+      await user.click(screen.getByLabelText('Import as parquet'));
+      await user.click(
+        screen.getByRole('button', {
+          name: 'Upload data files',
+        }),
+      );
+
       expect(
-        screen.queryByLabelText('Import as parquet'),
-      ).not.toBeInTheDocument();
+        releaseDataFileService.uploadZippedDataSetFilePair,
+      ).toHaveBeenCalledWith('release-version-id', {
+        title: 'Test title',
+        zipFile: file,
+        dataStorageVersion: 'ParquetV1',
+      });
     });
 
     test('uploads CSV files as parquet when the option is checked', async () => {

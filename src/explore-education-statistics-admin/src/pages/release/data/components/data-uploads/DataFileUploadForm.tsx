@@ -73,14 +73,6 @@ const fileErrorMappings = {
   DataSetImportInProgress: 'DataSetImportInProgress',
 };
 
-const parquetErrorMapping = mapFieldErrors<DataFileUploadFormValues>({
-  target: 'importAsParquet',
-  messages: {
-    DataStorageVersionNotSupportedForReplacement:
-      'Data replacements cannot be imported as parquet',
-  },
-});
-
 function baseErrorMappings(
   fileType: FileType,
 ): FieldMessageMapper<DataFileUploadFormValues>[] {
@@ -118,7 +110,6 @@ function baseErrorMappings(
           MustBeZipFile: 'MustBeZipFile',
         },
       }),
-      parquetErrorMapping,
     ];
   }
 
@@ -131,7 +122,6 @@ function baseErrorMappings(
       target: 'metadataFile' as FieldName<DataFileUploadFormValues>,
       messages: fileErrorMappings,
     }),
-    parquetErrorMapping,
   ];
 }
 
@@ -159,8 +149,7 @@ export default function DataFileUploadForm({
   const [showCompletionStatus, toggleCompletionStatus] = useToggle(false);
 
   const { user } = useAuthContext();
-  const canImportAsParquet =
-    (user?.permissions.isBauUser ?? false) && !isDataReplacement;
+  const canImportAsParquet = user?.permissions.isBauUser ?? false;
 
   const getErrorMappings = () => {
     return isDataReplacement
