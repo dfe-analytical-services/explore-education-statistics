@@ -111,7 +111,7 @@ Validate Cookies Details page
 
 Validate Contact page
     user clicks link containing text    Contact us
-    user waits until page contains    Contact Explore education statistics
+    user waits until page contains    Contact explore education statistics
     user waits until page contains    Need help using this service or have a question about the data?
     user waits until page contains    explore.statistics@education.gov.uk
     user waits until page contains    DfE Head of Profession for Statistics
