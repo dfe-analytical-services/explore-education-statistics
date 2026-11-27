@@ -28,12 +28,6 @@ type FunctionAppServicePlanSku =
   | FunctionAppPlanSkuBasic
   | FunctionAppPlanSkuStandard
 
-
-type AppServicePlanSkuBasic = {
-  tier: 'Basic'
-  name: 'B1' | 'B2' | 'B3'
-}
-
 type AppServicePlanSkuStandard = {
   tier: 'Standard'
   name: 'S1' | 'S2' | 'S3'
@@ -44,10 +38,16 @@ type AppServicePlanSkuPremiumV2 = {
   name: 'P1V2' | 'P2V2' | 'P3V2'
 }
 
-// Note this is not an exhaustive list of SKUs.
+type AppServicePlanSkuPremiumV3 = {
+  tier: 'PremiumV3'
+  name: 'P0V3' | 'P1V3' | 'P2V3' | 'P3V3'
+}
+
+// Note this is not an exhaustive list of SKUs. Basic SKUs are deliberately excluded, as they don't support the
+// deployment slots that our App Services rely upon for slot swapping during deploys.
 @export()
 @discriminator('tier')
-type AppServicePlanSku = 
-  | AppServicePlanSkuBasic
+type AppServicePlanSku =
   | AppServicePlanSkuStandard
   | AppServicePlanSkuPremiumV2
+  | AppServicePlanSkuPremiumV3

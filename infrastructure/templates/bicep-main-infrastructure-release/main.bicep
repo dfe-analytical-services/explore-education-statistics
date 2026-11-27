@@ -193,8 +193,12 @@ param publicSiteConfigParam PublicSiteConfig = {}
 var publicSiteConfig = mergePublicSiteConfig(publicSiteConfigParam)
 
 @secure()
-@description('The existing appsettings for the Public Site App Service, fetched by the pipeline before deployment.')
+@description('The existing appsettings for the Public Site App Service production slot, fetched by the pipeline before deployment.')
 param publicSiteProdAppSettings object = {}
+
+@secure()
+@description('The existing appsettings for the Public Site App Service staging slot, fetched by the pipeline before deployment.')
+param publicSiteStagingSlotAppSettings object = {}
 
 
 
@@ -449,6 +453,7 @@ module publicSiteModuleDeploy '../public-site/main.bicep' = {
     minTlsVersion: minTlsVersion
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     existingProdAppSettings: publicSiteProdAppSettings
+    existingStagingSlotAppSettings: publicSiteStagingSlotAppSettings
     tagValues: tagValues
   }
   dependsOn: [

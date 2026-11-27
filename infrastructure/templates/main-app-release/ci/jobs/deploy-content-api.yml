@@ -34,7 +34,7 @@ jobs:
                 environment: ${{ parameters.environment }}
 
             - download: MainBuild
-              displayName: Download Content API artifact
+              displayName: Content API - downloading artifact
               artifact: content-api
 
             - template: ../tasks/get-new-appsettings.yml

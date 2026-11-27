@@ -36,6 +36,9 @@ parameters:
   - name: publicSiteProdAppSettings
     type: string
     default: '{}'
+  - name: publicSiteStagingSlotAppSettings
+    type: string
+    default: '{}'
   - name: importerProdAppSettings
     type: string
     default: '{}'
@@ -69,6 +72,7 @@ steps:
         dataApiProdAppSettings: ${{ parameters.dataApiProdAppSettings }}
         dataApiStagingSlotAppSettings: ${{ parameters.dataApiStagingSlotAppSettings }}
         publicSiteProdAppSettings: ${{ parameters.publicSiteProdAppSettings }}
+        publicSiteStagingSlotAppSettings: ${{ parameters.publicSiteStagingSlotAppSettings }}
         importerProdAppSettings: ${{ parameters.importerProdAppSettings }}
         publisherProdAppSettings: ${{ parameters.publisherProdAppSettings }}
         notifierProdAppSettings: ${{ parameters.notifierProdAppSettings }}

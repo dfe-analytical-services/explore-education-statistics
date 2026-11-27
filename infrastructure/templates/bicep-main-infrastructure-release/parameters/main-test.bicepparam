@@ -56,8 +56,8 @@ param publisherConfigParam = {
 
 param publicSiteConfigParam = {
   appServiceSku: {
-    tier: 'Basic'
-    name: 'B1'
+    tier: 'PremiumV3'
+    name: 'P0V3'
   }
 }
 

@@ -10,10 +10,14 @@ parameters:
   - name: healthCheckPath
     type: string
     default: /api/health
+  # The marker generated for the deploy that was made to the staging slot. Used to confirm that
+  # the main slot is serving that deploy once the swap completes.
+  - name: deployedAt
+    type: string
 
 steps:
   - task: AzureCLI@2
-    displayName: ${{ parameters.displayNamePrefix }} - swapping staging slot into production.
+    displayName: ${{ parameters.displayNamePrefix }} - swapping staging slot into main slot
     inputs:
       azureSubscription: ${{ parameters.serviceConnection }}
       scriptType: bash
@@ -26,9 +30,13 @@ steps:
           --slot deploy \
           --target-slot production
 
-  - template: ../../../public-api/ci/tasks/wait-for-endpoint-result.yml
+  # Confirm that the main slot is now serving the deploy that was in the staging slot.
+  - template: ../../../../common/ci/tasks/wait-for-app-service-restart.yml
     parameters:
       serviceConnection: ${{ parameters.serviceConnection }}
-      displayName: ${{ parameters.displayNamePrefix }} - waiting for the app service swapped into production to report healthy after swap
-      endpoint: https://${{ parameters.appName }}.azurewebsites.net${{ parameters.healthCheckPath }}
+      displayName: ${{ parameters.displayNamePrefix }} - confirming main slot is serving the swapped-in deployment and is healthy
+      appName: ${{ parameters.appName }}
+      resourceGroupName: ${{ parameters.resourceGroupName }}
+      healthCheckPath: ${{ parameters.healthCheckPath }}
+      deployedAt: ${{ parameters.deployedAt }}
       maxAttempts: 20
