@@ -2,6 +2,6 @@
 
 public class FootnoteFilterGroupViewModel
 {
-    public IEnumerable<string> FilterItems { get; set; }
+    public List<string> FilterItems { get; set; }
     public bool Selected { get; set; }
 }

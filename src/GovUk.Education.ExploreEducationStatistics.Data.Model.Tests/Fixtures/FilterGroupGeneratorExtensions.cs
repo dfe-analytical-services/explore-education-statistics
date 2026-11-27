@@ -93,8 +93,10 @@ public static class FilterGroupGeneratorExtensions
                         {
                             FilterGroup = filterGroup,
                             FilterGroupId = filterGroup.Id,
+                            FilterId = filterGroup.Filter.Id,
                             Footnote = footnote,
                             FootnoteId = footnote.Id,
+                            SubjectId = filterGroup.Filter.SubjectId,
                         };
 
                         footnote.FilterGroups.Add(filterGroupFootnote);

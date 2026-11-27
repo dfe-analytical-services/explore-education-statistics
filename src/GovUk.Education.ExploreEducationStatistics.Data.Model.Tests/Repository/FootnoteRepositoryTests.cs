@@ -1158,26 +1158,26 @@ public class FootnoteRepositoryTests
             var footnoteFilters = results[0].Filters.ToList();
 
             Assert.Equal(2, footnoteSubjects.Count);
-            Assert.Equal(subject1.Id, footnoteFilters[0].Filter.SubjectId);
-            Assert.Equal(subject2.Id, footnoteFilters[1].Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilters[0].SubjectId);
+            Assert.Equal(subject2.Id, footnoteFilters[1].SubjectId);
 
             var footnoteFilterGroups = results[0].FilterGroups.ToList();
 
             Assert.Equal(2, footnoteFilterGroups.Count);
-            Assert.Equal(subject1.Id, footnoteFilterGroups[0].FilterGroup.Filter.SubjectId);
-            Assert.Equal(subject2.Id, footnoteFilterGroups[1].FilterGroup.Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilterGroups[0].SubjectId);
+            Assert.Equal(subject2.Id, footnoteFilterGroups[1].SubjectId);
 
             var footnoteFilterItems = results[0].FilterItems.ToList();
 
             Assert.Equal(2, footnoteFilterItems.Count);
-            Assert.Equal(subject1.Id, footnoteFilterItems[0].FilterItem.FilterGroup.Filter.SubjectId);
-            Assert.Equal(subject2.Id, footnoteFilterItems[1].FilterItem.FilterGroup.Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilterItems[0].SubjectId);
+            Assert.Equal(subject2.Id, footnoteFilterItems[1].SubjectId);
 
             var footnoteIndicators = results[0].Indicators.ToList();
 
             Assert.Equal(2, footnoteIndicators.Count);
-            Assert.Equal(subject1.Id, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
-            Assert.Equal(subject2.Id, footnoteIndicators[1].Indicator.IndicatorGroup.SubjectId);
+            Assert.Equal(subject1.Id, footnoteIndicators[0].SubjectId);
+            Assert.Equal(subject2.Id, footnoteIndicators[1].SubjectId);
         }
     }
 
@@ -1383,22 +1383,22 @@ public class FootnoteRepositoryTests
             var footnoteFilters = results[0].Filters.ToList();
 
             Assert.Single(footnoteFilters);
-            Assert.Equal(subject1.Id, footnoteFilters[0].Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilters[0].SubjectId);
 
             var footnoteFilterGroups = results[0].FilterGroups.ToList();
 
             Assert.Single(footnoteFilterGroups);
-            Assert.Equal(subject1.Id, footnoteFilterGroups[0].FilterGroup.Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilterGroups[0].SubjectId);
 
             var footnoteFilterItems = results[0].FilterItems.ToList();
 
             Assert.Single(footnoteFilterItems);
-            Assert.Equal(subject1.Id, footnoteFilterItems[0].FilterItem.FilterGroup.Filter.SubjectId);
+            Assert.Equal(subject1.Id, footnoteFilterItems[0].SubjectId);
 
             var footnoteIndicators = results[0].Indicators.ToList();
 
             Assert.Single(footnoteIndicators);
-            Assert.Equal(subject1.Id, footnoteIndicators[0].Indicator.IndicatorGroup.SubjectId);
+            Assert.Equal(subject1.Id, footnoteIndicators[0].SubjectId);
         }
     }
 
@@ -1614,6 +1614,145 @@ public class FootnoteRepositoryTests
         {
             Assert.Empty(context.Footnote);
             Assert.Empty(context.SubjectFootnote);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteFootnotesBySubject_FootnoteAlsoLinkedToAnotherSubjectOfSameReleaseVersion_DeletesOnlySubjectLinks()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubjects(_fixture.DefaultSubject().Generate(2))
+            .GenerateList();
+
+        var (subject, otherSubject) = GetSubjectsTuple2(releaseSubjects);
+
+        var footnote = _fixture
+            .DefaultFootnote()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubjects(ListOf(subject, otherSubject))
+            .WithOrder(1)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.ReleaseVersion.Add(releaseVersion);
+            context.ReleaseSubject.AddRange(releaseSubjects);
+            context.Footnote.Add(footnote);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var repository = BuildFootnoteRepository(context);
+            await repository.DeleteFootnotesBySubject(releaseVersionId: releaseVersion.Id, subjectId: subject.Id);
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var remainingFootnote = Assert.Single(context.Footnote);
+            Assert.Equal(footnote.Id, remainingFootnote.Id);
+            Assert.Equal(1, remainingFootnote.Order);
+
+            var subjectFootnote = Assert.Single(context.SubjectFootnote);
+            Assert.Equal(footnote.Id, subjectFootnote.FootnoteId);
+            Assert.Equal(otherSubject.Id, subjectFootnote.SubjectId);
+        }
+    }
+
+    [Fact]
+    public async Task DeleteFootnotesBySubject_FootnoteAlsoLinkedToFiltersAndIndicatorsOfAnotherSubjectOfSameReleaseVersion_DeletesOnlySubjectLinks()
+    {
+        var releaseVersion = _fixture.DefaultStatsReleaseVersion().Generate();
+
+        var releaseSubjects = _fixture
+            .DefaultReleaseSubject()
+            .WithReleaseVersion(releaseVersion)
+            .WithSubjects(
+                _fixture
+                    .DefaultSubject()
+                    .WithFilters(_ => _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1).Generate(3))
+                    .Generate(2)
+            )
+            .GenerateList();
+
+        var (subject, otherSubject) = GetSubjectsTuple2(releaseSubjects);
+
+        var subjectIndicatorGroup = _fixture
+            .DefaultIndicatorGroup()
+            .WithSubject(subject)
+            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+            .Generate();
+
+        var otherSubjectIndicatorGroup = _fixture
+            .DefaultIndicatorGroup()
+            .WithSubject(otherSubject)
+            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+            .Generate();
+
+        var otherSubjectFilter = otherSubject.Filters[0];
+        var otherSubjectFilterGroup = otherSubject.Filters[1].FilterGroups[0];
+        var otherSubjectFilterItem = otherSubject.Filters[2].FilterGroups[0].FilterItems[0];
+        var otherSubjectIndicator = otherSubjectIndicatorGroup.Indicators[0];
+
+        var footnote = _fixture
+            .DefaultFootnote()
+            .WithReleaseVersion(releaseVersion)
+            .WithFilters(ListOf(subject.Filters[0], otherSubjectFilter))
+            .WithFilterGroups(ListOf(subject.Filters[1].FilterGroups[0], otherSubjectFilterGroup))
+            .WithFilterItems(ListOf(subject.Filters[2].FilterGroups[0].FilterItems[0], otherSubjectFilterItem))
+            .WithIndicators(ListOf(subjectIndicatorGroup.Indicators[0], otherSubjectIndicator))
+            .WithOrder(1)
+            .Generate();
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            context.ReleaseVersion.Add(releaseVersion);
+            context.ReleaseSubject.AddRange(releaseSubjects);
+            context.Footnote.Add(footnote);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var repository = BuildFootnoteRepository(context);
+            await repository.DeleteFootnotesBySubject(releaseVersionId: releaseVersion.Id, subjectId: subject.Id);
+        }
+
+        await using (var context = InMemoryStatisticsDbContext(contextId))
+        {
+            var remainingFootnote = Assert.Single(context.Footnote);
+            Assert.Equal(footnote.Id, remainingFootnote.Id);
+            Assert.Equal(1, remainingFootnote.Order);
+
+            Assert.Empty(context.SubjectFootnote);
+
+            var filterFootnote = Assert.Single(context.FilterFootnote);
+            Assert.Equal(footnote.Id, filterFootnote.FootnoteId);
+            Assert.Equal(otherSubjectFilter.Id, filterFootnote.FilterId);
+            Assert.Equal(otherSubject.Id, filterFootnote.SubjectId);
+
+            var filterGroupFootnote = Assert.Single(context.FilterGroupFootnote);
+            Assert.Equal(footnote.Id, filterGroupFootnote.FootnoteId);
+            Assert.Equal(otherSubjectFilterGroup.Id, filterGroupFootnote.FilterGroupId);
+            Assert.Equal(otherSubject.Id, filterGroupFootnote.SubjectId);
+
+            var filterItemFootnote = Assert.Single(context.FilterItemFootnote);
+            Assert.Equal(footnote.Id, filterItemFootnote.FootnoteId);
+            Assert.Equal(otherSubjectFilterItem.Id, filterItemFootnote.FilterItemId);
+            Assert.Equal(otherSubject.Id, filterItemFootnote.SubjectId);
+
+            var indicatorFootnote = Assert.Single(context.IndicatorFootnote);
+            Assert.Equal(footnote.Id, indicatorFootnote.FootnoteId);
+            Assert.Equal(otherSubjectIndicator.Id, indicatorFootnote.IndicatorId);
+            Assert.Equal(otherSubject.Id, indicatorFootnote.SubjectId);
         }
     }
 

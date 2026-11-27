@@ -17,10 +17,10 @@ public class FootnoteRepository : IFootnoteRepository
     public async Task<Footnote> CreateFootnote(
         Guid releaseVersionId,
         string content,
-        IReadOnlySet<Guid> filterIds,
-        IReadOnlySet<Guid> filterGroupIds,
-        IReadOnlySet<Guid> filterItemIds,
-        IReadOnlySet<Guid> indicatorIds,
+        List<FilterFootnote> filterLinks,
+        List<FilterGroupFootnote> filterGroupLinks,
+        List<FilterItemFootnote> filterItemLinks,
+        List<IndicatorFootnote> indicatorLinks,
         IReadOnlySet<Guid> subjectIds,
         int order
     )
@@ -30,24 +30,12 @@ public class FootnoteRepository : IFootnoteRepository
             ReleaseVersionId = releaseVersionId,
             Content = content,
             Order = order,
-            Filters = filterIds.Select(filterId => new FilterFootnote { FilterId = filterId }).ToList(),
-            FilterGroups = filterGroupIds
-                .Select(filterGroupId => new FilterGroupFootnote { FilterGroupId = filterGroupId })
-                .ToList(),
-            FilterItems = filterItemIds
-                .Select(filterItemId => new FilterItemFootnote { FilterItemId = filterItemId })
-                .ToList(),
-            Indicators = indicatorIds
-                .Select(indicatorId => new IndicatorFootnote { IndicatorId = indicatorId })
-                .ToList(),
+            Filters = filterLinks,
+            FilterGroups = filterGroupLinks,
+            FilterItems = filterItemLinks,
+            Indicators = indicatorLinks,
             Subjects = subjectIds.Select(subjectId => new SubjectFootnote { SubjectId = subjectId }).ToList(),
         };
-
-        // TODO EES-2971 We could link Footnote with ReleaseSubject to simplify getting all foonotes for a subject.
-        // Currently this involves getting all footnotes with criteria matching the subject directly or indirectly.
-        // This would also prevent removing a subject from a release until all of its footnote links are removed.
-        // Currently a footnote could remain linked to a release and a subject (either directly or indirectly via
-        // its FilterItems/FilterGroups/Filters/Indicators) even though no ReleaseSubject exists.
 
         await _context.Footnote.AddAsync(footnote);
         await _context.SaveChangesAsync();
@@ -101,16 +89,10 @@ public class FootnoteRepository : IFootnoteRepository
                     footnote.Subjects.Any(subjectFootnote => subjectFootnote.SubjectId == subjectId)
                     // We don't allow a footnote to apply to directly to a subject and to specific subject data
                     // of the same subject at the same time, so these additional conditions aren't strictly necessary
-                    && footnote.FilterItems.All(itemFootnote =>
-                        itemFootnote.FilterItem.FilterGroup.Filter.SubjectId != subjectId
-                    )
-                    && footnote.FilterGroups.All(filterGroupFootnote =>
-                        filterGroupFootnote.FilterGroup.Filter.SubjectId != subjectId
-                    )
-                    && footnote.Filters.All(filterFootnote => filterFootnote.Filter.SubjectId != subjectId)
-                    && footnote.Indicators.All(indicatorFootnote =>
-                        indicatorFootnote.Indicator.IndicatorGroup.SubjectId != subjectId
-                    )
+                    && footnote.FilterItems.All(itemFootnote => itemFootnote.SubjectId != subjectId)
+                    && footnote.FilterGroups.All(filterGroupFootnote => filterGroupFootnote.SubjectId != subjectId)
+                    && footnote.Filters.All(filterFootnote => filterFootnote.SubjectId != subjectId)
+                    && footnote.Indicators.All(indicatorFootnote => indicatorFootnote.SubjectId != subjectId)
                 )
                 .OrderBy(footnote => footnote.Order)
                 .ThenBy(footnote => footnote.Id)
@@ -126,29 +108,19 @@ public class FootnoteRepository : IFootnoteRepository
                 // It must be applicable to it in some way
                 // rather than just being applicable exclusively to other subjects
                 (
-                    footnote.FilterItems.Any(filterItemFootnote =>
-                        filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId == subjectId
-                    )
-                    || footnote.FilterGroups.Any(filterGroupFootnote =>
-                        filterGroupFootnote.FilterGroup.Filter.SubjectId == subjectId
-                    )
-                    || footnote.Filters.Any(filterFootnote => filterFootnote.Filter.SubjectId == subjectId)
-                    || footnote.Indicators.Any(indicatorFootnote =>
-                        indicatorFootnote.Indicator.IndicatorGroup.SubjectId == subjectId
-                    )
+                    footnote.FilterItems.Any(filterItemFootnote => filterItemFootnote.SubjectId == subjectId)
+                    || footnote.FilterGroups.Any(filterGroupFootnote => filterGroupFootnote.SubjectId == subjectId)
+                    || footnote.Filters.Any(filterFootnote => filterFootnote.SubjectId == subjectId)
+                    || footnote.Indicators.Any(indicatorFootnote => indicatorFootnote.SubjectId == subjectId)
                 )
                 &&
                 // and it must be applicable to one or more filters / filter groups / filter items if there are any.
                 (
                     // It's either not got any applicable filters / filter groups / filter items for this subject id
                     (
-                        footnote.FilterItems.All(filterItemFootnote =>
-                            filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId != subjectId
-                        )
-                        && footnote.FilterGroups.All(filterGroupFootnote =>
-                            filterGroupFootnote.FilterGroup.Filter.SubjectId != subjectId
-                        )
-                        && footnote.Filters.All(filterFootnote => filterFootnote.Filter.SubjectId != subjectId)
+                        footnote.FilterItems.All(filterItemFootnote => filterItemFootnote.SubjectId != subjectId)
+                        && footnote.FilterGroups.All(filterGroupFootnote => filterGroupFootnote.SubjectId != subjectId)
+                        && footnote.Filters.All(filterFootnote => filterFootnote.SubjectId != subjectId)
                     )
                     ||
                     // or it's got a filter item applicable to one of the filter item id's
@@ -168,9 +140,7 @@ public class FootnoteRepository : IFootnoteRepository
                 // and it must be applicable to one or more of the indicators if there are any.
                 (
                     // It's either not got any applicable indicators for this subject id
-                    footnote.Indicators.All(indicatorFootnote =>
-                        indicatorFootnote.Indicator.IndicatorGroup.SubjectId != subjectId
-                    )
+                    footnote.Indicators.All(indicatorFootnote => indicatorFootnote.SubjectId != subjectId)
                     ||
                     // or it's got an indicator applicable to one of the indicator id's.
                     footnote.Indicators.Any(indicatorFootnote =>
@@ -211,25 +181,22 @@ public class FootnoteRepository : IFootnoteRepository
                     // which would happen when it's deleted. Explicitly delete the links instead
 
                     var filterItemFootnoteLinks = _context.FilterItemFootnote.Where(filterItemFootnote =>
-                        filterItemFootnote.FootnoteId == footnote.Id
-                        && filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId == subjectId
+                        filterItemFootnote.FootnoteId == footnote.Id && filterItemFootnote.SubjectId == subjectId
                     );
                     _context.FilterItemFootnote.RemoveRange(filterItemFootnoteLinks);
 
                     var filterGroupFootnoteLinks = _context.FilterGroupFootnote.Where(filterGroupFootnote =>
-                        filterGroupFootnote.FootnoteId == footnote.Id
-                        && filterGroupFootnote.FilterGroup.Filter.SubjectId == subjectId
+                        filterGroupFootnote.FootnoteId == footnote.Id && filterGroupFootnote.SubjectId == subjectId
                     );
                     _context.FilterGroupFootnote.RemoveRange(filterGroupFootnoteLinks);
 
                     var filterFootnoteLinks = _context.FilterFootnote.Where(filterFootnote =>
-                        filterFootnote.FootnoteId == footnote.Id && filterFootnote.Filter.SubjectId == subjectId
+                        filterFootnote.FootnoteId == footnote.Id && filterFootnote.SubjectId == subjectId
                     );
                     _context.FilterFootnote.RemoveRange(filterFootnoteLinks);
 
                     var indicatorFootnoteLinks = _context.IndicatorFootnote.Where(indicatorFootnote =>
-                        indicatorFootnote.FootnoteId == footnote.Id
-                        && indicatorFootnote.Indicator.IndicatorGroup.SubjectId == subjectId
+                        indicatorFootnote.FootnoteId == footnote.Id && indicatorFootnote.SubjectId == subjectId
                     );
                     _context.IndicatorFootnote.RemoveRange(indicatorFootnoteLinks);
 
@@ -321,23 +288,15 @@ public class FootnoteRepository : IFootnoteRepository
                     Content = f.Content,
                     Order = f.Order,
                     ReleaseVersionId = f.ReleaseVersionId,
-                    Filters = f
-                        .Filters.Where(filterFootnote => subjectIds.Contains(filterFootnote.Filter.SubjectId))
-                        .ToList(),
+                    Filters = f.Filters.Where(filterFootnote => subjectIds.Contains(filterFootnote.SubjectId)).ToList(),
                     Indicators = f
-                        .Indicators.Where(indicatorFootnote =>
-                            subjectIds.Contains(indicatorFootnote.Indicator.IndicatorGroup.SubjectId)
-                        )
+                        .Indicators.Where(indicatorFootnote => subjectIds.Contains(indicatorFootnote.SubjectId))
                         .ToList(),
                     FilterGroups = f
-                        .FilterGroups.Where(filterGroupFootnote =>
-                            subjectIds.Contains(filterGroupFootnote.FilterGroup.Filter.SubjectId)
-                        )
+                        .FilterGroups.Where(filterGroupFootnote => subjectIds.Contains(filterGroupFootnote.SubjectId))
                         .ToList(),
                     FilterItems = f
-                        .FilterItems.Where(filterItemFootnote =>
-                            subjectIds.Contains(filterItemFootnote.FilterItem.FilterGroup.Filter.SubjectId)
-                        )
+                        .FilterItems.Where(filterItemFootnote => subjectIds.Contains(filterItemFootnote.SubjectId))
                         .ToList(),
                     Subjects = f
                         .Subjects.Where(subjectFootnote => subjectIds.Contains(subjectFootnote.SubjectId))
@@ -351,17 +310,9 @@ public class FootnoteRepository : IFootnoteRepository
     {
         return _context
             .Footnote.Include(footnote => footnote.Filters)
-                .ThenInclude(filterFootnote => filterFootnote.Filter)
             .Include(footnote => footnote.FilterGroups)
-                .ThenInclude(filterGroupFootnote => filterGroupFootnote.FilterGroup)
-                    .ThenInclude(filterGroup => filterGroup.Filter)
             .Include(footnote => footnote.FilterItems)
-                .ThenInclude(filterItemFootnote => filterItemFootnote.FilterItem)
-                    .ThenInclude(filterItem => filterItem.FilterGroup)
-                        .ThenInclude(filterGroup => filterGroup.Filter)
             .Include(footnote => footnote.Indicators)
-                .ThenInclude(indicatorFootnote => indicatorFootnote.Indicator)
-                    .ThenInclude(indicator => indicator.IndicatorGroup)
             .Include(footnote => footnote.Subjects);
     }
 
@@ -371,20 +322,16 @@ public class FootnoteRepository : IFootnoteRepository
             .ReleaseSubject.Where(releaseSubject => releaseSubject.ReleaseVersionId == releaseVersionId)
             .Where(releaseSubject =>
                 !releaseSubject.Subject.Footnotes.Any()
-                && !releaseSubject.Subject.Filters.SelectMany(filter => filter.Footnotes).Any()
-                && !releaseSubject
-                    .Subject.Filters.SelectMany(filter => filter.FilterGroups)
-                    .SelectMany(filterGroup => filterGroup.Footnotes)
-                    .Any()
-                && !releaseSubject
-                    .Subject.Filters.SelectMany(filter => filter.FilterGroups)
-                    .SelectMany(filterGroup => filterGroup.FilterItems)
-                    .SelectMany(filterItem => filterItem.Footnotes)
-                    .Any()
-                && !releaseSubject
-                    .Subject.IndicatorGroups.SelectMany(indicatorGroup => indicatorGroup.Indicators)
-                    .SelectMany(indicator => indicator.Footnotes)
-                    .Any()
+                && !_context.FilterFootnote.Any(filterFootnote => filterFootnote.SubjectId == releaseSubject.SubjectId)
+                && !_context.FilterGroupFootnote.Any(filterGroupFootnote =>
+                    filterGroupFootnote.SubjectId == releaseSubject.SubjectId
+                )
+                && !_context.FilterItemFootnote.Any(filterItemFootnote =>
+                    filterItemFootnote.SubjectId == releaseSubject.SubjectId
+                )
+                && !_context.IndicatorFootnote.Any(indicatorFootnote =>
+                    indicatorFootnote.SubjectId == releaseSubject.SubjectId
+                )
             )
             .Select(releaseSubject => releaseSubject.Subject)
             .ToListAsync();
@@ -403,15 +350,9 @@ public class FootnoteRepository : IFootnoteRepository
 
         var footnote = await GetFootnote(footnoteId);
         return footnote.Subjects.Any(subject => otherSubjectIds.Contains(subject.SubjectId))
-            || footnote.Filters.Any(filter => otherSubjectIds.Contains(filter.Filter.SubjectId))
-            || footnote.Indicators.Any(indicator =>
-                otherSubjectIds.Contains(indicator.Indicator.IndicatorGroup.SubjectId)
-            )
-            || footnote.FilterGroups.Any(filterGroup =>
-                otherSubjectIds.Contains(filterGroup.FilterGroup.Filter.SubjectId)
-            )
-            || footnote.FilterItems.Any(filterItem =>
-                otherSubjectIds.Contains(filterItem.FilterItem.FilterGroup.Filter.SubjectId)
-            );
+            || footnote.Filters.Any(filter => otherSubjectIds.Contains(filter.SubjectId))
+            || footnote.Indicators.Any(indicator => otherSubjectIds.Contains(indicator.SubjectId))
+            || footnote.FilterGroups.Any(filterGroup => otherSubjectIds.Contains(filterGroup.SubjectId))
+            || footnote.FilterItems.Any(filterItem => otherSubjectIds.Contains(filterItem.SubjectId));
     }
 }
