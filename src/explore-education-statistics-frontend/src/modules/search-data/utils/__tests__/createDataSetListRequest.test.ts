@@ -215,6 +215,45 @@ describe('createDataSetListRequest', () => {
     });
   });
 
+  describe('release version filter', () => {
+    test('includes release version filter and excludes latest data and superseded filters when releaseVersionId provided', () => {
+      const testQuery: SearchDataPageQuery = {
+        releaseVersionId: 'release-version-1',
+      };
+
+      const result = createDataSetListRequest(testQuery);
+
+      expect(result.filter).toBe("releaseVersionId eq 'release-version-1'");
+    });
+
+    test('excludes latest data filter when latestDataOnly is true and releaseVersionId provided', () => {
+      const testQuery: SearchDataPageQuery = {
+        releaseVersionId: 'release-version-1',
+        latestDataOnly: 'true',
+      };
+
+      const result = createDataSetListRequest(testQuery);
+
+      expect(result.filter).toBe("releaseVersionId eq 'release-version-1'");
+    });
+
+    test('combines release version filter with other filters', () => {
+      const testQuery: SearchDataPageQuery = {
+        themeId: 'theme-1',
+        publicationId: 'pub-1',
+        releaseVersionId: 'release-version-1',
+        geographicLevel: 'NAT',
+        dataSetType: 'api',
+      };
+
+      const result = createDataSetListRequest(testQuery);
+
+      expect(result.filter).toBe(
+        "releaseVersionId eq 'release-version-1' and (search.in(themeId, 'theme-1', '|') or search.in(publicationId, 'pub-1', '|')) and geographicLevelDetails/any(g: search.in(g/code, 'NAT', '|')) and api/id ne null and api/id ne ''",
+      );
+    });
+  });
+
   describe('full request with all parameters', () => {
     test('returns complete request with all fields', () => {
       const testQuery: SearchDataPageQuery = {
@@ -257,6 +296,16 @@ describe('createDataSetSuggestRequest', () => {
       filter: 'isSuperseded eq false and latestData eq true',
     });
   });
+
+  test('includes release version filter', () => {
+    const testQuery: SearchDataPageQuery = {
+      releaseVersionId: 'release-version-1',
+    };
+
+    const result = createDataSetSuggestRequest(testQuery, 'test search');
+
+    expect(result.filter).toBe("releaseVersionId eq 'release-version-1'");
+  });
 });
 
 describe('getParamsFromQuery', () => {
@@ -273,6 +322,7 @@ describe('getParamsFromQuery', () => {
       page: undefined,
       publicationIds: undefined,
       releaseTypes: undefined,
+      releaseVersionId: undefined,
       search: undefined,
       sortBy: 'newest',
       themeIds: undefined,
