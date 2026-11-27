@@ -75,6 +75,8 @@ param vNetAddressRanges = {
     analyticsStoragePrivateEndpoints: '10.0.16.0/24'
 
     // Data files subnets.
+    // @MarkFix Double check 10.0.24.0/24 is free in every environment's vNet. It's used for all four environments, and
+    // nothing in the bicep params on dev uses it yet.
     dataFilesStoragePrivateEndpoints: '10.0.24.0/24'
   }
 }
